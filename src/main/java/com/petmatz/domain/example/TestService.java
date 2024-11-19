@@ -2,9 +2,6 @@ package com.petmatz.domain.example;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import spring.basic.common.exception.DomainException;
-import spring.basic.common.exception.GlobalErrorCode;
-import spring.basic.common.exception.WebException;
 
 @Service
 @RequiredArgsConstructor

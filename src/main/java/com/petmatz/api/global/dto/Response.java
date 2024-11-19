@@ -1,9 +1,9 @@
 package com.petmatz.api.global.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.petmatz.common.exception.ErrorReason;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import spring.basic.common.exception.ErrorReason;
 
 import java.time.LocalDateTime;
 
