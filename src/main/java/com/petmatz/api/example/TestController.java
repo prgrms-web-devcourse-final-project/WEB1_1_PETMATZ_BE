@@ -1,10 +1,10 @@
 package com.petmatz.api.example;
 
+import com.petmatz.api.global.dto.Response;
+import com.petmatz.domain.example.TestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import spring.basic.api.global.dto.Response;
-import spring.basic.domain.test.TestService;
 
 @RestController
 @RequestMapping("/test")
@@ -15,8 +15,8 @@ public class TestController {
     private final TestService testService;
 
     @GetMapping
-    public Response<?> testGet(@RequestParam String tt, @RequestBody TestDTO testDTO) {
-        testService.testGet();
+    public Response<?> testGet(@RequestParam String tt, @RequestBody TestRequest testRequest) {
+        testService.testGet(testRequest.of());
         return Response.success("test");
     }
 

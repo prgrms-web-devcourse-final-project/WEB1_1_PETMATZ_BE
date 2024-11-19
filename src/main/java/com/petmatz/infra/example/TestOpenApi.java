@@ -1,8 +1,8 @@
 package com.petmatz.infra.example;
 
+import com.petmatz.domain.example.TestOpenApiInterface;
 import org.springframework.stereotype.Component;
 
-import spring.basic.domain.test.TestOpenApiInterface;
 
 @Component
 public class TestOpenApi implements TestOpenApiInterface {
