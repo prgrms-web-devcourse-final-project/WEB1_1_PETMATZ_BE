@@ -12,7 +12,7 @@ import java.util.List;
 public class MatchPlaceService {
     private static final double EARTH_RADIUS_KM = 6371; // 지구 반지름 (km)
     private static final double MAX_DISTANCE_KM = 3.0; //
-    private static final double REGION_SCORE = 30.0; // 지역 점수 비중 (30%)
+    private static final double REGION_SCORE = 40.0; // 지역 점수 비중 (30%)
 
 
     public double calculateDistance(DistanceRequest request) {
@@ -32,19 +32,19 @@ public class MatchPlaceService {
 
     private double calculateDistanceScore(double distance) {
         if (distance <= 0.5) {
-            return 30.0; // 0.0 ~ 0.5km
+            return 40.0; // 0.0 ~ 0.5km
         } else if (distance <= 1.0) {
-            return 28.0; // 0.5 ~ 1.0km
+            return 38.0; // 0.5 ~ 1.0km
         } else if (distance <= 1.5) {
-            return 25.0; // 1.0 ~ 1.5km
+            return 35.0; // 1.0 ~ 1.5km
         } else if (distance <= 2.0) {
-            return 20.0; // 1.5 ~ 2.0km
+            return 30.0; // 1.5 ~ 2.0km
         } else if (distance <= 2.5) {
-            return 18.0; // 2.0 ~ 2.5km
+            return 28.0; // 2.0 ~ 2.5km
         } else if (distance <= 3.0) {
-            return 15.0; // 2.5 ~ 3.0km
-        } else { // 3km 이상이면 일단 10점만
-            return 10.0;
+            return 25.0; // 2.5 ~ 3.0km
+        } else { // 3km 이상이면 일단 20점만
+            return 20.0;
         }
     }
 

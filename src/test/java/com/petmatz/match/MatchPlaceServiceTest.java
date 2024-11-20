@@ -60,10 +60,10 @@ public class MatchPlaceServiceTest {
         });
 
         assert matches.size() == 4; // 4명의 대상 (자기 자신 제외)
-        assert matches.get(0).totalScore() == 30.0; // User2: 0.07km, 30점
-        assert matches.get(1).totalScore() == 25.0; // User3: 1.13km, 25점
-        assert matches.get(2).totalScore() == 15.0; // User4: 2.54km, 15점
-        assert matches.get(3).totalScore() == 10.0;  // User5: 4.16km, 10점
+        assert matches.get(0).totalScore() == 40.0; // User2: 0.07km, 40점
+        assert matches.get(1).totalScore() == 35.0; // User3: 1.13km, 35점
+        assert matches.get(2).totalScore() == 25.0; // User4: 2.54km, 25점
+        assert matches.get(3).totalScore() == 20.0;  // User5: 4.16km, 20점
 
     }
 
