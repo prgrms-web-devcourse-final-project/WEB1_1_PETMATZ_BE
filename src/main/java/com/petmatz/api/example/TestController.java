@@ -19,5 +19,4 @@ public class TestController {
         testService.testGet();
         return Response.success("test");
     }
-
 }
