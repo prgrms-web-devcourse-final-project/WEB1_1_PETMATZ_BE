@@ -1,4 +1,4 @@
-package com.petmatz.user;
+package com.petmatz.user.config;
 
 import com.petmatz.user.filter.JwtAuthenticationFilter;
 import com.petmatz.user.handler.OAuthSuccessHandler;
@@ -15,13 +15,13 @@ import org.springframework.security.config.annotation.web.configurers.CsrfConfig
 import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 
 import java.io.IOException;
 
@@ -47,6 +47,7 @@ public class WebSecurityConfig {
     /**
      * Spring Security 필터 체인 설정.
      * CORS, CSRF, 세션 관리, 권한 검증, OAuth2 로그인 설정 등을 구성.
+     *
      * @param httpSecurity HttpSecurity 객체
      * @return SecurityFilterChain 객체
      */
@@ -62,7 +63,7 @@ public class WebSecurityConfig {
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 비활성화 (JWT 사용)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/", "/api/auth/**", "/oauth2/**").permitAll() // 인증 없이 접근 가능
-                        .requestMatchers("/api/user/**").hasAnyRole("USER","ADMIN") // USER, ADMIN둘다 가능
+                        .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN") // USER, ADMIN둘다 가능
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // ADMIN 역할 필요
                         .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )
@@ -82,6 +83,7 @@ public class WebSecurityConfig {
     /**
      * CORS 설정.
      * 모든 도메인, 헤더, 메소드를 허용하는 설정을 적용.
+     *
      * @return CorsConfigurationSource 객체
      */
     @Bean

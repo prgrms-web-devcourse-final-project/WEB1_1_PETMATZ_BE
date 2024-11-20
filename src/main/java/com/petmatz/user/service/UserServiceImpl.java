@@ -1,7 +1,6 @@
 package com.petmatz.user.service;
 
 import com.petmatz.user.common.LogInResponseDto;
-import com.petmatz.user.common.Role;
 import com.petmatz.user.entity.CertificationEntity;
 import com.petmatz.user.entity.UserEntity;
 import com.petmatz.user.provider.CertificationNumberProvider;
@@ -63,7 +62,7 @@ public class UserServiceImpl implements UserService {
             String certificationNumber = dto.getCertificationNumber();
 
             // 인증 엔티티 조회
-            CertificationEntity certificationEntity = certificationRepository.findTopByAccountIdOrderByCreatedAtDesc(accountId);
+            CertificationEntity certificationEntity = certificationRepository.findByAccountId(accountId);
             if (certificationEntity == null) return CheckCertificationResponseDto.certificationFail();
 
             // 이메일 및 인증 번호가 일치하는지 확인
@@ -99,7 +98,7 @@ public class UserServiceImpl implements UserService {
                     .accountId(dto.getAccountId())
                     .password(dto.getPassword()) // Make sure to hash the password before saving
                     .nickname(dto.getNickname())
-                    .loginRole(Role.USER)
+                    .loginRole(UserEntity.LoginRole.ROLE_USER)
                     .gender(UserEntity.Gender.valueOf(dto.getGender())) // Convert string to Enum
                     .preferredSize(UserEntity.PreferredSize.valueOf(dto.getPreferredSize())) // Convert string to Enum
                     .introduction(dto.getIntroduction())
@@ -133,14 +132,16 @@ public class UserServiceImpl implements UserService {
             // 비밀번호 일치 확인
             String password = dto.getPassword();
             String encodedPassword = userEntity.getPassword();
+            UserEntity.LoginRole loginRole=userEntity.getLoginRole();
 
             boolean isMatched = passwordEncoder.matches(password, encodedPassword);
             if (!isMatched) return SignInResponseDto.signInFail();  // 비밀번호 불일치
 
             // JWT 토큰 생성
-            token = jwtProvider.create(accountId);
+            token = jwtProvider.create(accountId,loginRole);
+            loginRole=userRepository.findByAccountId(accountId).getLoginRole();
 
-            return SignInResponseDto.success(token);  // 로그인 성공 및 토큰 반환
+            return SignInResponseDto.success(token,loginRole);  // 로그인 성공 및 토큰 반환
         } catch (Exception e) {
             log.info("로그인 실패: {}", e);
             return SignInResponseDto.signInFail();

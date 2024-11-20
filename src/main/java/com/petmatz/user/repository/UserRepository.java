@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<UserEntity, String> {
     boolean existsByAccountId(String accountId);
     UserEntity findByAccountId(String accountId);
-    UserEntity findByAccountIdAndIsDeletedFalse(String accountId); // Only fetch active users
-    UserEntity findByIdAndIsDeletedFalse(Long id); // Only fetch active use
+//    UserEntity findByAccountIdAndIsDeletedFalse(String accountId); // Only fetch active users
+//    UserEntity findByIdAndIsDeletedFalse(Long id); // Only fetch active use
 
 }

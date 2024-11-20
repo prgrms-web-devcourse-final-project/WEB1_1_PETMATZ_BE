@@ -1,5 +1,6 @@
 package com.petmatz.user.handler;
 
+import com.petmatz.user.common.LogInResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;

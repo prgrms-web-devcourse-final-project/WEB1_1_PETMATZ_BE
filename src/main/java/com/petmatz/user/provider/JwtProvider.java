@@ -1,5 +1,6 @@
 package com.petmatz.user.provider;
 
+import com.petmatz.user.entity.UserEntity;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -30,7 +31,7 @@ public class JwtProvider {
      * 토큰은 1시간 동안 유효하며, 사용자 ID를 서브젝트로 설정.
      * @return 생성된 JWT 토큰 문자열
      */
-    public String create(String accountId) {
+    public String create(String accountId, UserEntity.LoginRole loginRole) {
         // 토큰 만료 시간 설정 (1시간 후)(시간늘림 가능)
         Date expireDate = Date.from(Instant.now().plus(1, ChronoUnit.HOURS));
 
@@ -40,7 +41,7 @@ public class JwtProvider {
         // JWT 토큰 생성
         String jwt = Jwts.builder()
                 .signWith(key, SignatureAlgorithm.HS256)  // 서명 알고리즘 및 키 설정
-                .setSubject(accountId).setIssuedAt(new Date()).setExpiration(expireDate) //
+                .setSubject(accountId).claim("loginRole",loginRole).setIssuedAt(new Date()).setExpiration(expireDate) //
                 .compact();
 
         return jwt;
@@ -64,6 +65,7 @@ public class JwtProvider {
                     .parseClaimsJws(jwt)  // JWT 토큰 검증 및 파싱
                     .getBody()
                     .getSubject();  // 서브젝트(사용자 ID) 추출
+
         } catch (Exception e) {
             e.printStackTrace();
             log.info("JWT 검증 실패: {}", e.getMessage());

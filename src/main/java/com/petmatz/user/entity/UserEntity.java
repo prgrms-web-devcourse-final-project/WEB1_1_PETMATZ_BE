@@ -18,7 +18,7 @@ public class UserEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "account_id", nullable = false, unique = true)
@@ -36,24 +36,24 @@ public class UserEntity extends BaseEntity {
     @Column(name = "profile_img")
     private String profileImg;
 
-    @Column(name = "role", nullable = false, length = 10)
-    private String loginRole; // ROLE_USER, ROLE_ADMIN
+    @Column(name = "login_role")
+    private LoginRole loginRole; // ROLE_USER, ROLE_ADMIN
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
-    private Role role; // Enum type for role: 'Dol' or 'Mat'
+    private Role role; //'Dol' or 'Mat'
 
     @Enumerated(EnumType.STRING)
     @Column(name = "login_type", nullable = false)
-    private LoginType loginType; // Enum type for login_type: 'Normal', 'Kakao'
+    private LoginType loginType; // 'Normal', 'Kakao'
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender")
-    private Gender gender; // Enum type for gender: 'Male', 'Female'
+    private Gender gender; // 'Male', 'Female'
 
     @Enumerated(EnumType.STRING)
     @Column(name = "preferred_size")
-    private PreferredSize preferredSize; // Enum type for preferred_size: 'Small', 'Medium', 'Large'
+    private PreferredSize preferredSize; // 'Small', 'Medium', 'Large'
 
     @Column(name = "introduction", nullable = false)
     private String introduction;
@@ -76,8 +76,12 @@ public class UserEntity extends BaseEntity {
     @Column(name = "longitude")
     private String longitude;
 
-    @Column(name = "is_deleted", nullable = false)
+    @Column(name = "is_deleted")
     private Boolean isDeleted = false;
+
+    public enum LoginRole{
+        ROLE_USER, ROLE_ADMIN
+    }
 
     public enum Role {
         Dol, Mat
