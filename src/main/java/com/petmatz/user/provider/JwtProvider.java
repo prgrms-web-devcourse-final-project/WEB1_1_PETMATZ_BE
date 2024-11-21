@@ -1,6 +1,6 @@
 package com.petmatz.user.provider;
 
-import com.petmatz.user.entity.UserEntity;
+import com.petmatz.user.entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -31,7 +31,7 @@ public class JwtProvider {
      * 토큰은 1시간 동안 유효하며, 사용자 ID를 서브젝트로 설정.
      * @return 생성된 JWT 토큰 문자열
      */
-    public String create(String accountId, UserEntity.LoginRole loginRole) {
+    public String create(String accountId, User.LoginRole loginRole) {
         // 토큰 만료 시간 설정 (1시간 후)(시간늘림 가능)
         Date expireDate = Date.from(Instant.now().plus(1, ChronoUnit.HOURS));
 

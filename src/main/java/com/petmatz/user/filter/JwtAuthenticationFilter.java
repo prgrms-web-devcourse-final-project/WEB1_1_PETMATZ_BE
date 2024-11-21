@@ -1,6 +1,6 @@
 package com.petmatz.user.filter;
 
-import com.petmatz.user.entity.UserEntity;
+import com.petmatz.user.entity.User;
 import com.petmatz.user.provider.JwtProvider;
 import com.petmatz.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
@@ -56,13 +56,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            // 사용자 ID로 사용자 정보 조회 (Long 타입 사용)
-            UserEntity userEntity = userRepository.findByAccountId(accountId);
-            String loginRole = userEntity.getLoginRole();// 역할: ROLE_USER 또는 ROLE_ADMIN
+            // 사용자 ID로 사용자 정보 조회
+            User userEntity = userRepository.findByAccountId(accountId);
+            User.LoginRole loginRole = userEntity.getLoginRole();// 역할: ROLE_USER 또는 ROLE_ADMIN
 
             // 사용자 권한 설정
             List<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority(loginRole));
+            authorities.add(new SimpleGrantedAuthority(String.valueOf(loginRole)));
 
             // 인증 객체 생성 및 SecurityContext에 설정
             SecurityContext securityContext = SecurityContextHolder.createEmptyContext();

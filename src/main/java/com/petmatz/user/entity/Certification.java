@@ -17,7 +17,7 @@ import lombok.experimental.SuperBuilder;
 /**
  * 이메일 검증을 위한 Entity
  */
-public class CertificationEntity extends BaseEntity {
+public class Certification extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

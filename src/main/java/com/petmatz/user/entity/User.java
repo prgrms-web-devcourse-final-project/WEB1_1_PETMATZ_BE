@@ -14,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @Entity(name = "User")
 @Table(name = "User")
-public class UserEntity extends BaseEntity {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,38 +36,39 @@ public class UserEntity extends BaseEntity {
     @Column(name = "profile_img")
     private String profileImg;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "login_role")
     private LoginRole loginRole; // ROLE_USER, ROLE_ADMIN
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "login_type")
+    private LoginType loginType; // 'Normal', 'Kakao'
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private Role role; //'Dol' or 'Mat'
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "login_type", nullable = false)
-    private LoginType loginType; // 'Normal', 'Kakao'
-
-    @Enumerated(EnumType.STRING)
     @Column(name = "gender")
     private Gender gender; // 'Male', 'Female'
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "preferred_size")
+    @Column(name = "preferred_size", nullable = false)
     private PreferredSize preferredSize; // 'Small', 'Medium', 'Large'
 
-    @Column(name = "introduction", nullable = false)
+    @Column(name = "introduction")
     private String introduction;
 
     @Column(name = "is_care_available", nullable = false)
     private Boolean isCareAvailable = false;
 
-    @Column(name = "is_registered", nullable = false)
+    @Column(name = "is_registered")
     private Boolean isRegistered = false;
 
-    @Column(name = "recommendation_count", nullable = false)
+    @Column(name = "recommendation_count")
     private Integer recommendationCount = 0;
 
-    @Column(name = "care_completion_count", nullable = false)
+    @Column(name = "care_completion_count")
     private Integer careCompletionCount = 0;
 
     @Column(name = "latitude")
@@ -78,6 +79,12 @@ public class UserEntity extends BaseEntity {
 
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
+
+    @Column(name = "time_wage",nullable = false)
+    private Integer timeWage = 0;
+
+    @Column(name = "month_wage",nullable = false)
+    private Integer monthWage = 0;
 
     public enum LoginRole{
         ROLE_USER, ROLE_ADMIN

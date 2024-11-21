@@ -1,6 +1,7 @@
 package com.petmatz.user.handler;
 
 import com.petmatz.user.entity.CustomOAuthUser;
+import com.petmatz.user.entity.User;
 import com.petmatz.user.provider.JwtProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +38,7 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
         // 사용자 ID를 Long 타입으로 가져오기
         String accountId = oAuth2User.getName();
-        String token = jwtProvider.create(accountId,"ROLE_USER");
+        String token = jwtProvider.create(accountId, User.LoginRole.ROLE_USER);
 
         // 인증 성공 후 클라이언트로 토큰을 전달할 수 있는 로직 추가 (리다이렉트)
         response.sendRedirect("http://localhost:3000/auth/oauth-response/" + token + "/3600");

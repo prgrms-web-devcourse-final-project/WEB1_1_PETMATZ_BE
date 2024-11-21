@@ -1,12 +1,12 @@
 package com.petmatz.user.repository;
 
-import com.petmatz.user.entity.CertificationEntity;
+import com.petmatz.user.entity.Certification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CertificationRepository extends JpaRepository<CertificationEntity, String> {
-    CertificationEntity findByAccountId(String accountId);
+public interface CertificationRepository extends JpaRepository<Certification, String> {
+    Certification findByAccountId(String accountId);
     void deleteByAccountId(String accountId);
-    CertificationEntity findTopByAccountIdOrderByCreatedAtDesc(String accountId);
+    Certification findTopByAccountIdOrderByCreatedAtDesc(String accountId);
 }

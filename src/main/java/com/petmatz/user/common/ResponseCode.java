@@ -20,4 +20,6 @@ public interface ResponseCode {
     String ID_NOT_MATCHING = "IDNM";
 
     String WRONG_ROLE = "WR";
+
+    String WRONG_PASSWORD="WP";
 }
