@@ -28,5 +28,6 @@ jobs:
         run: chmod +x ./gradlew
 
       # 4. Gradle 빌드 수행
-      - name: Build with Gradle
-        run: ./gradlew clean build -x test --parallel
+      - name: Grant execute permission to Gradle Wrapper
+        run: chmod +x ./gradlew
+
