@@ -7,11 +7,13 @@ import com.petmatz.user.entity.User;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 @Getter
-public class GetMypageResponseDto extends LogInResponseDto{
+public class GetMyProfileResponseDto extends LogInResponseDto {
+
     private User user;
 
-    public GetMypageResponseDto(User user) {
+    public GetMyProfileResponseDto(User user) {
         super();
         this.user = user;
     }
@@ -22,7 +24,7 @@ public class GetMypageResponseDto extends LogInResponseDto{
     }
 
     public static ResponseEntity<LogInResponseDto> success(User user) {
-        GetMypageResponseDto responseBody = new GetMypageResponseDto(user);
+        GetMyProfileResponseDto responseBody = new GetMyProfileResponseDto(user);
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 

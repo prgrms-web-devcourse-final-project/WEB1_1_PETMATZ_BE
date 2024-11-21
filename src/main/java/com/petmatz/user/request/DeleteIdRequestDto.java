@@ -8,10 +8,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class DeleteIdRequestDto {
-    @Email
-    @NotBlank
-    private String accountId;
-
     @NotBlank
     private String password;
 }

@@ -3,6 +3,7 @@ package com.petmatz.user.controller;
 import com.petmatz.user.request.*;
 import com.petmatz.user.response.*;
 import com.petmatz.user.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,24 +39,41 @@ public class UserController {
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<? super SignInResponseDto> signIn(@RequestBody @Valid SignInRequestDto requestBody) {
-        ResponseEntity<? super SignInResponseDto> response= userService.signIn(requestBody);
-        log.info("[signIn]: { accountId: " + requestBody.getAccountId() + ", password: " + requestBody.getPassword() + "}");
-        return response;
+    public ResponseEntity<? super SignInResponseDto> signIn(
+            @RequestBody @Valid SignInRequestDto requestBody,
+            HttpServletResponse response) {
+
+        ResponseEntity<? super SignInResponseDto> result = userService.signIn(requestBody, response);
+        log.info("[signIn]: { accountId: " + requestBody.getAccountId() + ", result: " + result.getStatusCode() + " }");
+        return result;
     }
 
     @PostMapping("/delete-user")
     public ResponseEntity<? super DeleteIdResponseDto> deleteUser(@RequestBody @Valid DeleteIdRequestDto requestBody) {
         ResponseEntity<? super DeleteIdResponseDto> response= userService.deleteId(requestBody);
-        log.info("[deleteUser]: {accountId: " + requestBody.getAccountId() + ", password: " + requestBody.getPassword() + "}");
+        log.info("[deleteUser]:{password: " + requestBody.getPassword() + "}");
         return response;
     }
 
     //---------------------------------------------------------------------------------------------------------------------------------//
-    @GetMapping("/get-mypage")
-    public ResponseEntity<? super GetMypageResponseDto> getMypage(@ModelAttribute @Valid GetMypageRequestDto requestBody) {
-        ResponseEntity<? super GetMypageResponseDto> response = userService.getMypage(requestBody);
+    @GetMapping("/get-myprofile")
+    public ResponseEntity<? super GetMyProfileResponseDto> getMypage() {
+        ResponseEntity<? super GetMyProfileResponseDto> response = userService.getMypage();
         log.info("[getMypage]");
+        return response;
+    }
+
+    @GetMapping("/get-otherprofile")
+    public ResponseEntity<? super GetMyProfileResponseDto> getOtherMypage(@ModelAttribute @Valid GetMyProfileRequestDto requestBody) {
+        ResponseEntity<? super GetMyProfileResponseDto> response = userService.getOtherMypage(requestBody);
+        log.info("[getOtherMypage]");
+        return response;
+    }
+
+    @PostMapping("/edit-myprofile")
+    public ResponseEntity<? super EditMyProfileResponseDto> editMyProfile(@RequestBody @Valid EditMyProfileRequestDto requestBody) {
+        ResponseEntity<? super EditMyProfileResponseDto> response = userService.editMyProfile(requestBody);
+        log.info("[editMyProfile]");
         return response;
     }
 

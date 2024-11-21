@@ -10,6 +10,4 @@ public interface UserRepository extends JpaRepository<User, String> {
     boolean existsByAccountId(String accountId);
     User findById(Long userId);
     User findByAccountId(String accountId);
-    User findByAccountIdAndIsDeletedFalse(String accountId); // Only fetch active users
-    User findByIdAndIsDeletedFalse(Long id); // Only fetch active use
 }

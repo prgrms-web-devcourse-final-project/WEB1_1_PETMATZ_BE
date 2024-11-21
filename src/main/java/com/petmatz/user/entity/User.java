@@ -27,7 +27,7 @@ public class User extends BaseEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "nickname", nullable = false)
+    @Column(name = "nickname", nullable = false, unique=true)
     private String nickname;
 
     @Column(name = "email")
@@ -54,22 +54,22 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "preferred_size", nullable = false)
-    private PreferredSize preferredSize; // 'Small', 'Medium', 'Large'
+    private PreferredSize preferredSize; // 'Small', 'Medium', 'Large', 'NoMatter'
 
     @Column(name = "introduction")
     private String introduction;
 
     @Column(name = "is_care_available", nullable = false)
-    private Boolean isCareAvailable = false;
+    private Boolean isCareAvailable;
 
     @Column(name = "is_registered")
-    private Boolean isRegistered = false;
+    private Boolean isRegistered;
 
     @Column(name = "recommendation_count")
-    private Integer recommendationCount = 0;
+    private Integer recommendationCount;
 
     @Column(name = "care_completion_count")
-    private Integer careCompletionCount = 0;
+    private Integer careCompletionCount;
 
     @Column(name = "latitude")
     private String latitude;
@@ -81,10 +81,10 @@ public class User extends BaseEntity {
     private Boolean isDeleted = false;
 
     @Column(name = "time_wage",nullable = false)
-    private Integer timeWage = 0;
+    private Integer timeWage;
 
     @Column(name = "month_wage",nullable = false)
-    private Integer monthWage = 0;
+    private Integer monthWage;
 
     public enum LoginRole{
         ROLE_USER, ROLE_ADMIN
@@ -103,6 +103,6 @@ public class User extends BaseEntity {
     }
 
     public enum PreferredSize {
-        Small, Medium, Large
+        Small, Medium, Large, NoMatter
     }
 }

@@ -9,6 +9,8 @@ import com.petmatz.user.repository.UserRepository;
 import com.petmatz.user.request.*;
 import com.petmatz.user.response.*;
 import com.petmatz.user.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +40,7 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<? super EmailCertificationResponseDto> emailCertification(EmailCertificationRequestDto dto) {
         try {
             String accountId = dto.getAccountId();
-            //이메일 전송과 동시에 중복검사
+            //이메일 전송과 동시에 아이디 중복검사
             boolean isExistId = userRepository.existsByAccountId(accountId);
             if (isExistId) return EmailCertificationResponseDto.duplicateId();
 
@@ -53,7 +55,7 @@ public class UserServiceImpl implements UserService {
 
         } catch (Exception e) {
             log.info("이메일 인증 실패: {}", e);
-            return LogInResponseDto.databaseError();
+            return EmailCertificationResponseDto.databaseError();
         }
         return EmailCertificationResponseDto.success();
     }
@@ -100,18 +102,18 @@ public class UserServiceImpl implements UserService {
 
             User user = User.builder()
                     .accountId(dto.getAccountId())
-                    .password(dto.getPassword()) // Make sure to hash the password before saving
+                    .password(encodedPassword) // 비밀번호를 암호화 후 저장
                     .nickname(dto.getNickname())
                     .loginRole(User.LoginRole.ROLE_USER)
-                    .gender(dto.getGender()) // Convert string to Enum
-                    .preferredSize(dto.getPreferredSize()) // Convert string to Enum
+                    .gender(dto.getGender())
+                    .preferredSize(dto.getPreferredSize())
                     .introduction(dto.getIntroduction())
                     .isCareAvailable(dto.getIsCareAvailable())
-                    .role(User.Role.Dol) // Assign a default role or map appropriately as needed
-                    .loginType(User.LoginType.Normal) // Default value or based on logic
-                    .isRegistered(false) // You can set default values or change based on your logic
-                    .recommendationCount(0) // Default value
-                    .careCompletionCount(0) // Default value
+                    .role(User.Role.Dol)
+                    .loginType(User.LoginType.Normal)
+                    .isRegistered(false)
+                    .recommendationCount(0)
+                    .careCompletionCount(0)
                     .isDeleted(false)
                     .timeWage(dto.getTimeWage())
                     .monthWage(dto.getMonthWage())
@@ -130,28 +132,41 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<? super SignInResponseDto> signIn(SignInRequestDto dto) {
-        String token = null;
-        User.LoginRole loginRole= null;
-
+    public ResponseEntity<? super SignInResponseDto> signIn(SignInRequestDto dto, HttpServletResponse response) {
         try {
             String accountId = dto.getAccountId();
             User user = userRepository.findByAccountId(accountId);
-            if (user == null) return SignInResponseDto.signInFail();  // 사용자 조회 실패
 
-            // 비밀번호 일치 확인
+            // 사용자 존재 여부 확인
+            if (user == null) {
+                log.info("사용자 조회 실패: {}", accountId);
+                return SignInResponseDto.signInFail();
+            }
+
+            // 비밀번호 확인
             String password = dto.getPassword();
             String encodedPassword = user.getPassword();
+            if (!passwordEncoder.matches(password, encodedPassword)) {
+                log.info("비밀번호 불일치: {}", accountId);
+                return SignInResponseDto.signInFail();
+            }
 
-            boolean isMatched = passwordEncoder.matches(password, encodedPassword);
-            if (!isMatched) return SignInResponseDto.signInFail();  // 비밀번호 불일치
+            // JWT 생성
+            String token = jwtProvider.create(accountId, user.getLoginRole());
+            log.info("JWT 생성 완료: {}", token);
 
-            // JWT 토큰 생성
-            token = jwtProvider.create(accountId, User.LoginRole.ROLE_USER);
+            // JWT 쿠키에 저장
+            Cookie jwtCookie = new Cookie("jwt", token);
+            jwtCookie.setHttpOnly(true);  // XSS 방지
+            jwtCookie.setSecure(true);   // HTTPS만 허용
+            jwtCookie.setPath("/");      // 모든 경로에서 접근 가능
+            jwtCookie.setMaxAge(3600);   // 1시간 유효기간
+            response.addCookie(jwtCookie);
 
-            return SignInResponseDto.success(token, User.LoginRole.ROLE_USER);  // 로그인 성공 및 토큰 반환
+            // 로그인 성공 응답 반환
+            return SignInResponseDto.success(token, user.getLoginRole());
         } catch (Exception e) {
-            log.info("로그인 실패: {}", e);
+            log.error("로그인 처리 중 예외 발생", e);
             return SignInResponseDto.signInFail();
         }
     }
@@ -159,7 +174,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<? super DeleteIdResponseDto> deleteId(DeleteIdRequestDto dto) {
         try {
-            String accountId = dto.getAccountId();
+            String accountId = findAccountIdFromJwt();
             User user = userRepository.findByAccountId(accountId);
             if (user == null) return DeleteIdResponseDto.idNotFound();  // 사용자 조회 실패
 
@@ -174,25 +189,20 @@ public class UserServiceImpl implements UserService {
                     .accountId(user.getAccountId() + "-deleted")
                     .password("deleted-password")
                     .email(user.getEmail() + "-deleted")
-                    .nickname(user.getNickname()) // Preserving existing values
-                    .profileImg(user.getProfileImg()) // Preserving existing values
-                    .loginRole(user.getLoginRole()) // Preserving existing values
-                    .role(user.getRole()) // Preserving existing values
-                    .loginType(user.getLoginType()) // Preserving existing values
-                    .gender(user.getGender()) // Preserving existing values
-                    .preferredSize(user.getPreferredSize()) // Preserving existing values
-                    .introduction(user.getIntroduction()) // Preserving existing values
-                    .isCareAvailable(user.getIsCareAvailable()) // Preserving existing values
-                    .isRegistered(user.getIsRegistered()) // Preserving existing values
-                    .recommendationCount(user.getRecommendationCount()) // Preserving existing values
-                    .careCompletionCount(user.getCareCompletionCount()) // Preserving existing values
-                    .latitude(user.getLatitude()) // Preserving existing values
-                    .longitude(user.getLongitude()) // Preserving existing values
-                    .isDeleted(true) // Soft delete flag
-                    .timeWage(user.getTimeWage()) // Preserving existing values
-                    .monthWage(user.getMonthWage()) // Preserving existing values
-                    .createdAt(user.getCreatedAt()) // Preserving original createdAt value
-                    .updatedAt(LocalDateTime.now()) // Updating the updatedAt timestamp
+                    .nickname(null)
+                    .profileImg(null)
+                    .loginRole(null)
+                    .role(null)
+                    .loginType(null)
+                    .gender(null)
+                    .preferredSize(user.getPreferredSize())
+                    .introduction(null)
+                    .isCareAvailable(user.getIsCareAvailable())
+                    .isDeleted(true)
+                    .timeWage(user.getTimeWage())
+                    .monthWage(user.getMonthWage())
+                    .createdAt(user.getCreatedAt())
+                    .updatedAt(LocalDateTime.now())
                     .build();
 
             userRepository.save(updatedUser);
@@ -206,29 +216,91 @@ public class UserServiceImpl implements UserService {
     }
 
 
-
     //    -------------------------------------------------------------------------------------------------------------
     @Override
-    public ResponseEntity<? super GetMypageResponseDto> getMypage(GetMypageRequestDto dto) {
-        try{
-            String accountId=dto.getAccountId();
-            System.out.println(accountId);
+    public ResponseEntity<? super GetMyProfileResponseDto> getMypage() {
+        try {
+            String accountId = findAccountIdFromJwt();
+            User user = userRepository.findByAccountId(accountId);
 
-            boolean exists=userRepository.existsByAccountId(accountId);
+            boolean exists = userRepository.existsByAccountId(accountId);
             if (!exists) {
-                return GetMypageResponseDto.userNotFound();
+                return GetMyProfileResponseDto.userNotFound();
             }
 
-            User user=userRepository.findByAccountId(accountId);
+            return GetMyProfileResponseDto.success(user);
 
-            return GetMypageResponseDto.success(user);
-
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            return GetMypageResponseDto.databaseError();
+            return GetMyProfileResponseDto.databaseError();
         }
     }
 
+    @Override
+    public ResponseEntity<? super GetMyProfileResponseDto> getOtherMypage(GetMyProfileRequestDto dto) {
+        try {
+            Long userId = dto.getUserId();
+            User user = userRepository.findById(userId);
+
+            boolean exists = userRepository.existsById(userId);
+            if (!exists) {
+                return GetMyProfileResponseDto.userNotFound();
+            }
+
+            return GetMyProfileResponseDto.success(user);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return GetMyProfileResponseDto.databaseError();
+        }
+    }
+
+    @Override
+    public ResponseEntity<? super EditMyProfileResponseDto> editMyProfile(EditMyProfileRequestDto dto) {
+        try {
+            String accountId = findAccountIdFromJwt();
+            User user = userRepository.findByAccountId(accountId);
+
+            boolean exists = userRepository.existsByAccountId(accountId);
+            if (!exists) {
+                return EditMyProfileResponseDto.editFailed();
+            }
+
+            User updatedUser = user.builder()
+                    .id(user.getId())
+                    .accountId(user.getAccountId())
+                    .password(user.getPassword())
+                    .email(user.getEmail())
+                    .nickname(dto.getNickname()) // 닉네임 업데이트
+                    .profileImg(user.getProfileImg())
+                    .loginRole(user.getLoginRole())
+                    .role(user.getRole())
+                    .loginType(user.getLoginType())
+                    .gender(user.getGender())
+                    .preferredSize(dto.getPreferredSize()) // 선호 크기 업데이트
+                    .introduction(dto.getIntroduction()) // 자기소개 업데이트
+                    .isCareAvailable(dto.isCareAvailable()) // 돌봄 가능 여부 업데이트
+                    .isRegistered(user.getIsRegistered())
+                    .recommendationCount(user.getRecommendationCount())
+                    .careCompletionCount(user.getCareCompletionCount())
+                    .latitude(user.getLatitude())
+                    .longitude(user.getLongitude())
+                    .isDeleted(false)
+                    .timeWage(dto.getTimeWage()) // 시간당 임금 업데이트
+                    .monthWage(dto.getMonthWage()) // 월 임금 업데이트
+                    .createdAt(user.getCreatedAt())
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+
+            userRepository.save(updatedUser);
+
+        }catch (Exception e) {
+            log.info("프로필 수정 실패: {}", e);
+            return EditMyProfileResponseDto.databaseError();
+        }
+        return EditMyProfileResponseDto.success();
+    }
+    //--------------------------------------------------------------------------------------------------------------------------------------------
     @Override
     public ResponseEntity<? super SendRepasswordResponseDto> sendRepassword(SendRepasswordRequestDto dto) {
         try {
@@ -237,43 +309,41 @@ public class UserServiceImpl implements UserService {
 
             String rePasswordNum = RePasswordProvider.generatePassword();
 
-            // Send the password reset email
             boolean isSendSuccess = rePasswordEmailProvider.sendVerificationEmail(accountId, rePasswordNum);
             if (!isSendSuccess) return SendRepasswordResponseDto.mailSendFail();
 
-            // Encrypt the new password before saving
             String encodedRePasswordNum = passwordEncoder.encode(rePasswordNum);
 
             User updatedUser = user.builder()
                     .id(user.getId())
                     .accountId(user.getAccountId())
-                    .password(encodedRePasswordNum) // Save the encrypted password
+                    .password(encodedRePasswordNum)
                     .email(user.getEmail())
-                    .nickname(user.getNickname()) // Preserving existing values
-                    .profileImg(user.getProfileImg()) // Preserving existing values
-                    .loginRole(user.getLoginRole()) // Preserving existing values
-                    .role(user.getRole()) // Preserving existing values
-                    .loginType(user.getLoginType()) // Preserving existing values
-                    .gender(user.getGender()) // Preserving existing values
-                    .preferredSize(user.getPreferredSize()) // Preserving existing values
-                    .introduction(user.getIntroduction()) // Preserving existing values
-                    .isCareAvailable(user.getIsCareAvailable()) // Preserving existing values
-                    .isRegistered(user.getIsRegistered()) // Preserving existing values
-                    .recommendationCount(user.getRecommendationCount()) // Preserving existing values
-                    .careCompletionCount(user.getCareCompletionCount()) // Preserving existing values
-                    .latitude(user.getLatitude()) // Preserving existing values
-                    .longitude(user.getLongitude()) // Preserving existing values
-                    .isDeleted(false) // Soft delete flag
-                    .timeWage(user.getTimeWage()) // Preserving existing values
-                    .monthWage(user.getMonthWage()) // Preserving existing values
-                    .createdAt(user.getCreatedAt()) // Preserving original createdAt value
-                    .updatedAt(LocalDateTime.now()) // Updating the updatedAt timestamp
+                    .nickname(user.getNickname())
+                    .profileImg(user.getProfileImg())
+                    .loginRole(user.getLoginRole())
+                    .role(user.getRole())
+                    .loginType(user.getLoginType())
+                    .gender(user.getGender())
+                    .preferredSize(user.getPreferredSize())
+                    .introduction(user.getIntroduction())
+                    .isCareAvailable(user.getIsCareAvailable())
+                    .isRegistered(user.getIsRegistered())
+                    .recommendationCount(user.getRecommendationCount())
+                    .careCompletionCount(user.getCareCompletionCount())
+                    .latitude(user.getLatitude())
+                    .longitude(user.getLongitude())
+                    .isDeleted(false)
+                    .timeWage(user.getTimeWage())
+                    .monthWage(user.getMonthWage())
+                    .createdAt(user.getCreatedAt())
+                    .updatedAt(LocalDateTime.now())
                     .build();
 
             userRepository.save(updatedUser);
 
         } catch (Exception e) {
-            log.info("비밀번호 재설정 실패: {}", e);
+            log.info("임시비밀번호 재설정 실패: {}", e);
             return SendRepasswordResponseDto.databaseError();
         }
         return SendRepasswordResponseDto.success();
@@ -281,11 +351,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<? super RepasswordResponseDto> repassword(RepasswordRequestDto dto) {
-        try{
-            String accountId = findUserIdFromJwt();
+        try {
+            String accountId = findAccountIdFromJwt();
             User user = userRepository.findByAccountId(accountId);
 
-            String currentPassword=dto.getCurrentPassword();
+            String currentPassword = dto.getCurrentPassword();
 
             boolean isPasswordValid = passwordEncoder.matches(currentPassword, user.getPassword());
             if (!isPasswordValid) {
@@ -298,43 +368,45 @@ public class UserServiceImpl implements UserService {
             User updatedUser = user.builder()
                     .id(user.getId())
                     .accountId(user.getAccountId())
-                    .password(encodedNewPassword) // Save the encrypted password
+                    .password(encodedNewPassword) //비밀번호 업데이트
                     .email(user.getEmail())
-                    .nickname(user.getNickname()) // Preserving existing values
-                    .profileImg(user.getProfileImg()) // Preserving existing values
-                    .loginRole(user.getLoginRole()) // Preserving existing values
-                    .role(user.getRole()) // Preserving existing values
-                    .loginType(user.getLoginType()) // Preserving existing values
-                    .gender(user.getGender()) // Preserving existing values
-                    .preferredSize(user.getPreferredSize()) // Preserving existing values
-                    .introduction(user.getIntroduction()) // Preserving existing values
-                    .isCareAvailable(user.getIsCareAvailable()) // Preserving existing values
-                    .isRegistered(user.getIsRegistered()) // Preserving existing values
-                    .recommendationCount(user.getRecommendationCount()) // Preserving existing values
-                    .careCompletionCount(user.getCareCompletionCount()) // Preserving existing values
-                    .latitude(user.getLatitude()) // Preserving existing values
-                    .longitude(user.getLongitude()) // Preserving existing values
-                    .isDeleted(false) // Soft delete flag
-                    .timeWage(user.getTimeWage()) // Preserving existing values
-                    .monthWage(user.getMonthWage()) // Preserving existing values
-                    .createdAt(user.getCreatedAt()) // Preserving original createdAt value
-                    .updatedAt(LocalDateTime.now()) // Updating the updatedAt timestamp
+                    .nickname(user.getNickname())
+                    .profileImg(user.getProfileImg())
+                    .loginRole(user.getLoginRole())
+                    .role(user.getRole())
+                    .loginType(user.getLoginType())
+                    .gender(user.getGender())
+                    .preferredSize(user.getPreferredSize())
+                    .introduction(user.getIntroduction())
+                    .isCareAvailable(user.getIsCareAvailable())
+                    .isRegistered(user.getIsRegistered())
+                    .recommendationCount(user.getRecommendationCount())
+                    .careCompletionCount(user.getCareCompletionCount())
+                    .latitude(user.getLatitude())
+                    .longitude(user.getLongitude())
+                    .isDeleted(false)
+                    .timeWage(user.getTimeWage())
+                    .monthWage(user.getMonthWage())
+                    .createdAt(user.getCreatedAt())
+                    .updatedAt(LocalDateTime.now())
                     .build();
 
             userRepository.save(updatedUser);
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.info("비밀번호 재설정 실패: {}", e);
             return RepasswordResponseDto.databaseError();
         }
         return RepasswordResponseDto.success();
     }
 
-    private String findUserIdFromJwt() {
-        String userId = "Default user id...";
+
+
+    private String findAccountIdFromJwt() {
+        String accountId = "Default_Id";
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
-            userId = authentication.getName();
+            accountId = authentication.getName();
         }
-        return userId;
+        return accountId;
     }
 }

@@ -22,4 +22,6 @@ public interface ResponseCode {
     String WRONG_ROLE = "WR";
 
     String WRONG_PASSWORD="WP";
+
+    String EDIT_FAIL = "EF";
 }

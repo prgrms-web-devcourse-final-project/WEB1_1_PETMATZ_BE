@@ -1,5 +1,6 @@
 package com.petmatz.user.request;
 
+import com.petmatz.user.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -20,20 +21,25 @@ public class SignUpRequestDto {
     private String password;
 
     @NotBlank
-    private String certificationNumber; // 기존 필드 유지
+    private String certificationNumber;
 
     @NotBlank
     private String nickname;
 
     @NotBlank
-    private String gender; // 'Male' 또는 'Female'
+    private User.Gender gender; // 'Male' 또는 'Female'
 
     @NotBlank
-    private String preferredSize; // 'Small', 'Medium', 'Large'
+    private User.PreferredSize preferredSize; // 여러 값을 허용하도록 변경
 
     @NotBlank
-    private String introduction;
+    private Boolean isCareAvailable;
 
     @NotBlank
-    private Boolean isCareAvailable = false;
+    private Integer timeWage;
+
+    @NotBlank
+    private Integer monthWage;
+
+    private String introduction; //선택이므로 @NotBlank 제외
 }

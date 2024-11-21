@@ -5,6 +5,7 @@ import com.petmatz.user.provider.JwtProvider;
 import com.petmatz.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,48 +18,45 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * JWT 인증 필터 클래스.
- * 요청 시마다 실행되며, JWT 토큰을 파싱하고 유효성 검증을 통해
- * 사용자 정보를 인증 처리하는 역할을 담당.
+ * 쿠키에서 JWT를 읽어 인증 처리.
  */
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final UserRepository userRepository;  // 사용자 정보를 조회 repository
-    private final JwtProvider jwtProvider;        // JWT 토큰 제공 및 검증 provider
+    private final UserRepository userRepository;
+    private final JwtProvider jwtProvider;
 
-    /**
-     * 요청마다 JWT 토큰을 확인하고, 유효한 토큰인 경우 사용자 인증 처리.
-     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            // Authorization 헤더에서 Bearer 토큰 파싱
-            String token = parseBearerToken(request);
+            // 쿠키에서 JWT 토큰 추출
+            String token = getJwtFromCookies(request);
 
             if (token == null) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            String accountId=jwtProvider.validate(token);
-            if(accountId == null) {
+            String accountId = jwtProvider.validate(token);
+            if (accountId == null) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
             // 사용자 ID로 사용자 정보 조회
             User userEntity = userRepository.findByAccountId(accountId);
-            User.LoginRole loginRole = userEntity.getLoginRole();// 역할: ROLE_USER 또는 ROLE_ADMIN
+            User.LoginRole loginRole = userEntity.getLoginRole();
 
             // 사용자 권한 설정
             List<GrantedAuthority> authorities = new ArrayList<>();
@@ -68,39 +66,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
             AbstractAuthenticationToken authenticationToken =
                     new UsernamePasswordAuthenticationToken(accountId, null, authorities);
-
-            // 요청의 상세 정보 설정
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            // SecurityContext에 인증 정보 설정
             securityContext.setAuthentication(authenticationToken);
             SecurityContextHolder.setContext(securityContext);
 
         } catch (Exception e) {
-            log.info("Invalid JWT token.{}", e);
+            log.info("Invalid JWT token: {}", e.getMessage());
         }
 
-        // 필터 체인 계속 진행
         filterChain.doFilter(request, response);
     }
 
     /**
-     * 요청 헤더에서 Bearer 토큰을 파싱하여 반환.
-     * @return Bearer 토큰 문자열, 없을 경우 null 반환
+     * 쿠키에서 JWT 추출
      */
-    private String parseBearerToken(HttpServletRequest request) {
-        String authorization = request.getHeader("Authorization");
+    private String getJwtFromCookies(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
 
-        // Authorization 헤더가 존재하는지 확인
-        boolean hasAuthorization = StringUtils.hasText(authorization);
-        if (!hasAuthorization) return null;
+        Optional<Cookie> jwtCookie = Arrays.stream(request.getCookies())
+                .filter(cookie -> "jwt".equals(cookie.getName())) // 쿠키 이름을 "jwt"로 가정
+                .findFirst();
 
-        // Bearer 토큰인지 확인
-        boolean isBearer = authorization.startsWith("Bearer ");
-        if (!isBearer) return null;
-
-        // "Bearer " 이후의 토큰 문자열 반환
-        String token = authorization.substring(7);
-        return token;
+        return jwtCookie.map(Cookie::getValue).orElse(null);
     }
 }

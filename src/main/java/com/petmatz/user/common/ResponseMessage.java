@@ -22,4 +22,6 @@ public interface ResponseMessage {
     String WRONG_ROLE = "Wrong role.";
 
     String WRONG_PASSWORD="Wrong password.";
+
+    String EDIT_FAIL = "Edit profile failed";
 }
