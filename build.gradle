@@ -36,7 +36,8 @@ dependencies {
 	implementation 'net.logstash.logback:logstash-logback-encoder:7.0' // Logstash용 로그백 엔코더
 
 	implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
-
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis' // redis
+	runtimeOnly 'com.mysql:mysql-connector-j' // sql
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

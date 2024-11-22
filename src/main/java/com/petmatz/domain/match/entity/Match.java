@@ -3,7 +3,7 @@ package com.petmatz.domain.match.entity;
 import com.petmatz.domain.global.BaseEntity;
 import jakarta.persistence.*;
 
-@Entity
+@Entity(name = "match")
 @Table(name = "match")
 public class Match extends BaseEntity {
 
