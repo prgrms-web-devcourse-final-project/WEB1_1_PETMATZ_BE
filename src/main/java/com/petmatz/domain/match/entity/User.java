@@ -38,8 +38,8 @@ public class User extends BaseEntity {
     @Column(name = "profile_img")
     private String profileImg;
 
-    @Column(name = "role", nullable = false, length = 10)
-    private String loginRole; // ROLE_USER, ROLE_ADMIN
+//    @Column(name = "role", nullable = false, length = 10)
+//    private String loginRole; // ROLE_USER, ROLE_ADMIN
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
