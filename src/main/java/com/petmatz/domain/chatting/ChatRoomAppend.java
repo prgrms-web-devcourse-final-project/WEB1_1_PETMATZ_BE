@@ -1,6 +1,5 @@
 package com.petmatz.domain.chatting;
 
-import com.petmatz.common.exception.DomainException;
 import com.petmatz.domain.chatting.dto.ChatRoomEntity;
 import com.petmatz.domain.chatting.dto.ChatRoomInfo;
 import com.petmatz.domain.chatting.repository.ChatRoomRepository;
@@ -13,7 +12,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class ChatRoomProvider {
+public class ChatRoomAppend {
 
     private final ChatRoomRepository chatRoomRepository;
 

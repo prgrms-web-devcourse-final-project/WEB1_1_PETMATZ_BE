@@ -25,6 +25,7 @@ public class ChatRoomDocs {
     //받는이 User Id
     //받는 이의 Info 추가
     private String entrustedInfo;
+
     private List<ChatMessage> messages = new ArrayList<>();
 
     @Builder

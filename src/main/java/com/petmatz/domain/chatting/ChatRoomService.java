@@ -11,13 +11,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatRoomService {
 
-    private final ChatRoomProvider chatRoomProvider;
-    private final ChatMessageProvider chatMessageProvider;
+    private final ChatRoomAppend chatRoomAppend;
+    private final ChatMessageAppend chatMessageAppend;
     private final ChatRoomReader chatRoomReader;
 
     public long createdChatRoom(ChatRoomInfo chatRoomInfo) {
-        long chatRoomId = chatRoomProvider.append(chatRoomInfo);
-        chatMessageProvider.init(chatRoomInfo,chatRoomId);
+        long chatRoomId = chatRoomAppend.append(chatRoomInfo);
+        chatMessageAppend.init(chatRoomInfo,chatRoomId);
         return chatRoomId;
     }
 

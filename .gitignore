@@ -16,7 +16,8 @@ build/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
-/src/main/resources
+/src/main/resources/application.*
+/src/main/resources/logback-spring.xml
 
 ### IntelliJ IDEA ###
 .idea

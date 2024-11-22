@@ -1,6 +1,7 @@
 package com.petmatz.domain.chatting;
 
 import com.petmatz.domain.chatting.dto.ChatMessage;
+import com.petmatz.domain.chatting.dto.ChatReadStatusDocs;
 import com.petmatz.domain.chatting.dto.ChatRoomDocs;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -21,13 +22,31 @@ public class ChatMessageReader {
 
     private final MongoTemplate mongoTemplate;
 
-    public List<ChatMessage> selectChatMessages(String chatRoomsId, int pageNumber, int pageSize) {
+    public List<ChatMessage> selectChatMessages(String userId, String chatRoomsId, int pageNumber, int pageSize) {
+
+        List<ChatMessage> chatMessages = selectChatMessagesHistory(chatRoomsId, pageNumber, pageSize);
+        ChatReadStatusDocs dd = createQuerySelectChatMessageLastStatus(chatRoomsId, userId);
+
+
+        return
+    }
+
+    private void selectMessageStatus() {
+
+    }
+
+    private List<ChatMessage> selectChatMessagesHistory(String chatRoomsId, int pageNumber, int pageSize) {
         Aggregation query = createQuerySelectChatMessagesPaging(chatRoomsId, pageNumber, pageSize);
 
         AggregationResults<ChatMessage> aggregate =
                 mongoTemplate.aggregate(query, "chat_rooms", ChatMessage.class);
 
         return aggregate.getMappedResults();
+    }
+
+    private ChatReadStatusDocs createQuerySelectChatMessageLastStatus(String chatRoomId, String userId) {
+        Query query = new Query(Criteria.where("chatRoomId").is(chatRoomId).and("userId").is(userId));
+        return mongoTemplate.findOne(query, ChatReadStatusDocs.class);
     }
 
     private Aggregation createQuerySelectChatMessagesPaging(String chatRoomsId, int pageNumber, int pageSize) {

@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 @Builder
 public record ChatMessageInfo(
 
-        String message1,
 
         String chatRoomId,
 

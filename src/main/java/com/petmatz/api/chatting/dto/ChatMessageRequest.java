@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 
 public record ChatMessageRequest(
 
-        String message1,
 
         String chatRoomId,
 
@@ -21,7 +20,6 @@ public record ChatMessageRequest(
 
     public ChatMessageInfo of() {
         return ChatMessageInfo.builder()
-                .message1(message1)
                 .chatRoomId(chatRoomId)
                 .senderId(senderId)
                 .receiverId(receiverId)

@@ -1,6 +1,5 @@
 package com.petmatz.domain.chatting;
 
-import com.petmatz.common.exception.DomainException;
 import com.petmatz.domain.chatting.dto.*;
 
 
@@ -13,15 +12,10 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.Optional;
-
-import static com.petmatz.common.exception.GlobalErrorCode.PERMISSION_DENIED;
-
 
 @Component
 @RequiredArgsConstructor
-public class ChatMessageProvider {
+public class ChatMessageAppend {
 
     private final MongoTemplate mongoTemplate;
     private final ChatRoomRepository chatRoomRepository;
@@ -45,8 +39,6 @@ public class ChatMessageProvider {
     public void init(ChatRoomInfo chatRoomInfo,long chatRoomID) {
         ChatRoomDocs chatRoomDocs = createdChatRooms(chatRoomInfo, chatRoomID);
         ChatRoomMetadataDocs chatRoomMetadataDocs = createdChatRoomMetaDataDocs(chatRoomInfo, chatRoomID);
-
-
 
         mongoTemplate.save(chatRoomDocs);
         mongoTemplate.save(chatRoomMetadataDocs);
