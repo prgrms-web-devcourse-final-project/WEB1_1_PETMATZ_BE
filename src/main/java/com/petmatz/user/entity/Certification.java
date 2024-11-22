@@ -12,8 +12,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor(access= AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Entity(name="certification" )
-@Table(name = "certification"  )
+@Entity(name="Certification" )
+@Table(name = "Certification"  )
 /**
  * 이메일 검증을 위한 Entity
  */

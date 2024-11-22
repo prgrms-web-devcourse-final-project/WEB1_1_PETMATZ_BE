@@ -24,4 +24,6 @@ public interface ResponseCode {
     String WRONG_PASSWORD="WP";
 
     String EDIT_FAIL = "EF";
+
+    String HEARTED_ID_NOT_FOUND = "HINF";
 }

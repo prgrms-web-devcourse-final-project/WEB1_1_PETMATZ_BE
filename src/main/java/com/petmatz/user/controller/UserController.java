@@ -90,5 +90,20 @@ public class UserController {
         log.info("[repassword]: {currentPassword: " + requestBody.getCurrentPassword() + ", newPassword: " + requestBody.getNewPassword() + "}");
         return response;
     }
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    @PostMapping("/hearting")
+    public ResponseEntity<? super HeartingResponseDto> hearting(@RequestBody @Valid HeartingRequestDto requestBody) {
+        ResponseEntity<? super HeartingResponseDto> response = userService.hearting(requestBody);
+        log.info("[hearting]: {heartedId: " + requestBody.getHeartedId() +"}");
+        return response;
+    }
+
+    @GetMapping("/get-heartlist")
+    public ResponseEntity<? super GetHeartingListResponseDto>getHeartedList() {
+        ResponseEntity<? super GetHeartingListResponseDto> response = userService.getHeartedList();
+        log.info("[getHeartedList]");
+        return response;
+    }
 
 }
+

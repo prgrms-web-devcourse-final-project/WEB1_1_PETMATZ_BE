@@ -2,13 +2,14 @@ package com.petmatz.user.service;
 
 import com.petmatz.user.common.LogInResponseDto;
 import com.petmatz.user.entity.Certification;
+import com.petmatz.user.entity.Heart;
 import com.petmatz.user.entity.User;
 import com.petmatz.user.provider.*;
 import com.petmatz.user.repository.CertificationRepository;
+import com.petmatz.user.repository.HeartRepository;
 import com.petmatz.user.repository.UserRepository;
 import com.petmatz.user.request.*;
 import com.petmatz.user.response.*;
-import com.petmatz.user.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -30,6 +32,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final CertificationRepository certificationRepository;
+    private final HeartRepository heartRepository;
     private final JwtProvider jwtProvider;
     private final EmailProvider emailProvider;
     private final RePasswordEmailProvider rePasswordEmailProvider;
@@ -294,12 +297,59 @@ public class UserServiceImpl implements UserService {
 
             userRepository.save(updatedUser);
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.info("프로필 수정 실패: {}", e);
             return EditMyProfileResponseDto.databaseError();
         }
         return EditMyProfileResponseDto.success();
     }
+
+    @Override
+    public ResponseEntity<? super HeartingResponseDto> hearting(HeartingRequestDto dto) {
+        try {
+            Long heartedId = dto.getHeartedId();
+            boolean exists = userRepository.existsById(heartedId);
+            if (!exists) {
+                return HeartingResponseDto.heartedIdNotFound();
+            }
+
+            String accountId = findAccountIdFromJwt();
+            User user = userRepository.findByAccountId(accountId);
+
+            Heart heart = Heart.builder()
+                    .myId(user.getId())
+                    .heartedId(heartedId)
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+            heartRepository.save(heart);
+
+
+        } catch (Exception e) {
+            log.info("찜하기 실패: {}", e);
+            return HeartingResponseDto.databaseError();
+        }
+        return HeartingResponseDto.success();
+    }
+
+    @Override
+    public ResponseEntity<? super GetHeartingListResponseDto> getHeartedList() {
+        try {
+
+            String accountId = findAccountIdFromJwt();
+            User user = userRepository.findByAccountId(accountId);
+
+            List<Heart> heartList = heartRepository.findAllByMyId(user.getId());
+
+            return GetHeartingListResponseDto.success(heartList);
+
+        } catch (Exception e) {
+            log.info("찜리스트 받아오기 실패: {}", e);
+            return HeartingResponseDto.databaseError();
+        }
+    }
+
+
     //--------------------------------------------------------------------------------------------------------------------------------------------
     @Override
     public ResponseEntity<? super SendRepasswordResponseDto> sendRepassword(SendRepasswordRequestDto dto) {
@@ -398,7 +448,6 @@ public class UserServiceImpl implements UserService {
         }
         return RepasswordResponseDto.success();
     }
-
 
 
     private String findAccountIdFromJwt() {

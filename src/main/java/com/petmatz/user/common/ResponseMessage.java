@@ -24,4 +24,6 @@ public interface ResponseMessage {
     String WRONG_PASSWORD="Wrong password.";
 
     String EDIT_FAIL = "Edit profile failed";
+
+    String HEARTED_ID_NOT_FOUND = "Hearted Id Not Found";
 }

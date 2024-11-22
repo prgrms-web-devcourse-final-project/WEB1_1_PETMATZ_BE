@@ -16,5 +16,9 @@ public interface UserService {
     ResponseEntity<? super GetMyProfileResponseDto> getOtherMypage(GetMyProfileRequestDto dto);
     ResponseEntity<? super SendRepasswordResponseDto> sendRepassword(SendRepasswordRequestDto dto);
     ResponseEntity<? super RepasswordResponseDto> repassword(RepasswordRequestDto dto);
-    ResponseEntity<? super EditMyProfileResponseDto> editMyProfile(@Valid EditMyProfileRequestDto dto);
+    ResponseEntity<? super EditMyProfileResponseDto> editMyProfile(EditMyProfileRequestDto dto);
+
+    ResponseEntity<? super HeartingResponseDto> hearting(HeartingRequestDto dto);
+
+    ResponseEntity<? super GetHeartingListResponseDto> getHeartedList();
 }
