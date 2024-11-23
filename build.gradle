@@ -45,7 +45,7 @@ dependencies {
 	//
 
 	// Spring Security 의존성 추가
-	implementation 'org.springframework.boot:spring-boot-starter-security'
+//	implementation 'org.springframework.boot:spring-boot-starter-security'
 
 	//DB 관련 설정들
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'

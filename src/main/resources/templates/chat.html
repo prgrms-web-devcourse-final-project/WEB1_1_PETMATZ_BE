@@ -148,7 +148,17 @@
             });
   });
 
-  // Display Chat Rooms
+  // WebSocket 연결 해제 함수
+  function disconnectFromWebSocket() {
+    if (stompClient && stompClient.connected) {
+      stompClient.disconnect(() => {
+        console.log('Disconnected from WebSocket.');
+        updateStatus('Disconnected from previous WebSocket connection.', true);
+      });
+    }
+  }
+
+  // Display Chat Rooms (수정된 부분)
   function displayChatRooms(chatRooms) {
     chatRoomsContainer.innerHTML = '<h2>Available Chat Rooms</h2>';
     chatRooms.forEach(room => {
@@ -158,20 +168,27 @@
 
       // Click to connect to WebSocket
       roomElement.addEventListener('click', () => {
+        // 이전 WebSocket 연결 해제
+        disconnectFromWebSocket();
+
+        // 새로운 채팅방 설정
         chatRoomNumber = room.chatRoomId; // 선택된 채팅방 ID
         chatRoomNumberSpan.textContent = chatRoomNumber; // 채팅방 번호 표시
         updateStatus(`Joined chat room: ${room.chatRoomName}`, true);
-        loadChatMessages(chatRoomNumber); // 채팅 내역 불러오기
-        connectToWebSocket(); // WebSocket 연결
+
+        // 채팅 내역 불러오기
+        loadChatMessages(chatRoomNumber);
+
+        // WebSocket 연결
+        connectToWebSocket();
       });
 
       chatRoomsContainer.appendChild(roomElement);
     });
   }
-
   // Load Chat Messages
   function loadChatMessages(chatRoomId) {
-    fetch(`/api/v1/chat/message?chatRoomId=${chatRoomId}&pageSize=10`)
+    fetch(`/api/v1/chat/message?userId=테스트&chatRoomId=${chatRoomId}&pageSize=10`)
             .then(response => response.json())
             .then(data => {
               if (data.responseCode === "SUCCESS") {
@@ -208,7 +225,7 @@
       chatContainer.style.display = 'block';
 
       // 채팅방 경로 구독
-      stompClient.subscribe(`/topic/chat1/${chatRoomNumber}`, message => {
+      stompClient.subscribe(`/topic/chat/${chatRoomNumber}`, message => {
         const chatMessage = JSON.parse(message.body);
         displayNewMessage(chatMessage);
       });
@@ -235,7 +252,7 @@
     }
 
     // Send message to the chat room
-    stompClient.send(`/app/chat1`, {}, JSON.stringify({
+    stompClient.send(`/app/chat`, {}, JSON.stringify({
       chatRoomId: chatRoomNumber,
       receiverId: entrustedInfoInput.value.trim(),
       senderId: caregiverInfoInput.value.trim(),

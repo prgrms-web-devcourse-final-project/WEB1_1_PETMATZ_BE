@@ -12,12 +12,12 @@ import java.util.List;
 public class ChatRoomService {
 
     private final ChatRoomAppend chatRoomAppend;
-    private final ChatMessageAppend chatMessageAppend;
+    private final ChatDocsAppend chatDocsAppend;
     private final ChatRoomReader chatRoomReader;
 
     public long createdChatRoom(ChatRoomInfo chatRoomInfo) {
         long chatRoomId = chatRoomAppend.append(chatRoomInfo);
-        chatMessageAppend.init(chatRoomInfo,chatRoomId);
+        chatDocsAppend.init(chatRoomInfo,chatRoomId);
         return chatRoomId;
     }
 

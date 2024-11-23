@@ -1,6 +1,7 @@
 package com.petmatz.api.chatting;
 
 import com.petmatz.api.chatting.dto.ChatMessageRequest;
+import com.petmatz.api.chatting.dto.ChatMessageResponse;
 import com.petmatz.api.chatting.dto.ChatReadRequest;
 import com.petmatz.api.global.dto.Response;
 import com.petmatz.domain.chatting.ChatService;
@@ -30,11 +31,11 @@ public class ChatController {
     private final ChatService chatService;
     private final SimpMessagingTemplate simpMessagingTemplate;
 
-    @MessageMapping("/chat1")
+    @MessageMapping("/chat")
     public void sendPrivateMessage(ChatMessageRequest chatMessageRequest) {
         ChatMessageInfo chatMessageInfo = chatMessageRequest.of();
-        chatService.saveChat(chatMessageInfo);
-        String destination = "/topic/chat1/" + chatMessageRequest.chatRoomId();
+        chatService.updateMessage(chatMessageInfo);
+        String destination = "/topic/chat/" + chatMessageRequest.chatRoomId();
         simpMessagingTemplate.convertAndSend(destination, chatMessageInfo);
     }
 
@@ -45,7 +46,7 @@ public class ChatController {
     // TODO 읽음, 안읽음 만들기
     @MessageMapping("/read")
     public void markAsRead(ChatReadRequest chatReadRequest) {
-        chatService.updateMessageStatusRead(chatReadRequest);
+        chatService.updateMessageStatusRead(chatReadRequest.of());
     }
 
 
@@ -63,7 +64,10 @@ public class ChatController {
                                          @RequestParam(defaultValue = "1") int startPage
     ) {
 
-        List<ChatMessage> chatMessages = chatService.selectMessage(userId, chatRoomId, startPage, pageSize);
+        List<ChatMessageResponse> chatMessages = chatService.selectMessage(userId, chatRoomId, startPage, pageSize).stream().map(
+                ChatMessageResponse::of
+        ).toList();
+
         return Response.success(chatMessages);
     }
 }

@@ -27,6 +27,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
+        // TODO 사용자가 가지고 있는 채팅방을 전부 연결해야 함.
+
         registry.addEndpoint("/ws")
                 .addInterceptors(chatWebSocketInterceptor)
                 .setAllowedOriginPatterns("*")
