@@ -26,5 +26,4 @@ public class MatchSizeService {
         }
         return 0.0;
     }
-
 }
