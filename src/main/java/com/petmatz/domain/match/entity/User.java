@@ -81,8 +81,21 @@ public class User extends BaseEntity {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
 
+    @Column(name = "mbti") // 테스트용 임시로 추가
+    private String mbti;
+
+    public User(Long id, double latitude, double longitude, boolean isCareAvailable, String preferredSize, String mbti) {
+        this.id = id;
+        this.latitude = String.valueOf(latitude);
+        this.longitude = String.valueOf(longitude);
+        this.isCareAvailable = isCareAvailable;
+        this.preferredSize = PreferredSize.valueOf(preferredSize);
+        this.mbti = mbti;
+    }
+
+
     public enum Role {
-        Dol, Mat
+        Dol, Mat,
     }
 
     public enum LoginType {

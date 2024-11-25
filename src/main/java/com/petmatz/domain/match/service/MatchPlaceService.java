@@ -1,19 +1,21 @@
 package com.petmatz.domain.match.service;
 
 import com.petmatz.domain.match.dto.request.DistanceRequest;
+import com.petmatz.domain.match.dto.response.MatchResultResponse;
 import com.petmatz.domain.match.dto.response.UserMatchResponse;
 import com.petmatz.domain.match.entity.User;
+import com.petmatz.domain.match.repo.MatchUserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class MatchPlaceService {
     private static final double EARTH_RADIUS_KM = 6371; // 지구 반지름 (km)
-    private static final double MAX_DISTANCE_KM = 3.0; //
-    private static final double REGION_SCORE = 40.0; // 지역 점수 비중 (30%)
-
 
     public double calculateDistance(DistanceRequest request) {
         double lat1 = Math.toRadians(request.latitude1());
@@ -28,6 +30,32 @@ public class MatchPlaceService {
                 Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(deltaLon / 2), 2);
         double c = 2 * Math.asin(Math.sqrt(a));
         return EARTH_RADIUS_KM * c; // (km)
+    }
+
+    public double findMatchesWithinDistance(User user, double radiusKm, List<User> allUsers) {
+        double totalScore = 0.0;
+
+        for (User targetUser : allUsers) {
+            if (user.getId().equals(targetUser.getId())) continue;
+
+            // 거리 계산
+            DistanceRequest distanceRequest = new DistanceRequest(
+                    Double.parseDouble(user.getLatitude()),
+                    Double.parseDouble(user.getLongitude()),
+                    Double.parseDouble(targetUser.getLatitude()),
+                    Double.parseDouble(targetUser.getLongitude())
+            );
+
+            double distance = calculateDistance(distanceRequest);
+
+            // 점수 계산 (거리만 사용하여 점수 계산)
+            if (distance <= radiusKm) {
+                double distanceScore = calculateDistanceScore(distance); // 거리 기반 점수 계산
+                totalScore += distanceScore; // 점수 합산
+            }
+        }
+
+        return totalScore; // 최종 점수 반환
     }
 
     private double calculateDistanceScore(double distance) {
@@ -46,32 +74,6 @@ public class MatchPlaceService {
         } else { // 3km 이상이면 일단 20점만
             return 20.0;
         }
-    }
-
-    public List<UserMatchResponse> findMatchesWithinDistance(User user, List<User> allUsers) {
-        List<UserMatchResponse> matches = new ArrayList<>();
-
-        for (User targetUser : allUsers) {
-            if (user.getId().equals(targetUser.getId())) continue;
-
-            DistanceRequest distanceRequest = new DistanceRequest(
-                    Double.parseDouble(user.getLatitude()),
-                    Double.parseDouble(user.getLongitude()),
-                    Double.parseDouble(targetUser.getLatitude()),
-                    Double.parseDouble(targetUser.getLongitude())
-            );
-
-            double distance = calculateDistance(distanceRequest);
-
-            double distanceScore = calculateDistanceScore(distance);
-
-            matches.add(new UserMatchResponse(
-                    targetUser.getId(),
-                    Math.round(distance * 100.0) / 100.0,
-                    Math.round(distanceScore * 100.0) / 100.0
-            ));
-        }
-        return matches;
     }
 
 }
