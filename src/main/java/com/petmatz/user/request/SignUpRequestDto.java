@@ -1,3 +1,4 @@
+package com.petmatz.user.request;
 
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.user.request.info.SignUpInfo;
