@@ -1,6 +1,6 @@
 package com.petmatz.user.request;
 
-import com.petmatz.user.entity.User;
+import com.petmatz.user.request.info.EditMyProfileInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,7 +11,7 @@ import lombok.Setter;
 public class EditMyProfileRequestDto {
     private String nickname;
 
-    private User.PreferredSize preferredSize;
+    private String preferredSize;
 
     private String introduction;
 
@@ -20,4 +20,15 @@ public class EditMyProfileRequestDto {
     private Integer timeWage;
 
     private Integer monthWage;
+
+    public static EditMyProfileInfo of(EditMyProfileRequestDto reqDto) {
+        return EditMyProfileInfo.builder()
+                .nickname(reqDto.getNickname())
+                .preferredSize(reqDto.getPreferredSize())
+                .introduction(reqDto.getIntroduction())
+                .isCareAvailable(reqDto.isCareAvailable())
+                .timeWage(reqDto.getTimeWage())
+                .monthWage(reqDto.getMonthWage())
+                .build();
+    }
 }

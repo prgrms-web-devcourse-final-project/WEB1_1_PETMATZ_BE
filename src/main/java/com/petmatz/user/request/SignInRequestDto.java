@@ -1,5 +1,6 @@
 package com.petmatz.user.request;
 
+import com.petmatz.user.request.info.SignInInfo;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -14,4 +15,11 @@ public class SignInRequestDto {
 
     @NotBlank
     private String password;
+
+    public static SignInInfo of(SignInRequestDto reqDto) {
+        return SignInInfo.builder()
+                .accountId(reqDto.getAccountId())
+                .password(reqDto.getPassword())
+                .build();
+    }
 }

@@ -1,13 +1,12 @@
-package com.petmatz.user.request;
 
-import com.petmatz.user.entity.User;
-import jakarta.validation.constraints.Email;
+import com.petmatz.domain.user.entity.User;
+import com.petmatz.user.request.info.SignUpInfo;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 
 @Getter
 @Setter
@@ -30,7 +29,7 @@ public class SignUpRequestDto {
     private User.Gender gender; // 'Male' 또는 'Female'
 
     @NotBlank
-    private User.PreferredSize preferredSize; // 여러 값을 허용하도록 변경
+    private String preferredSize; // 여러 값을 허용하도록 변경
 
     @NotBlank
     private Boolean isCareAvailable;
@@ -42,4 +41,23 @@ public class SignUpRequestDto {
     private Integer monthWage;
 
     private String introduction; //선택이므로 @NotBlank 제외
+
+    @NotBlank
+    private String mbti;
+
+    public static SignUpInfo of(SignUpRequestDto reqDto) {
+        return SignUpInfo.builder()
+                .accountId(reqDto.getAccountId())
+                .password(reqDto.getPassword())
+                .certificationNumber(reqDto.getCertificationNumber())
+                .nickname(reqDto.getNickname())
+                .gender(reqDto.getGender())
+                .preferredSize(reqDto.getPreferredSize())
+                .isCareAvailable(reqDto.getIsCareAvailable())
+                .timeWage(reqDto.getTimeWage())
+                .monthWage(reqDto.getMonthWage())
+                .introduction(reqDto.getIntroduction())
+                .mbti(reqDto.getMbti())
+                .build();
+    }
 }
