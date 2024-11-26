@@ -1,5 +1,6 @@
 package com.petmatz.domain.match.entity;
 
+import com.petmatz.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

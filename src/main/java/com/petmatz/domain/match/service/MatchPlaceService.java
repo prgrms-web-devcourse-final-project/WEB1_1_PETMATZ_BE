@@ -1,8 +1,8 @@
 package com.petmatz.domain.match.service;
 
 import com.petmatz.api.match.request.DistanceRequest;
-import com.petmatz.domain.match.entity.User;
 import com.petmatz.domain.match.exception.MatchException;
+import com.petmatz.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

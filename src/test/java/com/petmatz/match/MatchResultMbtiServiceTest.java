@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Nested
 @ExtendWith(MockitoExtension.class)
-class MatchMbtiServiceTest {
+class MatchResultMbtiServiceTest {
     @Mock
     private RedisTemplate<String, Object> redisTemplate;
 

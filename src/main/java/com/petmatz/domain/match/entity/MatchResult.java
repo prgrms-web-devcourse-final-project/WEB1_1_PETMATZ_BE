@@ -3,9 +3,9 @@ package com.petmatz.domain.match.entity;
 import com.petmatz.domain.global.BaseEntity;
 import jakarta.persistence.*;
 
-@Entity(name = "match")
-@Table(name = "match")
-public class Match extends BaseEntity {
+@Entity(name = "matchResult")
+@Table(name = "matchResult")
+public class MatchResult extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,8 +1,8 @@
 package com.petmatz.domain.match.service;
 
-import com.petmatz.domain.match.response.MatchResultResponse;
-import com.petmatz.domain.match.entity.User;
 import com.petmatz.domain.match.repo.MatchUserRepository;
+import com.petmatz.domain.match.response.MatchResultResponse;
+import com.petmatz.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,18 +34,16 @@ public class TotalScoreService {
         // SQL로 사각형 범위 내 사용자(러프하게) 가져오기
         List<Object[]> rawUsers = matchUserRepository.findUsersWithinBoundingBox(latMin, latMax, lngMin, lngMax);
 
-        List<User> users = rawUsers.stream()
-                .map(row -> new User(
-                        ((Number) row[0]).longValue(),
-                        ((Number) row[1]).doubleValue(),
-                        ((Number) row[2]).doubleValue(),
-                        (Boolean) row[3],
-                        (String) row[4],
-                        (String) row[5]
-                ))
+        return rawUsers.stream()
+                .map(row -> User.builder()
+                        .id(((Number) row[0]).longValue())
+                        .latitude(String.valueOf(((Number) row[1]).doubleValue()))  // double로 처리
+                        .longitude(String.valueOf(((Number) row[2]).doubleValue()))  // double로 처리
+                        .isCareAvailable((Boolean) row[3])  // is_care_available
+                        .preferredSize((String) row[4])  // preferred_size
+                        .mbti((String) row[5])  // mbti
+                        .build())
                 .collect(Collectors.toList());
-
-        return users;
     }
 
 

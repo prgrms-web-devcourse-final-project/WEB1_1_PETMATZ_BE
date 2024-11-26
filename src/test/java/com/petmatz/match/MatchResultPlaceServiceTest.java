@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class MatchPlaceServiceTest {
+public class MatchResultPlaceServiceTest {
 
     private final MatchPlaceService matchPlaceService = new MatchPlaceService();
 

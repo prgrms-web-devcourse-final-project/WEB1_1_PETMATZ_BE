@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MatchCareServiceTest {
+public class MatchResultCareServiceTest {
     private final MatchCareService matchCareService = new MatchCareService();
 
     @Test
