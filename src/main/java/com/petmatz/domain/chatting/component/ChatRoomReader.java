@@ -28,7 +28,7 @@ public class ChatRoomReader {
     }
 
     public Optional<ChatRoomEntity> selectChatRoom(ChatRoomInfo chatRoomInfo) {
-        return chatRoomRepository.selectUser1AndUser2(chatRoomInfo.caregiverInfo(), chatRoomInfo.entrustedInfo());
+        return chatRoomRepository.findChatRoomByUsers(chatRoomInfo.caregiverInfo(), chatRoomInfo.entrustedInfo());
     }
 
 

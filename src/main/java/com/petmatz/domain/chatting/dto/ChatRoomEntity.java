@@ -1,8 +1,12 @@
 package com.petmatz.domain.chatting.dto;
 
 import com.petmatz.domain.global.BaseEntity;
+import com.petmatz.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -15,22 +19,17 @@ public class ChatRoomEntity extends BaseEntity {
     private Long id;
 
     //TODO 추후 userEntity와 연관관계 매핑이 필요함.
-    private String user1;
-    private String user2;
-    //----
-
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserToChatRoomEntity> participants = new ArrayList<>();
 
     @Builder
-    public ChatRoomEntity(Long id, String user1, String user2) {
-        this.id = id;
-        this.user1 = user1;
-        this.user2 = user2;
+    public ChatRoomEntity(List<UserToChatRoomEntity> participants) {
+        this.participants = participants;
     }
 
     public static ChatRoomEntity of(ChatRoomInfo chatRoomInfo) {
         return ChatRoomEntity.builder()
-                .user1(chatRoomInfo.caregiverInfo())
-                .user2(chatRoomInfo.entrustedInfo())
+                .participants()
                 .build();
     }
     public ChatRoomListInfo toChatRoomListInfo(String userName) {
