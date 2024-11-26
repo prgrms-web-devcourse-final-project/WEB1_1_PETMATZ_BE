@@ -1,33 +1,40 @@
 package com.petmatz.domain.chatting.dto;
 
-
-import lombok.Builder;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Builder
-public record ChatMessageInfo(
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
+public class ChatMessageInfo {
 
 
-        String chatRoomId,
+    private String senderEmail;
 
-        String senderId,
+    private String receiverEmail;
 
-        String receiverId,
+    private String msg;
 
-        String msg,
+    private LocalDateTime msgTimestamp;
 
-        LocalDateTime msgTimestamp
 
-) {
+    private boolean readStatus = true;
 
-    public ChatMessage of() {
-        return ChatMessage.builder()
-                .senderId(senderId)
-                .receiverId(receiverId)
-                .msg(msg)
-                .msgTimestamp(msgTimestamp)
-                .build();
+
+    @Builder
+    public ChatMessageInfo(String senderEmail, String receiverEmail, String msg, LocalDateTime msgTimestamp, boolean readStatus) {
+        this.senderEmail = senderEmail;
+        this.receiverEmail = receiverEmail;
+        this.msg = msg;
+        this.msgTimestamp = msgTimestamp;
+        this.readStatus = readStatus;
     }
+
+    public void changeReadStatus(boolean readStatus) {
+        this.readStatus = readStatus;
+    }
+
+
 
 }

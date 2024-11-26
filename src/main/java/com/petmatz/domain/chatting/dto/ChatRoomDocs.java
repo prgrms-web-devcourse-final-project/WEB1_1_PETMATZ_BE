@@ -26,10 +26,10 @@ public class ChatRoomDocs {
     //받는 이의 Info 추가
     private String entrustedInfo;
 
-    private List<ChatMessage> messages = new ArrayList<>();
+    private List<ChatMessageInfo> messages = new ArrayList<>();
 
     @Builder
-    public ChatRoomDocs(String id, String caregiverInfo, String entrustedInfo, List<ChatMessage> messages) {
+    public ChatRoomDocs(String id, String caregiverInfo, String entrustedInfo, List<ChatMessageInfo> messages) {
         this.id = id;
         this.caregiverInfo = caregiverInfo;
         this.entrustedInfo = entrustedInfo;

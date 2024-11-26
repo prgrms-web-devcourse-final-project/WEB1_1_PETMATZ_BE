@@ -4,15 +4,15 @@ import com.petmatz.domain.chatting.dto.ChatRoomInfo;
 
 public record MatchRequest(
 
-        String caregiverInfo,
-        String entrustedInfo
+        String caregiverEmail,
+        String entrustedEmail
 
 ) {
 
     public ChatRoomInfo of() {
         return ChatRoomInfo.builder()
-                .caregiverInfo(caregiverInfo)
-                .entrustedInfo(entrustedInfo)
+                .caregiverInfo(caregiverEmail)
+                .entrustedInfo(entrustedEmail)
                 .build();
     }
 }

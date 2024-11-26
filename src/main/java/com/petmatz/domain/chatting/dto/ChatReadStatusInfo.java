@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public record ChatReadStatusInfo(
 
         String chatRoomId,
-        String userId,
+        String userEmail,
         LocalDateTime lastReadMessageData
 
 

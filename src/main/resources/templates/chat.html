@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>1:1 Chat with Room Management</title>
   <style>
-    /* 스타일 유지 */
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
@@ -63,7 +62,7 @@
 <div class="chat-container" id="chatContainer" style="display:none;">
   <h2>Chat Room</h2>
   <p>Chat Room ID: <span id="chatRoomNumber"></span></p>
-  <textarea id="chatMessages" rows="15" readonly placeholder="Messages will appear here"></textarea>
+  <textarea id="chatMessageInfos" rows="15" readonly placeholder="Messages will appear here"></textarea>
   <input type="text" id="messageInput" placeholder="Enter your message">
   <button id="sendMessageBtn">Send Message</button>
 </div>
@@ -71,8 +70,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.2/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 <script>
-  let stompClient = null;
-  let chatRoomNumber = null;
+  const stompClients = {}; // Store WebSocket clients for each room
+  let chatRoomNumber = null; // Currently active chat room
 
   // HTML Elements
   const caregiverInfoInput = document.getElementById('caregiverInfo');
@@ -82,7 +81,7 @@
   const chatRoomsContainer = document.getElementById('chatRoomsContainer');
   const chatContainer = document.getElementById('chatContainer');
   const chatRoomNumberSpan = document.getElementById('chatRoomNumber');
-  const chatMessages = document.getElementById('chatMessages');
+  const chatMessageInfos = document.getElementById('chatMessageInfos');
   const messageInput = document.getElementById('messageInput');
   const sendMessageBtn = document.getElementById('sendMessageBtn');
   const statusMessage = document.getElementById('statusMessage');
@@ -108,18 +107,22 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        caregiverInfo: caregiverInfo,
-        entrustedInfo: entrustedInfo
+        caregiverEmail: caregiverInfo,
+        entrustedEmail: entrustedInfo
       })
     })
             .then(response => response.json())
             .then(data => {
               if (data.responseCode === "SUCCESS") {
-                chatRoomNumber = data.result; // 생성된 chatRoomNumber 저장
-                chatRoomNumberSpan.textContent = chatRoomNumber; // 채팅방 번호 표시
+                chatRoomNumber = data.result;
+                chatRoomNumberSpan.textContent = chatRoomNumber;
                 updateStatus(`Chat room created: ${chatRoomNumber}`, true);
-                loadChatMessages(chatRoomNumber); // 채팅 내역 불러오기
-                connectToWebSocket(); // WebSocket 연결
+
+                // 채팅방 자동 WebSocket 연결 및 구독
+                connectToWebSocketForRoom(chatRoomNumber);
+
+                // 채팅 내역 불러오기
+                loadChatMessages(chatRoomNumber);
               } else {
                 updateStatus(`Failed to create chat room: ${data.responseCode}`);
               }
@@ -132,11 +135,18 @@
 
   // Fetch and Display Chat Rooms
   joinRoomBtn.addEventListener('click', () => {
-    fetch('/api/v1/match')
+    const caregiverInfo = caregiverInfoInput.value.trim();
+
+    if (!caregiverInfo) {
+      updateStatus('Please enter your nickname!');
+      return;
+    }
+
+    fetch(`/api/v1/match?userEmail=${encodeURIComponent(caregiverInfo)}`)
             .then(response => response.json())
             .then(data => {
               if (data.responseCode === "SUCCESS") {
-                displayChatRooms(data.result); // 채팅방 목록 표시
+                displayChatRooms(data.result);
                 updateStatus('Fetched chat rooms successfully.', true);
               } else {
                 updateStatus(`Failed to fetch chat rooms: ${data.responseCode}`);
@@ -148,100 +158,98 @@
             });
   });
 
-  // WebSocket 연결 해제 함수
-  function disconnectFromWebSocket() {
-    if (stompClient && stompClient.connected) {
-      stompClient.disconnect(() => {
-        console.log('Disconnected from WebSocket.');
-        updateStatus('Disconnected from previous WebSocket connection.', true);
-      });
-    }
-  }
-
-  // Display Chat Rooms (수정된 부분)
+  // Display Chat Rooms
   function displayChatRooms(chatRooms) {
-    chatRoomsContainer.innerHTML = '<h2>Available Chat Rooms</h2>';
-    chatRooms.forEach(room => {
+    chatRoomsContainer.innerHTML = '<h2>Your Chat Rooms</h2>';
+
+    Object.entries(chatRooms).forEach(([chatRoomId, metaData]) => {
       const roomElement = document.createElement('div');
-      roomElement.textContent = `Room ID: ${room.chatRoomId}, Room Name: ${room.chatRoomName}`;
       roomElement.className = 'room-item';
+      roomElement.textContent = `Room ID: ${chatRoomId}, Last Message: ${metaData.lastMessage}, Unread: ${metaData.unreadCount}`;
 
-      // Click to connect to WebSocket
+      // 채팅방 클릭 시 메시지 로드 및 WebSocket 연결
       roomElement.addEventListener('click', () => {
-        // 이전 WebSocket 연결 해제
-        disconnectFromWebSocket();
-
-        // 새로운 채팅방 설정
-        chatRoomNumber = room.chatRoomId; // 선택된 채팅방 ID
-        chatRoomNumberSpan.textContent = chatRoomNumber; // 채팅방 번호 표시
-        updateStatus(`Joined chat room: ${room.chatRoomName}`, true);
-
-        // 채팅 내역 불러오기
-        loadChatMessages(chatRoomNumber);
-
-        // WebSocket 연결
-        connectToWebSocket();
+        chatRoomNumber = chatRoomId; // 활성화된 채팅방 설정
+        chatRoomNumberSpan.textContent = chatRoomId; // 화면에 표시
+        chatContainer.style.display = 'block'; // 채팅창 표시
+        loadChatMessages(chatRoomId); // 메시지 로드
       });
 
       chatRoomsContainer.appendChild(roomElement);
+
+      // WebSocket 연결 설정
+      connectToWebSocketForRoom(chatRoomId);
     });
+  }
+
+  // WebSocket 연결 및 메시지 구독
+  function connectToWebSocketForRoom(chatRoomId) {
+    const socket = new SockJS(`/ws?roomId=${chatRoomId}`);
+    const client = Stomp.over(socket);
+
+    client.connect({}, frame => {
+      console.log(`Connected to WebSocket for room ${chatRoomId}:`, frame);
+
+      // Subscribe to room's topic
+      client.subscribe(`/topic/chat/${chatRoomId}`, message => {
+        const chatMessageInfo = JSON.parse(message.body);
+        displayNewMessageForRoom(chatRoomId, chatMessageInfo);
+      });
+
+      updateStatus(`Connected to WebSocket for room ${chatRoomId}.`, true);
+    }, error => {
+      console.error(`Error connecting to WebSocket for room ${chatRoomId}:`, error);
+      updateStatus(`Failed to connect to WebSocket for room ${chatRoomId}.`);
+    });
+
+    stompClients[chatRoomId] = client; // WebSocket 클라이언트 저장
   }
   // Load Chat Messages
   function loadChatMessages(chatRoomId) {
-    fetch(`/api/v1/chat/message?userId=테스트&chatRoomId=${chatRoomId}&pageSize=10`)
+    // API 요청 URL 생성
+    const apiUrl = `/api/v1/chat/message?senderEmail=${caregiverInfoInput.value}&receiverEmail=${entrustedInfoInput.value}&chatRoomId=${chatRoomId}&pageSize=10`;
+
+    fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
               if (data.responseCode === "SUCCESS") {
-                displayChatMessages(data.result); // 채팅 내역 화면에 표시
-                updateStatus('Loaded chat messages successfully.', true);
+                const chatResponse = data.result; // ChatMessageResponse 구조
+
+                // _id, chatMessage, other 사용
+                if (chatResponse && chatResponse.chatMessage) {
+                  displayChatMessages(chatResponse.chatMessage);
+                  updateStatus(`Loaded messages for room ${chatResponse._id}`, true);
+                } else {
+                  updateStatus('No messages found.');
+                }
               } else {
-                updateStatus(`Failed to load chat messages: ${data.responseCode}`);
+                updateStatus(`Failed to load messages: ${data.responseCode}`);
               }
             })
             .catch(error => {
-              console.error('Error loading chat messages:', error);
-              updateStatus('Error loading chat messages.');
+              console.error('Error loading messages:', error);
+              updateStatus('Error loading messages.');
             });
   }
 
   // Display Chat Messages
   function displayChatMessages(messages) {
-    chatMessages.value = ''; // 기존 메시지 초기화
+    chatMessageInfos.value = ''; // 기존 메시지 초기화
     messages.forEach(message => {
-      chatMessages.value += `[${message.senderId}]: ${message.msg}\n`;
+      const formattedMessage = `[${message.senderEmail}] ${message.msg} (${message.msgTimestamp})`;
+      chatMessageInfos.value += `${formattedMessage}\n`;
     });
-    chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll
+    chatMessageInfos.scrollTop = chatMessageInfos.scrollHeight; // 스크롤 맨 아래로
+  }
+  function displayNewMessageForRoom(chatRoomId, chatMessageInfo) {
+    if (chatRoomNumber === chatRoomId) {
+      chatMessageInfos.value += `[${chatMessageInfo.senderIdEmail}]: ${chatMessageInfo.msg}\n`;
+      chatMessageInfos.scrollTop = chatMessageInfos.scrollHeight;
+    } else {
+      console.log(`New message for room ${chatRoomId}:`, chatMessageInfo);
+    }
   }
 
-  // Connect to WebSocket
-  function connectToWebSocket() {
-    const socket = new SockJS(`/ws?roomId=${chatRoomNumber}`);
-    stompClient = Stomp.over(socket);
-
-    stompClient.connect({}, frame => {
-      console.log('Connected to WebSocket:', frame);
-
-      // Show chat UI
-      chatContainer.style.display = 'block';
-
-      // 채팅방 경로 구독
-      stompClient.subscribe(`/topic/chat/${chatRoomNumber}`, message => {
-        const chatMessage = JSON.parse(message.body);
-        displayNewMessage(chatMessage);
-      });
-
-      updateStatus('Connected to WebSocket. Ready to chat!', true);
-    }, error => {
-      console.error('Error connecting to WebSocket:', error);
-      updateStatus('Failed to connect to WebSocket.');
-    });
-  }
-
-  // Display a New Chat Message
-  function displayNewMessage(chatMessage) {
-    chatMessages.value += `[${chatMessage.senderId}]: ${chatMessage.msg}\n`;
-    chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll
-  }
 
   // Send Message
   sendMessageBtn.addEventListener('click', () => {
@@ -251,16 +259,19 @@
       return;
     }
 
-    // Send message to the chat room
-    stompClient.send(`/app/chat`, {}, JSON.stringify({
-      chatRoomId: chatRoomNumber,
-      receiverId: entrustedInfoInput.value.trim(),
-      senderId: caregiverInfoInput.value.trim(),
-      msg: content
-    }));
+    const client = stompClients[chatRoomNumber];
+    if (client) {
+      client.send(`/app/chat`, {}, JSON.stringify({
+        chatRoomId: chatRoomNumber,
+        senderEmail: caregiverInfoInput.value.trim(),
+        receiverEmail: entrustedInfoInput.value.trim(),
+        msg: content
+      }));
 
-    // Clear input
-    messageInput.value = '';
+      messageInput.value = '';
+    } else {
+      updateStatus('No active WebSocket connection for this room.');
+    }
   });
 </script>
 

@@ -16,10 +16,10 @@ public class ChatRoomMetadataDocs {
     private String lastMessage;
     private LocalDateTime lastMessageTimestamp;
     private int messageCount;
-    private Map<String, Integer> unreadCount;
+    private int unreadCount;
 
     @Builder
-    public ChatRoomMetadataDocs(String room_id, String lastMessage, LocalDateTime lastMessageTimestamp, int messageCount, Map<String, Integer> unreadCount) {
+    public ChatRoomMetadataDocs(String room_id, String lastMessage, LocalDateTime lastMessageTimestamp, int messageCount, int unreadCount) {
         this.room_id = room_id;
         this.lastMessage = lastMessage;
         this.lastMessageTimestamp = lastMessageTimestamp;
@@ -33,17 +33,17 @@ public class ChatRoomMetadataDocs {
                 .lastMessage("first")
                 .lastMessageTimestamp(LocalDateTime.now())
                 .messageCount(0)
-//                .unreadCount(0)
+                .unreadCount(0)
                 .build();
     }
 
-    public static ChatRoomMetadataDocs updateChatRoomMetaData(ChatMessageInfo chatMessageInfo) {
+    public static ChatRoomMetadataDocs updateChatRoomMetaData(ChatMessageInfo chatMessageInfo, String chatRoomId) {
         return ChatRoomMetadataDocs.builder()
-                .room_id(chatMessageInfo.chatRoomId())
-                .lastMessage(chatMessageInfo.msg())
+                .room_id(chatRoomId)
+                .lastMessage(chatMessageInfo.getMsg())
                 .lastMessageTimestamp(LocalDateTime.now())
                 .messageCount(0)
-//                .unreadCount(0)
+                .unreadCount(0)
                 .build();
     }
 }

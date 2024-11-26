@@ -1,5 +1,6 @@
 package com.petmatz.domain.chatting.dto;
 
+import com.petmatz.domain.chatting.utils.ChatUtils;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
@@ -13,30 +14,23 @@ public class ChatReadStatusDocs {
 
     @Id
     private String chatRoomId;
-    private String userId;
+    private String userEmail;
     private String lastReadMessageId;
     private LocalDateTime lastReadTimestamp;
 
     @Builder
-    public ChatReadStatusDocs(String chatRoomId, String userId, String lastReadMessageId, LocalDateTime lastReadTimestamp) {
+    public ChatReadStatusDocs(String chatRoomId, String userEmail, String lastReadMessageId, LocalDateTime lastReadTimestamp) {
         this.chatRoomId = chatRoomId;
-        this.userId = userId;
+        this.userEmail = userEmail;
         this.lastReadMessageId = lastReadMessageId;
         this.lastReadTimestamp = lastReadTimestamp;
     }
 
-    public static ChatReadStatusDocs initChatReadStatusData(String userName,long chatRoomID) {
+    public static ChatReadStatusDocs initChatReadStatusData(String userEmail,long chatRoomID) {
         return ChatReadStatusDocs.builder()
-                .chatRoomId(addString(chatRoomID, userName))
-                .userId(userName)
+                .chatRoomId(ChatUtils.addString(String.valueOf(chatRoomID), userEmail))
+                .userEmail(userEmail)
                 .build();
     }
 
-    private static String addString(long chatRoomID, String userName) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(chatRoomID);
-        stringBuilder.append("_");
-        stringBuilder.append(userName);
-        return stringBuilder.toString();
-    }
 }

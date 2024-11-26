@@ -9,20 +9,21 @@ public record ChatMessageRequest(
 
         String chatRoomId,
 
-        String senderId,
+        String senderEmail,
 
-        String receiverId,
+        String receiverEmail,
 
-        String msg
+        String msg,
+
+        String msg_type
 
 
 ) {
 
     public ChatMessageInfo of() {
         return ChatMessageInfo.builder()
-                .chatRoomId(chatRoomId)
-                .senderId(senderId)
-                .receiverId(receiverId)
+                .senderEmail(senderEmail)
+                .receiverEmail(receiverEmail)
                 .msg(msg)
                 .msgTimestamp(LocalDateTime.now())
                 .build();

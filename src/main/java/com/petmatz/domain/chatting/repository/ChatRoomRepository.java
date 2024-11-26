@@ -14,6 +14,8 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoomEntity, Long> 
     Optional<ChatRoomEntity> selectUser1AndUser2(@Param("user1") String user1,
                                                  @Param("user2") String user2);
 
-    @Query("select c from ChatRoomEntity c where c.user1 = :userName or c.user2 = :userName")
-    Optional<List<ChatRoomEntity>> selectUserInChatRoomList(@Param("userName") String userName);
+    //채팅방을 연쪽, 그 반대쪽 중 하나라도 만족하면 채팅방을 가져옴
+    @Query("select c from ChatRoomEntity c where c.user1 = :userEmail or c.user2 = :userEmail")
+    Optional<List<ChatRoomEntity>> selectUserInChatRoomList(@Param("userEmail") String userEmail);
+
 }

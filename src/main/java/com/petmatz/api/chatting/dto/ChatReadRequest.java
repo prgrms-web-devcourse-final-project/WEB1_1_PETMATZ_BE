@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public record ChatReadRequest(
 
         String chatRoomId,
-        String userId,
+        String userEmail,
         LocalDateTime lastReadMessageData
 
 ) {
@@ -15,7 +15,7 @@ public record ChatReadRequest(
     public ChatReadStatusInfo of() {
         return ChatReadStatusInfo.builder()
                 .chatRoomId(chatRoomId)
-                .userId(userId)
+                .userEmail(userEmail)
                 .lastReadMessageData(lastReadMessageData)
                 .build();
     }

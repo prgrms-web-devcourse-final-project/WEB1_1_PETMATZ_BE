@@ -1,32 +1,40 @@
 package com.petmatz.api.chatting.dto;
 
-import com.petmatz.domain.chatting.dto.ChatMessage;
 import lombok.Builder;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
-
 public record ChatMessageResponse(
-        String senderId,
+        //chatRoom Id
+        String _id,
 
-        String receiverId,
+        List<ChatMessage> chatMessage,
 
-        String msg,
+        int pageNumber,
 
-        Boolean readStatus,
+        int totalPages,
 
-        LocalDateTime msgTimestamp
+        long totalElements,
+
+        IChatUserResponse other
 ) {
 
-    public static ChatMessageResponse of(ChatMessage chatMessage) {
+    public static ChatMessageResponse of(List<ChatMessage> chatMessage,
+                                         IChatUserResponse other,
+                                         String _id,
+                                         int pageNumber,
+                                         int totalPages,
+                                         long totalElements) {
         return ChatMessageResponse.builder()
-                .senderId(chatMessage.getSenderId())
-                .receiverId(chatMessage.getReceiverId())
-                .msg(chatMessage.getMsg())
-                .msgTimestamp(chatMessage.getMsgTimestamp())
-//                .readStatus()
+                ._id(_id)
+                .chatMessage(chatMessage)
+                .pageNumber(pageNumber)
+                .totalPages(totalPages)
+                .totalElements(totalElements)
+                .other(null)
                 .build();
     }
+
 
 }
