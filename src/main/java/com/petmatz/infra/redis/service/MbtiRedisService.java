@@ -30,10 +30,10 @@ public class MbtiRedisService {
     }
 
     // 특정 MBTI와 타겟 MBTI 간 점수 조회 (실질적 로직)
-    public Integer getScore(String mbti, String targetMbti) {
+    public Double getScore(String mbti, String targetMbti) {
         String score = (String) redisTemplate.opsForHash().get("MBTI:" + mbti, targetMbti);
         if (score != null) {
-            return Integer.parseInt(score);
+            return Double.parseDouble(score);
         } else {
             return null;
         }

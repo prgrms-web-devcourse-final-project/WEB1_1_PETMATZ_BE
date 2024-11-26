@@ -1,6 +1,6 @@
 package com.petmatz.domain.match.repo;
 
-import com.petmatz.domain.match.entity.User;
+import com.petmatz.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,15 +14,24 @@ import java.util.List;
 @Repository
 public interface MatchUserRepository extends JpaRepository<User, Long> {
 
+
     @Query(value = """
-           SELECT id, latitude, longitude, is_care_available, preferred_size, mbti
-           FROM users
-           WHERE latitude BETWEEN :latMin AND :latMax
-             AND longitude BETWEEN :lngMin AND :lngMax
-           LIMIT 1000;
-           """, nativeQuery = true)
-    List<Object[]> findUsersWithinBoundingBox(@Param("latMin") double latMin,
-                                              @Param("latMax") double latMax,
-                                              @Param("lngMin") double lngMin,
-                                              @Param("lngMax") double lngMax);
+
+            SELECT id, latitude, longitude, is_care_available, preferred_size, mbti,
+              ST_Distance_Sphere(
+                  point(RADIANS(longitude), RADIANS(latitude)), 
+                  point(RADIANS(:userLng), RADIANS(:userLat))
+              ) AS distance_in_meters
+       FROM user
+       WHERE latitude BETWEEN :minLat AND :maxLat
+       AND longitude BETWEEN :minLng AND :maxLng
+       ORDER BY distance_in_meters ASC
+       LIMIT 1000;
+       """, nativeQuery = true)
+    List<Object[]> findUsersWithinBoundingBox(@Param("userLng") double userLng,
+                                              @Param("userLat") double userLat,
+                                              @Param("minLat") double minLat,
+                                              @Param("maxLat") double maxLat,
+                                              @Param("minLng") double minLng,
+                                              @Param("maxLng") double maxLng);
 }
