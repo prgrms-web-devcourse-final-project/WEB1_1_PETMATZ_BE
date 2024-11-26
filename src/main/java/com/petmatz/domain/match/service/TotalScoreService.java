@@ -5,6 +5,7 @@ import com.petmatz.domain.match.response.MatchResultResponse;
 import com.petmatz.domain.match.response.UserResponse;
 import com.petmatz.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,7 +21,8 @@ public class TotalScoreService {
     private final MatchCareService matchCareService;
     private final MatchMbtiService matchMbtiService;
     private final MatchPlaceService matchPlaceService;
-    private final MatchSizeService matchSizeService;
+    private final RedisTemplate<String, Object> redisTemplate;
+
 
     static final double RANGE_KM = 10.0;
 
@@ -72,20 +74,17 @@ public class TotalScoreService {
 
         for (UserResponse targetUser : targetUsers) {
             double distance = matchPlaceService.calculateDistanceOnly(user, targetUser);
-
-            double distanceScore = matchPlaceService.findMatchesWithinDistance(user,targetUser);
-
+            double distanceScore = matchPlaceService.findMatchesWithinDistance(user, targetUser);
             double careScore = matchCareService.calculateCareScore(targetUser.isCareAvailable());
 
             // 11/25 사용자와 연결된 펫의 크기를 타고 가야할것 같음.
 //            double sizeScore = matchSizeService.calculateDogSizeScore("머지후 개발 ");
-            double sizeScore = 10.0; // 임시 점수
+            double sizeScore = 10.0;
 
             double mbtiScore = matchMbtiService.calculateMbtiScore(user.getMbti(), targetUser.mbti());
-
             double totalScore = distanceScore + careScore + sizeScore + mbtiScore;
 
-            matchResults.add(new MatchResultResponse(
+            MatchResultResponse result = new MatchResultResponse(
                     targetUser.id(),
                     Math.round(distance * 100.0) / 100.0,
                     Math.round(distanceScore * 100.0) / 100.0,
@@ -93,8 +92,15 @@ public class TotalScoreService {
                     Math.round(sizeScore * 100.0) / 100.0,
                     Math.round(mbtiScore * 100.0) / 100.0,
                     Math.round(totalScore * 100.0) / 100.0
-            ));
+            );
+
+            matchResults.add(result);
         }
+
+        String redisKey = "matchResult:" + user.getId();
+        redisTemplate.opsForValue().set(redisKey, matchResults);  // json으로
+
         return matchResults;
     }
+
 }

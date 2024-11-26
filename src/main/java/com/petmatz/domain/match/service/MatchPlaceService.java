@@ -51,26 +51,26 @@ public class MatchPlaceService {
     public double findMatchesWithinDistance(User user, UserResponse targetUser) {
         double distanceScore = 0.0;
 
-            if (user.getId() == null || targetUser.id() == null || user.getId().equals(targetUser.id())) {
-                return distanceScore;
-            }
+        if (user.getId() == null || targetUser.id() == null || user.getId().equals(targetUser.id())) {
+            return distanceScore;
+        }
 
-            try {
-                checkLatitudeLongitude(user, "User");
-                System.out.println("user : " + user.getLatitude());
-                checkTargetUserLatitudeLongitude(targetUser, "Target user");
-                System.out.println("target user : " + targetUser.latitude());
+        try {
+            checkLatitudeLongitude(user, "User");
+            System.out.println("user : " + user.getLatitude());
+            checkTargetUserLatitudeLongitude(targetUser, "Target user");
+            System.out.println("target user : " + targetUser.latitude());
 
-                double distance = calculateDistance(createDistanceRequest(user, targetUser));
-                System.out.println("distance : " + distance);
+            double distance = calculateDistance(createDistanceRequest(user, targetUser));
+            System.out.println("distance : " + distance);
 
-                    distanceScore = calculateDistanceScore(distance);
-                    System.out.println("점수는 " + distanceScore);
+            distanceScore = calculateDistanceScore(distance);
+            System.out.println("점수는 " + distanceScore);
 
-            } catch (MatchException e) {
-                throw new MatchException(INVALID_MATCH_DATA,
-                        "Error for user " + user.getId() + " and target " + targetUser.id() + ": " + e.getMessage());
-            }
+        } catch (MatchException e) {
+            throw new MatchException(INVALID_MATCH_DATA,
+                    "Error for user " + user.getId() + " and target " + targetUser.id() + ": " + e.getMessage());
+        }
 
         return distanceScore;
     }
@@ -80,7 +80,12 @@ public class MatchPlaceService {
             throw new MatchException(INSUFFICIENT_LATITUDE_DATA, userType);
         }
         if (user.getLongitude() <= 0) {
-            throw new MatchException(INSUFFICIENT_LONGITUDE_DATA, userType);
+            if (user.getLatitude() == 0.0) {
+                throw new MatchException(INSUFFICIENT_LATITUDE_DATA, userType);
+            }
+            if (user.getLongitude() == 0.0) {
+                throw new MatchException(INSUFFICIENT_LONGITUDE_DATA, userType);
+            }
         }
     }
 
