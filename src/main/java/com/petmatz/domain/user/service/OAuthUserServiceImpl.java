@@ -43,7 +43,7 @@ public class OAuthUserServiceImpl extends DefaultOAuth2UserService {
                     .nickname("nickname")
                     .loginRole(User.LoginRole.ROLE_USER)
                     .gender(User.Gender.Male) // Convert string to Enum
-                    .preferredSize(User.PreferredSize.Medium) // Convert string to Enum
+                    .preferredSize("Small") // Convert string to Enum
                     .introduction("null")
                     .isCareAvailable(true)
                     .role(User.Role.Dol) // Assign a default role or map appropriately as needed
