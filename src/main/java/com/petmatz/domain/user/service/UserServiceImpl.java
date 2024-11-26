@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -211,14 +212,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<? super GetMyProfileResponseDto> getOtherMypage(Long userId) {
         try {
-            User user = userRepository.findById(userId);
+            Optional<User> user = userRepository.findById(userId);
 
             boolean exists = userRepository.existsById(userId);
             if (!exists) {
                 return GetMyProfileResponseDto.userNotFound();
             }
 
-            return GetMyProfileResponseDto.success(user);
+            return GetMyProfileResponseDto.success(user.orElse(null));
 
         } catch (Exception e) {
             e.printStackTrace();

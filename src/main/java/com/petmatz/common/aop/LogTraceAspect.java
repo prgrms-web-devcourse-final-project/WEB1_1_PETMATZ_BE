@@ -20,7 +20,7 @@ public class LogTraceAspect {
         this.logTrace = trace;
     }
 
-    @Pointcut("execution(* com.petmatz..*(..)) && " +
+    @Pointcut("execution(* com.petmatz.*(..)) && " +
 //            "!execution(* spring.basic.api..*Controller.*(..)) && " +
             "!execution(* com.petmatz.common.config.*.*(..)) && " +
             "!execution(* com.petmatz.common.aop.*.*(..))")
