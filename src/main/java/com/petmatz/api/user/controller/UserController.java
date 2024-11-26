@@ -26,14 +26,14 @@ public class UserController {
 
     @PostMapping("/check-certification")
     public ResponseEntity<? super CheckCertificationResponseDto> checkCertification(@RequestBody @Valid CheckCertificationRequestDto requestBody) {
-        ResponseEntity<? super CheckCertificationResponseDto> response= userService.checkCertification(requestBody);
+        ResponseEntity<? super CheckCertificationResponseDto> response= userService.checkCertification(CheckCertificationRequestDto.of(requestBody));
         log.info("[checkCertification]: {accountId: " + requestBody.getAccountId() + ", certificationNumber: " + requestBody.getCertificationNumber() + "}");
         return response;
     }
 
     @PostMapping("/sign-up")
     public ResponseEntity<? super SignUpResponseDto> signUp(@RequestBody @Valid SignUpRequestDto requestBody) {
-        ResponseEntity<? super SignUpResponseDto> response= userService.signUp(requestBody);
+        ResponseEntity<? super SignUpResponseDto> response= userService.signUp(SignUpRequestDto.of(requestBody));
         log.info("[signUp]: { accountId: " + requestBody.getAccountId() + ", password: " + requestBody.getPassword());
         return response;
     }
@@ -43,7 +43,7 @@ public class UserController {
             @RequestBody @Valid SignInRequestDto requestBody,
             HttpServletResponse response) {
 
-        ResponseEntity<? super SignInResponseDto> result = userService.signIn(requestBody, response);
+        ResponseEntity<? super SignInResponseDto> result = userService.signIn(SignInRequestDto.of(requestBody), response);
         log.info("[signIn]: { accountId: " + requestBody.getAccountId() + ", result: " + result.getStatusCode() + " }");
         return result;
     }
@@ -64,15 +64,15 @@ public class UserController {
     }
 
     @GetMapping("/get-otherprofile")
-    public ResponseEntity<? super GetMyProfileResponseDto> getOtherMypage(@ModelAttribute @Valid GetMyProfileRequestDto requestBody) {
-        ResponseEntity<? super GetMyProfileResponseDto> response = userService.getOtherMypage(requestBody);
+    public ResponseEntity<? super GetMyProfileResponseDto> getOtherMypage(@RequestParam @Valid Long userId) {
+        ResponseEntity<? super GetMyProfileResponseDto> response = userService.getOtherMypage(userId);
         log.info("[getOtherMypage]");
         return response;
     }
 
     @PostMapping("/edit-myprofile")
     public ResponseEntity<? super EditMyProfileResponseDto> editMyProfile(@RequestBody @Valid EditMyProfileRequestDto requestBody) {
-        ResponseEntity<? super EditMyProfileResponseDto> response = userService.editMyProfile(requestBody);
+        ResponseEntity<? super EditMyProfileResponseDto> response = userService.editMyProfile(EditMyProfileRequestDto.of(requestBody));
         log.info("[editMyProfile]");
         return response;
     }
@@ -86,7 +86,7 @@ public class UserController {
 
     @PostMapping("/repassword")
     public ResponseEntity<? super RepasswordResponseDto> repassword(@RequestBody @Valid RepasswordRequestDto requestBody) {
-        ResponseEntity<? super RepasswordResponseDto> response = userService.repassword(requestBody);
+        ResponseEntity<? super RepasswordResponseDto> response = userService.repassword(RepasswordRequestDto.of(requestBody));
         log.info("[repassword]: {currentPassword: " + requestBody.getCurrentPassword() + ", newPassword: " + requestBody.getNewPassword() + "}");
         return response;
     }
