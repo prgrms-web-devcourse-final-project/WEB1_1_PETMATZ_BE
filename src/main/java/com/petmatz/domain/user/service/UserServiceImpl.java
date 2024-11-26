@@ -210,20 +210,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<? super GetMyProfileResponseDto> getOtherMypage(Long userId) {
+    public ResponseEntity<? super GetOtherProfileResponseDto> getOtherMypage(Long userId) {
         try {
             Optional<User> user = userRepository.findById(userId);
 
             boolean exists = userRepository.existsById(userId);
             if (!exists) {
-                return GetMyProfileResponseDto.userNotFound();
+                return GetOtherProfileResponseDto.userNotFound();
             }
 
-            return GetMyProfileResponseDto.success(user.orElse(null));
+            return GetOtherProfileResponseDto.success(user.orElse(null));
 
         } catch (Exception e) {
             e.printStackTrace();
-            return GetMyProfileResponseDto.databaseError();
+            return GetOtherProfileResponseDto.databaseError();
         }
     }
 
@@ -252,6 +252,14 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<? super HeartingResponseDto> hearting(HeartingRequestDto dto) {
         try {
             Long heartedId = dto.getHeartedId();
+            User heartedUser = userRepository.findById(heartedId)
+                    .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
+
+            Integer heartCount= heartedUser.getHeartCount();
+            User heartedUpdateUser=UserFactory.createHeartUpdateUser(heartedUser,heartCount+1);
+            userRepository.save(heartedUpdateUser);
+
+
             boolean exists=userRepository.existsById(heartedId);
             if(!exists) {
                 return HeartingResponseDto.heartedIdNotFound();
@@ -343,6 +351,30 @@ public class UserServiceImpl implements UserService {
         }
         return RepasswordResponseDto.success();
     }
+
+
+
+    @Override
+    public ResponseEntity<? super UpdateLocationResponseDto> updateLocation(UpdateLocationInfo info) {
+        try {
+            String accountId = findAccountIdFromJwt();
+            User user = userRepository.findByAccountId(accountId);
+
+            boolean exists = userRepository.existsByAccountId(accountId);
+            if (!exists) {
+                return EditMyProfileResponseDto.editFailed();
+            }
+
+            User updatedUser = UserFactory.createLocationUpdateUser(user, info);
+            userRepository.save(updatedUser);
+
+        } catch (Exception e) {
+            log.info("위치업데이트 실패: {}", e);
+            return UpdateLocationResponseDto.wrongLocation();
+        }
+        return UpdateLocationResponseDto.success();
+    }
+
 
 
     private String findAccountIdFromJwt() {

@@ -3,6 +3,7 @@ package com.petmatz.domain.user.entity;
 
 import com.petmatz.domain.user.info.EditMyProfileInfo;
 import com.petmatz.domain.user.info.SignUpInfo;
+import com.petmatz.domain.user.info.UpdateLocationInfo;
 
 import java.time.LocalDateTime;
 
@@ -24,9 +25,8 @@ public class UserFactory {
                 .recommendationCount(0)
                 .careCompletionCount(0)
                 .isDeleted(false)
-                .timeWage(info.getTimeWage())
-                .monthWage(info.getMonthWage())
                 .mbti(info.getMbti())
+                .heartCount(0)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -48,9 +48,8 @@ public class UserFactory {
                 .introduction(null)
                 .isCareAvailable(user.getIsCareAvailable())
                 .isDeleted(true)
-                .timeWage(user.getTimeWage())
-                .monthWage(user.getMonthWage())
-                .mbti(user.getMbti())
+                .mbti("deleted")
+                .heartCount(null)
                 .createdAt(user.getCreatedAt())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -78,9 +77,8 @@ public class UserFactory {
                 .latitude(user.getLatitude())
                 .longitude(user.getLongitude())
                 .isDeleted(user.getIsDeleted()) // 기존 삭제 여부 유지
-                .timeWage(info.getTimeWage()) // 시간당 임금 업데이트
-                .monthWage(info.getMonthWage()) // 월 임금 업데이트
                 .mbti(user.getMbti())
+                .heartCount(user.getHeartCount())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(LocalDateTime.now()) // 수정 시간 갱신
                 .build();
@@ -108,11 +106,66 @@ public class UserFactory {
                 .latitude(user.getLatitude())
                 .longitude(user.getLongitude())
                 .isDeleted(user.getIsDeleted()) // 기존 삭제 여부 유지
-                .timeWage(user.getTimeWage())
-                .monthWage(user.getMonthWage())
                 .mbti(user.getMbti())
+                .heartCount(user.getHeartCount())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(LocalDateTime.now()) // 수정 시간 갱신
+                .build();
+    }
+
+    public static User createLocationUpdateUser(User user, UpdateLocationInfo info) {
+        return User.builder()
+                .id(user.getId())
+                .accountId(user.getAccountId())
+                .password(user.getPassword())
+                .email(user.getEmail())
+                .nickname(user.getNickname()) // 닉네임 업데이트
+                .profileImg(user.getProfileImg())
+                .loginRole(user.getLoginRole())
+                .role(user.getRole())
+                .loginType(user.getLoginType())
+                .gender(user.getGender())
+                .preferredSize(user.getPreferredSize()) // 선호 크기 업데이트
+                .introduction(user.getIntroduction()) // 자기소개 업데이트
+                .isCareAvailable(user.getIsCareAvailable()) // 돌봄 가능 여부 업데이트
+                .isRegistered(user.getIsRegistered())
+                .recommendationCount(user.getRecommendationCount())
+                .careCompletionCount(user.getCareCompletionCount())
+                .latitude(info.getLatitude())
+                .longitude(info.getLongitude())
+                .isDeleted(user.getIsDeleted()) // 기존 삭제 여부 유지
+                .mbti(user.getMbti())
+                .heartCount(user.getHeartCount())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(LocalDateTime.now()) // 수정 시간 갱신
+                .build();
+    }
+
+    public static User createHeartUpdateUser(User user, Integer heartCount) {
+        return User.builder()
+                .id(user.getId())
+                .accountId(user.getAccountId())
+                .password(user.getPassword())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .profileImg(user.getProfileImg())
+                .loginRole(user.getLoginRole())
+                .role(user.getRole())
+                .loginType(user.getLoginType())
+                .gender(user.getGender())
+                .preferredSize(user.getPreferredSize())
+                .introduction(user.getIntroduction())
+                .isCareAvailable(user.getIsCareAvailable())
+                .isRegistered(user.getIsRegistered())
+                .recommendationCount(user.getRecommendationCount())
+                .careCompletionCount(user.getCareCompletionCount())
+                .latitude(user.getLatitude())
+                .longitude(user.getLongitude())
+                .isDeleted(user.getIsDeleted())
+                .mbti(user.getMbti())
+                .heartCount(heartCount)
+                .createdAt(user.getCreatedAt())
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 }

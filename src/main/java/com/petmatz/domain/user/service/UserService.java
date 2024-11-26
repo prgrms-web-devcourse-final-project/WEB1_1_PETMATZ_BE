@@ -16,7 +16,7 @@ public interface UserService {
     ResponseEntity<? super SignInResponseDto> signIn(SignInInfo info, HttpServletResponse response);
     ResponseEntity<? super DeleteIdResponseDto> deleteId(DeleteIdRequestDto dto);
     ResponseEntity<? super GetMyProfileResponseDto> getMypage();
-    ResponseEntity<? super GetMyProfileResponseDto> getOtherMypage(Long userId);
+    ResponseEntity<? super GetOtherProfileResponseDto> getOtherMypage(Long userId);
     ResponseEntity<? super SendRepasswordResponseDto> sendRepassword(SendRepasswordRequestDto dto);
     ResponseEntity<? super RepasswordResponseDto> repassword(RepasswordInfo info);
     ResponseEntity<? super EditMyProfileResponseDto> editMyProfile(EditMyProfileInfo info);
@@ -24,4 +24,6 @@ public interface UserService {
     ResponseEntity<? super HeartingResponseDto> hearting(HeartingRequestDto dto);
 
     ResponseEntity<? super GetHeartingListResponseDto> getHeartedList();
+
+    ResponseEntity<? super UpdateLocationResponseDto> updateLocation(UpdateLocationInfo info);
 }

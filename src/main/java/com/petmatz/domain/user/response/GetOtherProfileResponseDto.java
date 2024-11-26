@@ -8,15 +8,12 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.stream.Collectors;
-
 @Getter
-public class SignInResponseDto extends LogInResponseDto {
+public class GetOtherProfileResponseDto extends LogInResponseDto {
     private Long id;
     private String accountId;
     private String nickname;
-    private User.LoginRole loginRole;
-    private User.LoginType loginType;
+    private String profileImg;
     private User.Role role;
     private String preferredSize;
     private User.Gender gender;
@@ -24,15 +21,17 @@ public class SignInResponseDto extends LogInResponseDto {
     private Integer recommendationCount;
     private Integer careCompletionCount;
     private Boolean isCareAvailable;
+    private Double latitude;
+    private Double longitude;
     private String mbti;
+    private Integer heartCount;
 
-    private SignInResponseDto(User user) {
+    public GetOtherProfileResponseDto(User user) {
         super();
         this.id = user.getId();
         this.accountId = user.getAccountId();
         this.nickname = user.getNickname();
-        this.loginRole = user.getLoginRole();
-        this.loginType = user.getLoginType();
+        this.profileImg=user.getProfileImg();
         this.role = user.getRole();
         this.preferredSize =user.getPreferredSize();
         this.gender = user.getGender();
@@ -40,16 +39,20 @@ public class SignInResponseDto extends LogInResponseDto {
         this.recommendationCount = user.getRecommendationCount();
         this.careCompletionCount = user.getCareCompletionCount();
         this.isCareAvailable = user.getIsCareAvailable();
+        this.latitude = user.getLatitude();
+        this.longitude = user.getLongitude();
         this.mbti=user.getMbti();
+        this.heartCount = user.getHeartCount();
     }
 
-    public static ResponseEntity<SignInResponseDto> success(User user) {
-        SignInResponseDto responseBody = new SignInResponseDto(user);
+    public static ResponseEntity<LogInResponseDto> userNotFound() {
+        LogInResponseDto responseBody=new LogInResponseDto(ResponseCode.ID_NOT_FOUND, ResponseMessage.ID_NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseBody);
+    }
+
+    public static ResponseEntity<LogInResponseDto> success(User user) {
+        GetOtherProfileResponseDto responseBody = new GetOtherProfileResponseDto(user);
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
-    public static ResponseEntity<LogInResponseDto> signInFail() {
-        LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.SIGN_IN_FAIL, ResponseMessage.SIGN_IN_FAIL);
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseBody);
-    }
 }

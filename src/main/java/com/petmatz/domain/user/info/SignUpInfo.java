@@ -21,10 +21,6 @@ public class SignUpInfo {
 
     private Boolean isCareAvailable;
 
-    private Integer timeWage;
-
-    private Integer monthWage;
-
     private String introduction;
 
     private String mbti;

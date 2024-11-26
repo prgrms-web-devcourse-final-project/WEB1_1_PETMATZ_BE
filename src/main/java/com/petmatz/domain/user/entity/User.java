@@ -59,7 +59,7 @@ public class User extends BaseEntity {
 
     //    @Enumerated(EnumType.STRING)
     @Column(name = "preferred_size", nullable = false)
-    private String preferredSize; // 'Small', 'Medium', 'Large',
+    private String preferredSize; // 'Small', 'Medium', 'Large'
 
     @Column(name = "introduction")
     private String introduction;
@@ -77,22 +77,19 @@ public class User extends BaseEntity {
     private Integer careCompletionCount;
 
     @Column(name = "latitude")
-    private String latitude;
+    private Double latitude;
 
     @Column(name = "longitude")
-    private String longitude;
+    private Double longitude;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
 
-    @Column(name = "time_wage",nullable = false)
-    private Integer timeWage;
-
-    @Column(name = "month_wage",nullable = false)
-    private Integer monthWage;
-
     @Column(name = "mbti", nullable = false)
     private String mbti;
+
+    @Column(name="heart_count")
+    private Integer heartCount;
 
     public enum LoginRole {
         ROLE_USER, ROLE_ADMIN,
