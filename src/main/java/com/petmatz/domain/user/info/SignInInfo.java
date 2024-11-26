@@ -1,4 +1,4 @@
-package com.petmatz.user.request.info;
+package com.petmatz.domain.user.info;
 
 import lombok.Builder;
 import lombok.Data;

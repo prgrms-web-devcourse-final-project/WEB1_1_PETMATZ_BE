@@ -1,7 +1,7 @@
-package com.petmatz.user.request;
+package com.petmatz.api.user.request;
 
 import com.petmatz.domain.user.entity.User;
-import com.petmatz.user.request.info.SignUpInfo;
+import com.petmatz.domain.user.info.SignUpInfo;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;

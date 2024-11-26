@@ -1,8 +1,11 @@
 package com.petmatz.domain.user.service;
 
-import com.petmatz.user.request.*;
-import com.petmatz.user.request.info.*;
-import com.petmatz.user.response.*;
+import com.petmatz.api.user.request.DeleteIdRequestDto;
+import com.petmatz.api.user.request.EmailCertificationRequestDto;
+import com.petmatz.api.user.request.HeartingRequestDto;
+import com.petmatz.api.user.request.SendRepasswordRequestDto;
+import com.petmatz.domain.user.info.*;
+import com.petmatz.domain.user.response.*;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 

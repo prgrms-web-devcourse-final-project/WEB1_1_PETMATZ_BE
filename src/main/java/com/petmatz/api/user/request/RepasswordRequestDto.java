@@ -1,6 +1,6 @@
-package com.petmatz.user.request;
+package com.petmatz.api.user.request;
 
-import com.petmatz.user.request.info.RepasswordInfo;
+import com.petmatz.domain.user.info.RepasswordInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

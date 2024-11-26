@@ -1,4 +1,4 @@
-package com.petmatz.user.request;
+package com.petmatz.api.user.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class EmailCertificationRequestDto {
-    @Email
+public class DeleteIdRequestDto {
     @NotBlank
-    private String accountId;
+    private String password;
 }

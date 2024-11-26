@@ -1,8 +1,7 @@
 package com.petmatz.api.user.controller;
 
-import com.petmatz.domain.user.service.UserService;
-import com.petmatz.user.request.*;
-import com.petmatz.user.response.*;
+import com.petmatz.api.user.request.*;
+import com.petmatz.domain.user.response.*;
 import com.petmatz.domain.user.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;

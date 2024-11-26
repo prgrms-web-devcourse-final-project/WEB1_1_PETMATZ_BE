@@ -1,4 +1,4 @@
-package com.petmatz.user.request;
+package com.petmatz.api.user.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

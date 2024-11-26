@@ -1,8 +1,8 @@
 package com.petmatz.domain.user.entity;
 
 
-import com.petmatz.user.request.info.EditMyProfileInfo;
-import com.petmatz.user.request.info.SignUpInfo;
+import com.petmatz.domain.user.info.EditMyProfileInfo;
+import com.petmatz.domain.user.info.SignUpInfo;
 
 import java.time.LocalDateTime;
 

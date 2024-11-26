@@ -1,4 +1,4 @@
-package com.petmatz.user.response;
+package com.petmatz.domain.user.response;
 
 import com.petmatz.user.common.LogInResponseDto;
 import com.petmatz.user.common.ResponseCode;
