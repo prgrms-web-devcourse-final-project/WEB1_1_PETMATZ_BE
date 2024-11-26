@@ -38,8 +38,10 @@ public class Pet extends BaseEntity {
     @Column(name = "gender", nullable = false)
     private Gender gender; // 성별
 
-    @Column(name = "is_neutered", nullable = false)
-    private String isNeutered; // 중성화 여부
+    // String 그대로 반환
+    @Getter
+    @Column(name = "is_neutered", columnDefinition = "VARCHAR(10)", nullable = false)
+    private String neuterYn; // 중성화 여부
 
     @Column(name = "temperament")
     private String temperament; // 성격
@@ -85,5 +87,6 @@ public class Pet extends BaseEntity {
             };
         }
     }
+
 }
 

@@ -2,7 +2,9 @@ package com.petmatz.domain.pet;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.petmatz.api.pet.PetInfoDto;
+import com.petmatz.api.pet.dto.PetInfoDto;
+import com.petmatz.domain.pet.dto.PetServiceDto;
+import com.petmatz.domain.pet.dto.PetServiceDtoFactory;
 import com.petmatz.domain.pet.exception.ImageErrorCode;
 import com.petmatz.domain.pet.exception.ImageServiceException;
 import com.petmatz.domain.pet.exception.PetErrorCode;
@@ -29,18 +31,16 @@ public class PetService {
 
     private final PetRepository repository;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    // 실행 디렉토리 기준으로 uploads 폴더 설정
     private final String uploadDir = System.getProperty("user.dir") + "/uploads/";
 
-    // 동물등록번호 유효한지 조회만. 디비에 저장은 X
-    public PetServiceDto fetchPetInfo(PetServiceDto serviceDto) {
-        try {
-            if (repository.existsByDogRegNo(serviceDto.dogRegNo())) {
-                throw new PetServiceException(PetErrorCode.DOG_REG_NO_DUPLICATE);
-            }
+    // 동물 등록 정보를 외부 API로 가져오는 메서드
+    public PetServiceDto fetchPetInfo(String dogRegNo, String ownerNm) {
+        if (repository.existsByDogRegNo(dogRegNo)) {
+            throw new PetServiceException(PetErrorCode.DOG_REG_NO_DUPLICATE);
+        }
 
-            // API 호출 및 데이터 파싱
-            String response = callApi(serviceDto.dogRegNo(), serviceDto.ownerNm());
+        try {
+            String response = callApi(dogRegNo, ownerNm);
             JsonNode rootNode = objectMapper.readTree(response);
             JsonNode item = rootNode.path("response").path("body").path("item");
 
@@ -48,12 +48,10 @@ public class PetService {
                 throw new PetServiceException(PetErrorCode.FETCH_FAILED, "API_RESPONSE");
             }
 
-            // 조회된 데이터를 DTO로 변환
+            // API 결과를 PetInfoDto로 변환 후 PetServiceDto 생성
             PetInfoDto infoDto = objectMapper.treeToValue(item, PetInfoDto.class);
-
-            // PetServiceDto 변환
-            return PetServiceDto.of(infoDto);
-        }catch (IOException e) {
+            return PetServiceDtoFactory.from(infoDto);
+        } catch (IOException e) {
             throw new PetServiceException(PetErrorCode.FETCH_FAILED, "IO_EXCEPTION");
         } catch (PetServiceException e) {
             throw e;
@@ -62,83 +60,86 @@ public class PetService {
         }
     }
 
-    public void savePet(User user, PetServiceDto serviceDto) {
-        // Pet 엔티티 생성
-        Pet pet = Pet.builder()
-                .user(user)
-                .dogRegNo(serviceDto.dogRegNo())
-                .petName(serviceDto.petName())
-                .breed(serviceDto.breed())
-                .gender("수컷".equals(serviceDto.gender()) ? Pet.Gender.수컷 : Pet.Gender.암컷)
-                .isNeutered(serviceDto.isNeutered())
-                .size(Pet.Size.fromString(serviceDto.size()))
-                .age(serviceDto.age())
-                .temperament(serviceDto.temperament())
-                .preferredWalkingLocation(serviceDto.preferredWalkingLocation())
-                .profileImg(serviceDto.profileImg())
-                .comment(serviceDto.comment())
-                .build();
-
-        // 중복된 동물등록번호 검사
-        if (repository.existsByDogRegNo(pet.getDogRegNo())) {
+    // 펫 저장
+    public void savePet(User user, PetServiceDto dto) {
+        if (repository.existsByDogRegNo(dto.dogRegNo())) {
             throw new PetServiceException(PetErrorCode.DOG_REG_NO_DUPLICATE);
         }
 
-        // 데이터 저장
+        // DTO에서 Pet 엔티티 생성
+        Pet pet = Pet.builder()
+                .user(user)
+                .dogRegNo(dto.dogRegNo())
+                .petName(dto.petName())
+                .breed(dto.breed())
+                .gender(Pet.Gender.fromString(dto.gender()))
+                .neuterYn(dto.neuterYn())
+                .size(Pet.Size.fromString(dto.size()))
+                .age(dto.age())
+                .temperament(dto.temperament())
+                .preferredWalkingLocation(dto.preferredWalkingLocation())
+                .profileImg(dto.profileImg())
+                .comment(dto.comment())
+                .build();
+
         repository.save(pet);
     }
 
-
-    public void updatePet(Long id, User user, PetServiceDto serviceDto) {
-        Pet existingPet = repository.findByIdAndUser(id, user)
+    // 펫 업데이트
+    public void updatePet(Long petId, User user, PetServiceDto updatedDto) {
+        Pet existingPet = repository.findByIdAndUser(petId, user)
                 .orElseThrow(() -> new PetServiceException(PetErrorCode.PET_NOT_FOUND));
 
-        Pet updatedPet = Pet.builder()
-                .id(existingPet.getId())
-                .user(existingPet.getUser())
-                .dogRegNo(existingPet.getDogRegNo())
-                .petName(serviceDto.petName() != null ? serviceDto.petName() : existingPet.getPetName())
-                .breed(serviceDto.breed() != null ? serviceDto.breed() : existingPet.getBreed())
-                .gender(serviceDto.gender() != null ? Pet.Gender.fromString(serviceDto.gender()) : existingPet.getGender())
-                .isNeutered(serviceDto.isNeutered() != null ? serviceDto.isNeutered() : existingPet.getIsNeutered())
-                .size(serviceDto.size() != null ? Pet.Size.fromString(serviceDto.size()) : existingPet.getSize())
-                .age(serviceDto.age() != null ? serviceDto.age() : existingPet.getAge())
-                .temperament(serviceDto.temperament() != null ? serviceDto.temperament() : existingPet.getTemperament())
-                .preferredWalkingLocation(serviceDto.preferredWalkingLocation() != null ? serviceDto.preferredWalkingLocation() : existingPet.getPreferredWalkingLocation())
-                .profileImg(serviceDto.profileImg() != null ? serviceDto.profileImg() : existingPet.getProfileImg())
-                .comment(serviceDto.comment() != null ? serviceDto.comment() : existingPet.getComment())
-                .build();
+        try {
+            // 병합된 DTO를 기반으로 엔티티 생성
+            Pet updatedPet = Pet.builder()
+                    .id(existingPet.getId())
+                    .user(user)
+                    .dogRegNo(updatedDto.dogRegNo() != null ? updatedDto.dogRegNo() : existingPet.getDogRegNo())
+                    .petName(updatedDto.petName() != null ? updatedDto.petName() : existingPet.getPetName())
+                    .breed(updatedDto.breed() != null ? updatedDto.breed() : existingPet.getBreed())
+                    .gender(updatedDto.gender() != null ? Pet.Gender.fromString(updatedDto.gender()) : existingPet.getGender())
+                    .neuterYn(updatedDto.neuterYn() != null ? updatedDto.neuterYn() : existingPet.getNeuterYn())
+                    .size(updatedDto.size() != null ? Pet.Size.fromString(updatedDto.size()) : existingPet.getSize())
+                    .age(updatedDto.age() != null ? updatedDto.age() : existingPet.getAge())
+                    .temperament(updatedDto.temperament() != null ? updatedDto.temperament() : existingPet.getTemperament())
+                    .preferredWalkingLocation(updatedDto.preferredWalkingLocation() != null ? updatedDto.preferredWalkingLocation() : existingPet.getPreferredWalkingLocation())
+                    .profileImg(updatedDto.profileImg() != null ? updatedDto.profileImg() : existingPet.getProfileImg())
+                    .comment(updatedDto.comment() != null ? updatedDto.comment() : existingPet.getComment())
+                    .createdAt(existingPet.getCreatedAt())
+                    .build();
 
-        repository.save(updatedPet);
+            repository.save(updatedPet);
+        } catch (Exception e) {
+            throw new PetServiceException(PetErrorCode.UPDATE_FAILED, "GENERAL_EXCEPTION");
+        }
     }
 
-    public void deletePet(Long id, User user) {
-        Pet pet = repository.findByIdAndUser(id, user)
+
+    // 펫 삭제
+    public void deletePet(Long petId, User user) {
+        Pet pet = repository.findByIdAndUser(petId, user)
                 .orElseThrow(() -> new PetServiceException(PetErrorCode.PET_NOT_FOUND));
         repository.delete(pet);
     }
 
+    // 이미지 업로드
     public Map<String, String> uploadImage(MultipartFile file) {
-        try {
-            // 파일 비어있는지 검증
-            if (file.isEmpty()) {
-                throw new ImageServiceException(ImageErrorCode.INVALID_FILE_FORMAT);
-            }
+        if (file.isEmpty()) {
+            throw new ImageServiceException(ImageErrorCode.INVALID_FILE_FORMAT);
+        }
 
-            // 파일 이름 생성
+        try {
             String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
             String filePath = uploadDir + fileName;
 
-            // 디렉토리 생성
             File uploadDirFile = new File(uploadDir);
             if (!uploadDirFile.exists() && !uploadDirFile.mkdirs()) {
                 throw new ImageServiceException(ImageErrorCode.FILE_UPLOAD_ERROR, "FILE_SYSTEM");
             }
 
-            // 파일 저장
             file.transferTo(new File(filePath));
 
-            // 파일 정보 반환
             Map<String, String> response = new HashMap<>();
             response.put("fileName", fileName);
             response.put("filePath", filePath);
@@ -149,36 +150,32 @@ public class PetService {
         }
     }
 
+    // 외부 API 호출
     private String callApi(String dogRegNo, String ownerNm) throws Exception {
         String baseUrl = "http://apis.data.go.kr/1543061/animalInfoSrvc/animalInfo";
-        String serviceKey = "pKvmFkk28rLMAzf45F57ROEOkGB1ofd1JjdhjC7yEGjr7YKzJ107n9o1GKJPU5jNobwFuNmZn7%2B3QLMfi%2FP6XQ%3D%3D";
+        String serviceKey = "YOUR_SERVICE_KEY";
 
         StringBuilder urlBuilder = new StringBuilder(baseUrl);
-        urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=" + serviceKey);
-        urlBuilder.append("&" + URLEncoder.encode("dog_reg_no", "UTF-8") + "=" + URLEncoder.encode(dogRegNo, "UTF-8"));
-        urlBuilder.append("&" + URLEncoder.encode("owner_nm", "UTF-8") + "=" + URLEncoder.encode(ownerNm, "UTF-8"));
-        urlBuilder.append("&" + URLEncoder.encode("_type", "UTF-8") + "=" + URLEncoder.encode("json", "UTF-8"));
+        urlBuilder.append("?").append(URLEncoder.encode("serviceKey", "UTF-8")).append("=").append(serviceKey);
+        urlBuilder.append("&").append(URLEncoder.encode("dog_reg_no", "UTF-8")).append("=").append(URLEncoder.encode(dogRegNo, "UTF-8"));
+        urlBuilder.append("&").append(URLEncoder.encode("owner_nm", "UTF-8")).append("=").append(URLEncoder.encode(ownerNm, "UTF-8"));
+        urlBuilder.append("&").append(URLEncoder.encode("_type", "UTF-8")).append("=").append("json");
 
-        URL url = new URL(urlBuilder.toString());
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        HttpURLConnection conn = (HttpURLConnection) new URL(urlBuilder.toString()).openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-type", "application/json");
 
-        BufferedReader rd = (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300)
-                ? new BufferedReader(new InputStreamReader(conn.getInputStream()))
-                : new BufferedReader(new InputStreamReader(conn.getErrorStream()));
-
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = rd.readLine()) != null) {
-            sb.append(line);
+        try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = rd.readLine()) != null) {
+                response.append(line);
+            }
+            return response.toString();
         }
-        rd.close();
-        conn.disconnect();
-
-        return sb.toString();
     }
 }
+
 
 
 
