@@ -1,6 +1,6 @@
 package com.petmatz.match;
 
-import com.petmatz.domain.match.dto.response.UserMatchResponse;
+import com.petmatz.domain.match.response.UserMatchResponse;
 import com.petmatz.domain.match.entity.User;
 import com.petmatz.domain.match.service.MatchPlaceService;
 import org.junit.jupiter.api.Test;

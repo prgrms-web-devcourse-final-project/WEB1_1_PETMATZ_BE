@@ -1,16 +1,14 @@
 package com.petmatz.domain.match.service;
 
-import com.petmatz.domain.match.dto.request.DistanceRequest;
-import com.petmatz.domain.match.dto.response.MatchResultResponse;
-import com.petmatz.domain.match.dto.response.UserMatchResponse;
+import com.petmatz.api.match.request.DistanceRequest;
 import com.petmatz.domain.match.entity.User;
-import com.petmatz.domain.match.repo.MatchUserRepository;
+import com.petmatz.domain.match.exception.MatchException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+
+import static com.petmatz.domain.match.exception.MatchErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +27,7 @@ public class MatchPlaceService {
         double a = Math.pow(Math.sin(deltaLat / 2), 2) +
                 Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(deltaLon / 2), 2);
         double c = 2 * Math.asin(Math.sqrt(a));
+
         return EARTH_RADIUS_KM * c; // (km)
     }
 
@@ -36,27 +35,47 @@ public class MatchPlaceService {
         double totalScore = 0.0;
 
         for (User targetUser : allUsers) {
-            if (user.getId().equals(targetUser.getId())) continue;
+            if (user.getId().equals(targetUser.getId())) {
+                continue;
+            }
 
-            // 거리 계산
-            DistanceRequest distanceRequest = new DistanceRequest(
+            try {
+                checkLatitudeLongitude(user, "User");
+                checkLatitudeLongitude(targetUser, "Target user");
+
+                double distance = calculateDistance(createDistanceRequest(user, targetUser));
+
+                if (distance <= radiusKm) {
+                    totalScore += calculateDistanceScore(distance);
+                }
+
+            } catch (MatchException e) {
+                throw new MatchException(INVALID_MATCH_DATA,
+                        "Error for user " + user.getId() + " and target " + targetUser.getId() + ": " + e.getMessage());
+            }
+        }
+
+        return totalScore;
+    }
+
+        public void checkLatitudeLongitude (User user, String userType){
+            if (user.getLatitude() == null) {
+                throw new MatchException(INSUFFICIENT_LATITUDE_DATA, userType);
+            }
+            if (user.getLongitude() == null) {
+                throw new MatchException(INSUFFICIENT_LONGITUDE_DATA, userType);
+            }
+        }
+
+        private DistanceRequest createDistanceRequest(User user, User targetUser) {
+            return new DistanceRequest(
                     Double.parseDouble(user.getLatitude()),
                     Double.parseDouble(user.getLongitude()),
                     Double.parseDouble(targetUser.getLatitude()),
                     Double.parseDouble(targetUser.getLongitude())
             );
-
-            double distance = calculateDistance(distanceRequest);
-
-            // 점수 계산 (거리만 사용하여 점수 계산)
-            if (distance <= radiusKm) {
-                double distanceScore = calculateDistanceScore(distance); // 거리 기반 점수 계산
-                totalScore += distanceScore; // 점수 합산
-            }
         }
 
-        return totalScore; // 최종 점수 반환
-    }
 
     private double calculateDistanceScore(double distance) {
         if (distance <= 0.5) {

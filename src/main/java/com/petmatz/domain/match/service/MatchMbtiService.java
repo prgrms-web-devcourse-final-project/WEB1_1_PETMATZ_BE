@@ -1,11 +1,14 @@
 package com.petmatz.domain.match.service;
 
+import com.petmatz.domain.match.exception.MatchException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.petmatz.domain.match.exception.MatchErrorCode.INSUFFICIENT_MBTI_DATA;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +22,7 @@ public class MatchMbtiService {
         Map<Object, Object> scores = redisTemplate.opsForHash().entries(redisKey);
 
         if (scores.isEmpty()) {
-            throw new RuntimeException("예외는 추후 처리");
+            throw new MatchException(INSUFFICIENT_MBTI_DATA);
         }
 
         return scores.entrySet().stream()
@@ -37,7 +40,7 @@ public class MatchMbtiService {
         Object score = redisTemplate.opsForHash().get(redisKey, fieldKey);
 
         if (score == null) {
-            throw new RuntimeException("예외는 추후 처리");
+            throw new MatchException(INSUFFICIENT_MBTI_DATA);
         }
 
         return Integer.parseInt(score.toString());

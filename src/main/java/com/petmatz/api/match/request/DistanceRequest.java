@@ -1,4 +1,4 @@
-package com.petmatz.domain.match.dto.request;
+package com.petmatz.api.match.request;
 
 public record DistanceRequest(
         double latitude1,  // 기준 사용자의 위도

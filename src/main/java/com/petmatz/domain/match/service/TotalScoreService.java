@@ -1,6 +1,6 @@
 package com.petmatz.domain.match.service;
 
-import com.petmatz.domain.match.dto.response.MatchResultResponse;
+import com.petmatz.domain.match.response.MatchResultResponse;
 import com.petmatz.domain.match.entity.User;
 import com.petmatz.domain.match.repo.MatchUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -60,7 +60,8 @@ public class TotalScoreService {
             double careScore = matchCareService.calculateCareScore(targetUser.getIsCareAvailable());
 
             // 11/25 사용자와 연결된 펫의 크기를 타고 가야할것 같음.
-            double sizeScore = matchSizeService.calculateDogSizeScore("머지후 개발 ");
+//            double sizeScore = matchSizeService.calculateDogSizeScore("머지후 개발 ");
+            double sizeScore = 10.0; // 임시 점수
 
             double mbtiScore = matchMbtiService.calculateMbtiScore(user.getMbti(), targetUser.getEmail());
 
@@ -78,6 +79,4 @@ public class TotalScoreService {
         }
         return matchResults;
     }
-
-
 }

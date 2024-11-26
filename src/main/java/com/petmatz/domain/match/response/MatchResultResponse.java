@@ -1,4 +1,4 @@
-package com.petmatz.domain.match.dto.response;
+package com.petmatz.domain.match.response;
 
 public record MatchResultResponse(
         Long id,
