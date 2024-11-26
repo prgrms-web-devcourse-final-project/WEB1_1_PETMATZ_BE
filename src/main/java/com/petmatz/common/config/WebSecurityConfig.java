@@ -62,10 +62,11 @@ public class WebSecurityConfig {
                 .httpBasic(HttpBasicConfigurer::disable) // HTTP Basic 인증 비활성화
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 비활성화 (JWT 사용)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/", "/api/auth/**", "/oauth2/**").permitAll() // 인증 없이 접근 가능
+                                .anyRequest().permitAll() // 모든 요청 허용/* request
+                       /* .requestMatchers("/", "/api/auth/**", "/oauth2/**").permitAll() // 인증 없이 접근 가능
                         .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN") // USER, ADMIN둘다 가능
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // ADMIN 역할 필요
-                        .anyRequest().authenticated() // 나머지 요청은 인증 필요
+                        .anyRequest().authenticated()*/// 나머지 요청은 인증 필요
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(endpoint -> endpoint.baseUri("/api/auth/oauth2")) // OAuth2 로그인 엔드포인트 설정
