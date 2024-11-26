@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class UserToChatRoomEntity {
 
@@ -17,16 +16,28 @@ public class UserToChatRoomEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user; // 채팅방 참여자
+    @JoinColumn(name = "account_id", referencedColumnName = "account_id", nullable = false)
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_id", nullable = false)
     private ChatRoomEntity chatRoom; // 채팅방
 
-    @Builder
-    public UserToChatRoomEntity(User user, ChatRoomEntity chatRoom) {
+    public UserToChatRoomEntity() {
+
+    }
+
+    public void addUser(User user) {
         this.user = user;
+        if (!user.getChatRooms().contains(this)) {
+            user.getChatRooms().add(this); // 양방향 관계 설정
+        }
+    }
+
+    public void addChatRoom(ChatRoomEntity chatRoom) {
         this.chatRoom = chatRoom;
+        if (!chatRoom.getParticipants().contains(this)) {
+            chatRoom.getParticipants().add(this); // 양방향 관계 설정
+        }
     }
 }

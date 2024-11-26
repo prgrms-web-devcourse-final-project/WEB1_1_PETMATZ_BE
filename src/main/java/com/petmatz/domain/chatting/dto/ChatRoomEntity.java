@@ -10,7 +10,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoomEntity extends BaseEntity {
 
     @EqualsAndHashCode.Include
@@ -22,16 +21,12 @@ public class ChatRoomEntity extends BaseEntity {
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserToChatRoomEntity> participants = new ArrayList<>();
 
-    @Builder
-    public ChatRoomEntity(List<UserToChatRoomEntity> participants) {
-        this.participants = participants;
+
+    public void addParticipant(UserToChatRoomEntity participant) {
+        this.participants.add(participant);
+        participant.addChatRoom(this); // 연관관계 편의 메서드
     }
 
-    public static ChatRoomEntity of(ChatRoomInfo chatRoomInfo) {
-        return ChatRoomEntity.builder()
-                .participants()
-                .build();
-    }
     public ChatRoomListInfo toChatRoomListInfo(String userName) {
         return ChatRoomListInfo.builder()
                 .chatRoomId(String.valueOf(id))
@@ -40,7 +35,13 @@ public class ChatRoomEntity extends BaseEntity {
     }
 
     private String choseUserName(String userName) {
-        return userName.equals(user1) ? user1 : user2;
+        for (UserToChatRoomEntity participant : participants) {
+            if (!participant.getUser().getEmail().equals(userName)) {
+                // 현재 사용자가 아닌 참여자의 이름 반환
+                return participant.getUser().getEmail();
+            }
+        }
+        throw new IllegalArgumentException("No other participant found in the chat room for user: " + userName);
     }
 
 }

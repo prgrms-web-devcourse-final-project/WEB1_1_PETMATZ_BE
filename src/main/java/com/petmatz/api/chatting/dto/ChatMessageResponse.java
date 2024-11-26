@@ -32,7 +32,7 @@ public record ChatMessageResponse(
                 .pageNumber(pageNumber)
                 .totalPages(totalPages)
                 .totalElements(totalElements)
-                .other(null)
+                .other(other)
                 .build();
     }
 

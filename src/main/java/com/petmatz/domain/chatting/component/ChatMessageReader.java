@@ -77,7 +77,7 @@ public class ChatMessageReader {
         return Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("_id").is(chatRoomsId)), // 특정 채팅방 필터
                 Aggregation.unwind("messages"), // 배열의 각 메시지를 분리
-                Aggregation.project("messages.senderId", "messages.receiverId", "messages.msg", "messages.msgTimestamp")
+                Aggregation.project("messages.senderEmail", "messages.receiverEmail", "messages.msg", "messages.msgTimestamp")
                         .and("messages.msgTimestamp").as("msgTimestamp"),
                 Aggregation.sort(Sort.Direction.DESC, "msgTimestamp"), // 최신 메시지 정렬
                 Aggregation.skip(skipCount), // 시작 위치

@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,6 +28,11 @@ public class ChatController {
 
     private final ChatMessageService chatService;
     private final SimpMessagingTemplate simpMessagingTemplate;
+
+
+    //TODO 메세지 전송 ( 구독한 쪽으로 )
+//    @MessageMapping("/chat")
+//    @SendTo("/topic/chat/{chatRoomId}")
 
     @MessageMapping("/chat")
     public void sendPrivateMessage(ChatMessageRequest chatMessageRequest) {
@@ -42,6 +48,7 @@ public class ChatController {
 
 
     //TODO sender는 Token 파싱해서 사용, Pagin적용해서 보내기
+
     @GetMapping("/chat/message")
     @Operation(summary = "메세지 내역 긁어오기", description = "채팅방의 메세지 내역을 긁어오는 API")
     @Parameters({

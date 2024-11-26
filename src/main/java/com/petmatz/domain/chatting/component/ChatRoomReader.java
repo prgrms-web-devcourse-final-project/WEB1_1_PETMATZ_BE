@@ -2,6 +2,7 @@ package com.petmatz.domain.chatting.component;
 
 import com.petmatz.domain.chatting.dto.*;
 import com.petmatz.domain.chatting.repository.ChatRoomRepository;
+import com.petmatz.domain.chatting.repository.UserToChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -19,11 +20,13 @@ import java.util.stream.Collectors;
 public class ChatRoomReader {
 
     private final ChatRoomRepository chatRoomRepository;
+    private final UserToChatRoomRepository userToChatRoomRepository;
 
     //TODO 예외처리 해야 함.
     //자기자신이 속한 채팅방을 전부 조회
-    public List<ChatRoomEntity> findChatRoomNumber(String userEmail) {
-        Optional<List<ChatRoomEntity>> chatRoomEntities = chatRoomRepository.selectUserInChatRoomList(userEmail);
+    public List<UserToChatRoomEntity> findChatRoomNumber(String userEmail) {
+        Optional<List<UserToChatRoomEntity>> chatRoomEntities = userToChatRoomRepository.findByUser_AccountId(userEmail);
+        System.out.println(chatRoomEntities.get());
         return chatRoomEntities.get();
     }
 
