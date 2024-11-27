@@ -68,7 +68,7 @@ public class ChatController {
                                          @RequestParam String senderEmail,
                                          @RequestParam String receiverEmail,
                                          @RequestParam String chatRoomId,
-                                         @RequestParam(defaultValue = "5") int pageSize,
+                                         @RequestParam(defaultValue = "15") int pageSize,
                                          @RequestParam(defaultValue = "1") int startPage
     ) {
 
