@@ -1,6 +1,7 @@
 package com.petmatz.domain.user.entity;
 
 
+import com.petmatz.api.user.request.UpdateRecommendationRequestDto;
 import com.petmatz.domain.user.info.EditMyProfileInfo;
 import com.petmatz.domain.user.info.SignUpInfo;
 import com.petmatz.domain.user.info.UpdateLocationInfo;
@@ -177,4 +178,32 @@ public class UserFactory {
                 .build();
     }
 
+    public static User createRecommendationUpdateUser(User user, Integer recommendationCount) {
+        return User.builder()
+                .id(user.getId())
+                .accountId(user.getAccountId())
+                .password(user.getPassword())
+                .nickname(user.getNickname())
+                .email(user.getEmail())
+                .profileImg(user.getProfileImg())
+                .loginRole(user.getLoginRole())
+                .loginType(user.getLoginType())
+                .role(user.getRole())
+                .gender(user.getGender())
+                .preferredSize(user.getPreferredSize())
+                .introduction(user.getIntroduction())
+                .isCareAvailable(user.getIsCareAvailable())
+                .isRegistered(user.getIsRegistered())
+                .recommendationCount(recommendationCount)
+                .careCompletionCount(user.getCareCompletionCount())
+                .latitude(user.getLatitude())
+                .longitude(user.getLongitude())
+                .isDeleted(user.getIsDeleted())
+                .mbti(user.getMbti())
+                .region(user.getRegion())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+    }
 }
