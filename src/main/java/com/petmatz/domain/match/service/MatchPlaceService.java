@@ -76,10 +76,10 @@ public class MatchPlaceService {
     }
 
     public void checkLatitudeLongitude(User user, String userType) {
-        if (user.getLatitude() == null) {
+        if (user.getLatitude() <= 0) {
             throw new MatchException(INSUFFICIENT_LATITUDE_DATA, userType);
         }
-        if (user.getLongitude() == null) {
+        if (user.getLongitude() <= 0) {
             throw new MatchException(INSUFFICIENT_LONGITUDE_DATA, userType);
         }
     }

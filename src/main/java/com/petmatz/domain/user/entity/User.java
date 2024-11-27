@@ -1,5 +1,6 @@
 package com.petmatz.domain.user.entity;
 
+import com.petmatz.domain.chatting.dto.UserToChatRoomEntity;
 import com.petmatz.domain.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -77,10 +78,10 @@ public class User extends BaseEntity {
     private Integer careCompletionCount;
 
     @Column(name = "latitude")
-    private double latitude;
+    private Double latitude;
 
     @Column(name = "longitude")
-    private double longitude;
+    private Double longitude;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
@@ -93,6 +94,9 @@ public class User extends BaseEntity {
 
     @Column(name = "mbti", nullable = false)
     private String mbti;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserToChatRoomEntity> chatRooms = new ArrayList<>();
 
     public enum LoginRole {
         ROLE_USER, ROLE_ADMIN,
