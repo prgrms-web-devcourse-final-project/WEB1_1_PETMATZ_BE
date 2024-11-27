@@ -1,14 +1,10 @@
 package com.petmatz.api.user.request;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @NoArgsConstructor
-public class GetMyProfileRequestDto {
-    @NotNull
+public class UpdateRecommendationRequestDto {
     private Long userId;
 }

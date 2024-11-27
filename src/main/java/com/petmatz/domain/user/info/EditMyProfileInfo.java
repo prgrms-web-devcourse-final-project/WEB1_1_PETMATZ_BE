@@ -13,8 +13,4 @@ public class EditMyProfileInfo {
     private String introduction;
 
     private boolean isCareAvailable;
-
-    private Integer timeWage;
-
-    private Integer monthWage;
 }

@@ -57,7 +57,6 @@ public class User extends BaseEntity {
     @Column(name = "gender")
     private Gender gender; // 'Male', 'Female'
 
-    //    @Enumerated(EnumType.STRING)
     @Column(name = "preferred_size", nullable = false)
     private String preferredSize; // 'Small', 'Medium', 'Large',
 
@@ -85,14 +84,11 @@ public class User extends BaseEntity {
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
 
-    @Column(name = "time_wage",nullable = false)
-    private Integer timeWage;
-
-    @Column(name = "month_wage",nullable = false)
-    private Integer monthWage;
-
     @Column(name = "mbti", nullable = false)
     private String mbti;
+
+    @Column(name="region")
+    private String region;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserToChatRoomEntity> chatRooms = new ArrayList<>();
@@ -116,9 +112,5 @@ public class User extends BaseEntity {
     public enum Gender {
         Male, Female
     }
-
-//    public enum PreferredSize {
-//        Small, Medium, Large
-//    }
 
 }

@@ -1,5 +1,7 @@
 package com.petmatz.domain.user.service;
 
+import com.petmatz.api.user.request.*;
+import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.common.security.utils.JwtProvider;
 import com.petmatz.domain.user.entity.Certification;
 import com.petmatz.domain.user.entity.Heart;
@@ -13,10 +15,6 @@ import com.petmatz.domain.user.repository.HeartRepository;
 import com.petmatz.domain.user.repository.UserRepository;
 import com.petmatz.domain.user.response.*;
 import com.petmatz.user.common.LogInResponseDto;
-import com.petmatz.api.user.request.DeleteIdRequestDto;
-import com.petmatz.api.user.request.EmailCertificationRequestDto;
-import com.petmatz.api.user.request.HeartingRequestDto;
-import com.petmatz.api.user.request.SendRepasswordRequestDto;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +43,9 @@ public class UserServiceImpl implements UserService {
     private final EmailProvider emailProvider;
     private final RePasswordEmailProvider rePasswordEmailProvider;
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final JwtExtractProvider jwtExtractProvider;
+
+    private final GeocodingService geocodingService;
 
 
     @Override
@@ -166,7 +167,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<? super DeleteIdResponseDto> deleteId(DeleteIdRequestDto dto) {
         try {
-            String accountId = findAccountIdFromJwt();
+            String accountId = jwtExtractProvider.findAccountIdFromJwt();
             User user = userRepository.findByAccountId(accountId);
             if (user == null) return DeleteIdResponseDto.idNotFound();  // 사용자 조회 실패
 
@@ -192,7 +193,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<? super GetMyProfileResponseDto> getMypage() {
         try {
-            String accountId = findAccountIdFromJwt();
+            String accountId = jwtExtractProvider.findAccountIdFromJwt();
             User user = userRepository.findByAccountId(accountId);
 
 
@@ -210,27 +211,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<? super GetMyProfileResponseDto> getOtherMypage(Long userId) {
+    public ResponseEntity<? super GetOtherProfileResponseDto> getOtherMypage(Long userId) {
         try {
             Optional<User> user = userRepository.findById(userId);
 
             boolean exists = userRepository.existsById(userId);
             if (!exists) {
-                return GetMyProfileResponseDto.userNotFound();
+                return GetOtherProfileResponseDto.userNotFound();
             }
 
-            return GetMyProfileResponseDto.success(user.orElse(null));
+            return GetOtherProfileResponseDto.success(user.orElse(null));
 
         } catch (Exception e) {
             e.printStackTrace();
-            return GetMyProfileResponseDto.databaseError();
+            return GetOtherProfileResponseDto.databaseError();
         }
     }
 
     @Override
     public ResponseEntity<? super EditMyProfileResponseDto> editMyProfile(EditMyProfileInfo info) {
         try {
-            String accountId = findAccountIdFromJwt();
+            String accountId = jwtExtractProvider.findAccountIdFromJwt();
             User user = userRepository.findByAccountId(accountId);
 
             boolean exists = userRepository.existsByAccountId(accountId);
@@ -252,12 +253,13 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<? super HeartingResponseDto> hearting(HeartingRequestDto dto) {
         try {
             Long heartedId = dto.getHeartedId();
-            boolean exists=userRepository.existsById(heartedId);
-            if(!exists) {
+
+            boolean exists = userRepository.existsById(heartedId);
+            if (!exists) {
                 return HeartingResponseDto.heartedIdNotFound();
             }
 
-            String accountId = findAccountIdFromJwt();
+            String accountId = jwtExtractProvider.findAccountIdFromJwt();
             User user = userRepository.findByAccountId(accountId);
 
             Heart heart = Heart.builder()
@@ -279,8 +281,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<? super GetHeartingListResponseDto> getHeartedList() {
         try {
-
-            String accountId = findAccountIdFromJwt();
+            String accountId = jwtExtractProvider.findAccountIdFromJwt();
             User user = userRepository.findByAccountId(accountId);
 
             List<Heart> heartList = heartRepository.findAllByMyId(user.getId());
@@ -321,7 +322,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<? super RepasswordResponseDto> repassword(RepasswordInfo info) {
         try {
-            String accountId = findAccountIdFromJwt();
+            String accountId = jwtExtractProvider.findAccountIdFromJwt();
             User user = userRepository.findByAccountId(accountId);
 
             String currentPassword = info.getCurrentPassword();
@@ -345,13 +346,71 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private String findAccountIdFromJwt() {
-        String accountId = "Default_Id";
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            accountId = authentication.getName();
+    @Override
+    public ResponseEntity<? super UpdateLocationResponseDto> updateLocation(UpdateLocationInfo info) {
+        try {
+            String accountId = jwtExtractProvider.findAccountIdFromJwt();
+            User user = userRepository.findByAccountId(accountId);
+
+            boolean exists = userRepository.existsByAccountId(accountId);
+            if (!exists) {
+                return EditMyProfileResponseDto.editFailed();
+            }
+
+            User updatedUser = UserFactory.createLocationUpdateUser(user, info);
+            userRepository.save(updatedUser);
+
+        } catch (Exception e) {
+            log.info("위치업데이트 실패: {}", e);
+            return UpdateLocationResponseDto.wrongLocation();
         }
-        return accountId;
+        return UpdateLocationResponseDto.success();
     }
+
+    public ResponseEntity<? super UpdateLocationResponseDto> updateUserRegion() {
+        try {
+            String accountId = jwtExtractProvider.findAccountIdFromJwt();
+            User user = userRepository.findByAccountId(accountId);
+
+            boolean exists = userRepository.existsByAccountId(accountId);
+            if (!exists) {
+                return GetOtherProfileResponseDto.userNotFound();
+            }
+
+            String region = geocodingService.getRegionFromCoordinates(user.getLatitude(), user.getLongitude());
+            User updateUser = UserFactory.createRegionUpdateUser(user, region);
+
+            userRepository.save(updateUser);
+        } catch (Exception e) {
+            log.info("지역업데이트 실패: {}", e);
+            return UpdateLocationResponseDto.wrongLocation();
+        }
+        return UpdateLocationResponseDto.success();
+    }
+
+    @Override
+    public ResponseEntity<? super UpdateRecommendationResponseDto> updateRecommend(UpdateRecommendationRequestDto dto) {
+        try {
+            Long userId = dto.getUserId();
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
+
+            boolean exists = userRepository.existsById(userId);
+            if (!exists) {
+                return GetOtherProfileResponseDto.userNotFound();
+            }
+            Integer recommendationCount = user.getRecommendationCount()+1;
+
+            User updatedUser = UserFactory.createRecommendationUpdateUser(user, recommendationCount);
+
+            userRepository.save(updatedUser);
+
+        } catch (Exception e) {
+            log.info("추천수 업데이트 실패: {}", e);
+            return UpdateRecommendationResponseDto.databaseError();
+        }
+        return UpdateRecommendationResponseDto.success();
+    }
+
 
 }

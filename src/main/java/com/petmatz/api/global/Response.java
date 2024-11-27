@@ -1,4 +1,4 @@
-package com.petmatz.api.global.dto;
+package com.petmatz.api.global;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.petmatz.common.exception.ErrorReason;
