@@ -29,7 +29,7 @@ import java.io.IOException;
  * Spring Security 설정 클래스.
  * JWT 기반 인증과 OAuth2 로그인 설정을 담당하며, CORS 및 CSRF 설정도 포함.
  */
-@Configurable
+//@Configurable
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -65,7 +65,8 @@ public class WebSecurityConfig {
                         .requestMatchers("/", "/api/auth/**", "/oauth2/**").permitAll() // 인증 없이 접근 가능
                         .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN") // USER, ADMIN둘다 가능
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // ADMIN 역할 필요
-                        .anyRequest().authenticated() // 나머지 요청은 인증 필요
+//                        .anyRequest().authenticated() // 나머지 요청은 인증 필요
+                                .anyRequest().permitAll()
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(endpoint -> endpoint.baseUri("/api/auth/oauth2")) // OAuth2 로그인 엔드포인트 설정

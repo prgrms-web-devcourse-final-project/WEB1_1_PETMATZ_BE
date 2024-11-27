@@ -1,5 +1,6 @@
 package com.petmatz.domain.user.entity;
 
+import com.petmatz.domain.chatting.dto.UserToChatRoomEntity;
 import com.petmatz.domain.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -9,9 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @SuperBuilder
@@ -58,7 +57,7 @@ public class User extends BaseEntity {
     private Gender gender; // 'Male', 'Female'
 
     @Column(name = "preferred_size", nullable = false)
-    private String preferredSize; // 'Small', 'Medium', 'Large'
+    private String preferredSize; // 'Small', 'Medium', 'Large',
 
     @Column(name = "introduction")
     private String introduction;
@@ -66,7 +65,7 @@ public class User extends BaseEntity {
     @Column(name = "is_care_available", nullable = false)
     private Boolean isCareAvailable;
 
-    @Column(name = "is_registered",nullable = false)
+    @Column(name = "is_registered")
     private Boolean isRegistered;
 
     @Column(name = "recommendation_count")
@@ -76,10 +75,10 @@ public class User extends BaseEntity {
     private Integer careCompletionCount;
 
     @Column(name = "latitude")
-    private Double latitude;
+    private String latitude;
 
     @Column(name = "longitude")
-    private Double longitude;
+    private String longitude;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
@@ -89,6 +88,9 @@ public class User extends BaseEntity {
 
     @Column(name="region")
     private String region;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserToChatRoomEntity> chatRooms = new ArrayList<>();
 
     public enum LoginRole {
         ROLE_USER, ROLE_ADMIN,
