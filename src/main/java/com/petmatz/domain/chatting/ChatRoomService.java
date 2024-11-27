@@ -28,7 +28,6 @@ public class ChatRoomService {
     private final ChatRoomMetaDataDeleter chatRoomMetaDataDeleter;
     private final ChatReadStatusDeleter chatReadStatusDeleter;
 
-    private final UserToChatRoomRepository userToChatRoomRepository;
 
 
 
@@ -98,9 +97,12 @@ public class ChatRoomService {
     }
 
     public void deletRoom(String userName, String roomId) {
-        chatRoomDeleter.deleteDocs();
-        chatMessageDeleter.deleteDocs();
-        chatRoomMetaDataDeleter.deleteDocs();
-        chatReadStatusDeleter.deleteDocs();
+        List<String> strings = chatRoomReader.selectChatRoomUserList(roomId).get();
+        System.out.println("테스트입니다아아앙 : " + strings);
+
+        chatRoomDeleter.deleteDocs(userName, roomId);
+        chatMessageDeleter.deleteChatMessageDocs(userName, roomId);
+        chatRoomMetaDataDeleter.deleteChatRoomMetaDataDocs(userName, roomId);
+        chatReadStatusDeleter.deleteChatReadStatusDocs(strings, roomId);
     }
 }

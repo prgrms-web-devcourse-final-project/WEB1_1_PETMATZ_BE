@@ -34,6 +34,10 @@ public class ChatRoomReader {
         return chatRoomRepository.findChatRoomByUsers(chatRoomInfo.caregiverInfo(), chatRoomInfo.entrustedInfo());
     }
 
+    public Optional<List<String>> selectChatRoomUserList(String chatRoomId) {
+        return userToChatRoomRepository.selectChatRoomForUserList(Long.valueOf(chatRoomId));
+    }
+
 
 
 }

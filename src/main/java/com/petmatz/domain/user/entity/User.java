@@ -78,10 +78,10 @@ public class User extends BaseEntity {
     private Integer careCompletionCount;
 
     @Column(name = "latitude")
-    private double latitude;
+    private Double latitude;
 
     @Column(name = "longitude")
-    private double longitude;
+    private Double longitude;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;

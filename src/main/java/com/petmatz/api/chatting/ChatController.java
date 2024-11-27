@@ -3,6 +3,7 @@ package com.petmatz.api.chatting;
 import com.petmatz.api.chatting.dto.ChatMessage;
 import com.petmatz.api.chatting.dto.ChatMessageRequest;
 import com.petmatz.api.chatting.dto.ChatMessageResponse;
+import com.petmatz.api.chatting.dto.ChatReadStatusDirect;
 import com.petmatz.api.global.dto.Response;
 import com.petmatz.domain.chatting.ChatMessageService;
 import com.petmatz.domain.chatting.dto.ChatMessageInfo;
@@ -31,9 +32,6 @@ public class ChatController {
 
 
     //TODO 메세지 전송 ( 구독한 쪽으로 )
-//    @MessageMapping("/chat")
-//    @SendTo("/topic/chat/{chatRoomId}")
-
     @MessageMapping("/chat")
     public void sendPrivateMessage(ChatMessageRequest chatMessageRequest) {
         ChatMessageInfo chatMessageInfo = chatMessageRequest.of();
@@ -45,10 +43,15 @@ public class ChatController {
     // TODO 멍멍이 부탁등록 실시간 API 하나 파기
     // TODO 멍멍이 부탁같은 경우 채팅 DTO랑 똑같이 만들기
 
+    //TODO 메세지 읽음 처리 ( 구독한 쪽으로 ), senderId, chatRoomId
+    @MessageMapping("/chat")
+    public void sendReadStatus(ChatReadStatusDirect chatReadStatusDirect, @RequestParam("chatRoomId") String chatRoomId) {
+        String destination = "/topic/chat/" + chatRoomId;
+        simpMessagingTemplate.convertAndSend(destination, chatReadStatusDirect);
+    }
 
 
     //TODO sender는 Token 파싱해서 사용, Pagin적용해서 보내기
-
     @GetMapping("/chat/message")
     @Operation(summary = "메세지 내역 긁어오기", description = "채팅방의 메세지 내역을 긁어오는 API")
     @Parameters({

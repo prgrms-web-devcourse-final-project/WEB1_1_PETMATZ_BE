@@ -34,6 +34,7 @@ public class MatchingController {
     @PostMapping
     @Operation(summary = "채팅방 생성", description = "채팅방을 생성하는 API API")
     @Parameters({
+            @Parameter(name = "JWT [ caregiverInfo 추후 대체 ]", description = "토큰을 받아와 쓸 예정", example = "입력금지"),
             @Parameter(name = "caregiverInfo", description = "반려인 닉네임", example = "반려인이름"),
             @Parameter(name = "entrustedName", description = "돌봄이 닉네임", example = "돌봄이이름")
     })
@@ -64,7 +65,7 @@ public class MatchingController {
     @GetMapping
     @Operation(summary = "채팅방 조회", description = "해당 사용자가 보유하고 있는 채팅방 조회 API")
     @Parameters({
-            @Parameter(name = "JWT", description = "토큰을 받아와 쓸 예정", example = "입력금지"),
+            @Parameter(name = "JWT [ userEmail 추후 대체 ]", description = "토큰을 받아와 쓸 예정", example = "입력금지"),
             @Parameter(name = "userEmail", description = "현재 자기 자신의 userEmail", example = "테스트"),
             @Parameter(name = "pageSize", description = "default : 5", example = "5"),
             @Parameter(name = "startPage", description = "default : 1", example = "1"),
@@ -83,15 +84,20 @@ public class MatchingController {
                 )));
     }
 
+    //TODO Token에서 이메일 가져오기
     @DeleteMapping
     @Operation(summary = "채팅방 삭제", description = "해당 사용자가 지정한 채팅방을 삭제한다")
-    public Response<?> deleteChatRoom(
+    @Parameters({
+            @Parameter(name = "JWT [ userEmail 추후 대체 ]", description = "토큰을 받아와 쓸 예정", example = "입력금지"),
+            @Parameter(name = "userEmail", description = "현재 자기 자신의 userEmail", example = "테스트"),
+            @Parameter(name = "romId", description = "삭제하려는 Chat Room Id", example = "1"),
+    })
+    public Response<Void> deleteChatRoom(
             @RequestParam String userEmail,
             @RequestParam String roomId
-
     ) {
         chatRoomService.deletRoom(userEmail, roomId);
-        return null;
+        return Response.success("성공적으로 삭제 되었습니다.");
     }
 
 }
