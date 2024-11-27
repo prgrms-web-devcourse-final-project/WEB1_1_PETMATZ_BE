@@ -1,12 +1,10 @@
 package com.petmatz.domain.user.service;
 
-import com.petmatz.api.user.request.DeleteIdRequestDto;
-import com.petmatz.api.user.request.EmailCertificationRequestDto;
-import com.petmatz.api.user.request.HeartingRequestDto;
-import com.petmatz.api.user.request.SendRepasswordRequestDto;
+import com.petmatz.api.user.request.*;
 import com.petmatz.domain.user.info.*;
 import com.petmatz.domain.user.response.*;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 
 public interface UserService {
@@ -28,4 +26,6 @@ public interface UserService {
     ResponseEntity<? super UpdateLocationResponseDto> updateLocation(UpdateLocationInfo info);
 
     ResponseEntity<? super UpdateLocationResponseDto> updateUserRegion();
+
+    ResponseEntity<? super UpdateRecommendationResponseDto> updateRecommend(UpdateRecommendationRequestDto dto);
 }
