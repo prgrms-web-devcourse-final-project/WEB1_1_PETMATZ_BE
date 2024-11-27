@@ -2,6 +2,7 @@ package com.petmatz.domain.user.entity;
 
 import com.petmatz.domain.chatting.dto.UserToChatRoomEntity;
 import com.petmatz.domain.global.BaseEntity;
+import com.petmatz.domain.petmission.entity.PetMissionEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -10,9 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @SuperBuilder
@@ -97,6 +96,10 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserToChatRoomEntity> chatRooms = new ArrayList<>();
+
+    // 맡김이가 작성한 미션들
+    @OneToMany(mappedBy = "giver", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PetMissionEntity> givenMissions = new ArrayList<>();
 
     public enum LoginRole {
         ROLE_USER, ROLE_ADMIN,
