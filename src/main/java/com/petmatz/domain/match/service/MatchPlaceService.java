@@ -1,16 +1,13 @@
 package com.petmatz.domain.match.service;
 
-import com.petmatz.api.match.request.DistanceRequest;
+import com.petmatz.domain.match.dto.request.DistanceRequest;
 import com.petmatz.domain.match.exception.MatchException;
-import com.petmatz.domain.match.response.UserResponse;
+import com.petmatz.domain.match.dto.response.UserResponse;
 import com.petmatz.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 import static com.petmatz.domain.match.exception.MatchErrorCode.*;
-import static com.petmatz.domain.match.service.TotalScoreService.RANGE_KM;
 
 @Service
 @RequiredArgsConstructor

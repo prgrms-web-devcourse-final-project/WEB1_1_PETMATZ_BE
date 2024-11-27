@@ -1,6 +1,6 @@
-package com.petmatz.domain.match.response;
+package com.petmatz.domain.match.dto.response;
 
-public record MatchResultResponse(
+public record MatchScoreResponse(
         Long id,
         double distance,
         double distanceScore,

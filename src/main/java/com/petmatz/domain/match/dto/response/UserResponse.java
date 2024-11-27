@@ -1,4 +1,4 @@
-package com.petmatz.domain.match.response;
+package com.petmatz.domain.match.dto.response;
 
 public record UserResponse (
         Long id,
