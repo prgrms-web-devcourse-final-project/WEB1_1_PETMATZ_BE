@@ -17,18 +17,12 @@ public class EditMyProfileRequestDto {
 
     private boolean isCareAvailable;
 
-    private Integer timeWage;
-
-    private Integer monthWage;
-
     public static EditMyProfileInfo of(EditMyProfileRequestDto reqDto) {
         return EditMyProfileInfo.builder()
                 .nickname(reqDto.getNickname())
                 .preferredSize(reqDto.getPreferredSize())
                 .introduction(reqDto.getIntroduction())
                 .isCareAvailable(reqDto.isCareAvailable())
-                .timeWage(reqDto.getTimeWage())
-                .monthWage(reqDto.getMonthWage())
                 .build();
     }
 }

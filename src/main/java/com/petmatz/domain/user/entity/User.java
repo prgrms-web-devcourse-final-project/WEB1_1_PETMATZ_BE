@@ -1,5 +1,6 @@
 package com.petmatz.domain.user.entity;
 
+import com.petmatz.domain.chatting.dto.UserToChatRoomEntity;
 import com.petmatz.domain.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -9,9 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @SuperBuilder
@@ -57,7 +56,6 @@ public class User extends BaseEntity {
     @Column(name = "gender")
     private Gender gender; // 'Male', 'Female'
 
-    //    @Enumerated(EnumType.STRING)
     @Column(name = "preferred_size", nullable = false)
     private String preferredSize; // 'Small', 'Medium', 'Large',
 
@@ -77,22 +75,22 @@ public class User extends BaseEntity {
     private Integer careCompletionCount;
 
     @Column(name = "latitude")
-    private String latitude;
+    private Double latitude;
 
     @Column(name = "longitude")
-    private String longitude;
+    private Double longitude;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
 
-    @Column(name = "time_wage",nullable = false)
-    private Integer timeWage;
-
-    @Column(name = "month_wage",nullable = false)
-    private Integer monthWage;
-
     @Column(name = "mbti", nullable = false)
     private String mbti;
+
+    @Column(name="region")
+    private String region;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserToChatRoomEntity> chatRooms = new ArrayList<>();
 
     public enum LoginRole {
         ROLE_USER, ROLE_ADMIN,
@@ -109,9 +107,5 @@ public class User extends BaseEntity {
     public enum Gender {
         Male, Female
     }
-
-//    public enum PreferredSize {
-//        Small, Medium, Large
-//    }
 
 }

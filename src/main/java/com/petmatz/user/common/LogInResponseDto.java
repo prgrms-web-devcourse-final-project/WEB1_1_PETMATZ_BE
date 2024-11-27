@@ -8,11 +8,11 @@ import org.springframework.http.ResponseEntity;
 @Getter
 @AllArgsConstructor
 public class LogInResponseDto {
-    private String code;
+    private String responseCode;
     private String message;
 
     public LogInResponseDto() {
-        this.code = ResponseCode.SUCCESS;
+        this.responseCode = ResponseCode.SUCCESS;
         this.message = ResponseMessage.SUCCESS;
     }
 

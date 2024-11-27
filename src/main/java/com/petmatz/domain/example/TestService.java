@@ -10,7 +10,7 @@ public class TestService {
     private final TestOpenApiInterface testOpenApiInterface;
 //    private final TestReader testReader;
 
-    public void testGet() {
+    public void testGet(TestDTO testDTO) {
         testOpenApiInterface.getTest();
 //        throw new DomainException(GlobalErrorCode.PERMISSION_DENIED);
 //        testReader.getTest();
