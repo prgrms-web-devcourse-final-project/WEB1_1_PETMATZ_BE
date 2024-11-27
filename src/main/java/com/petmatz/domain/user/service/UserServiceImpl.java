@@ -1,5 +1,9 @@
 package com.petmatz.domain.user.service;
 
+import com.petmatz.api.user.request.DeleteIdRequestDto;
+import com.petmatz.api.user.request.EmailCertificationRequestDto;
+import com.petmatz.api.user.request.HeartingRequestDto;
+import com.petmatz.api.user.request.SendRepasswordRequestDto;
 import com.petmatz.common.security.utils.JwtProvider;
 import com.petmatz.domain.user.entity.Certification;
 import com.petmatz.domain.user.entity.Heart;
@@ -13,10 +17,6 @@ import com.petmatz.domain.user.repository.HeartRepository;
 import com.petmatz.domain.user.repository.UserRepository;
 import com.petmatz.domain.user.response.*;
 import com.petmatz.user.common.LogInResponseDto;
-import com.petmatz.api.user.request.DeleteIdRequestDto;
-import com.petmatz.api.user.request.EmailCertificationRequestDto;
-import com.petmatz.api.user.request.HeartingRequestDto;
-import com.petmatz.api.user.request.SendRepasswordRequestDto;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +45,8 @@ public class UserServiceImpl implements UserService {
     private final EmailProvider emailProvider;
     private final RePasswordEmailProvider rePasswordEmailProvider;
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    private final GeocodingService geocodingService;
 
 
     @Override
@@ -210,20 +212,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<? super GetMyProfileResponseDto> getOtherMypage(Long userId) {
+    public ResponseEntity<? super GetOtherProfileResponseDto> getOtherMypage(Long userId) {
         try {
             Optional<User> user = userRepository.findById(userId);
 
             boolean exists = userRepository.existsById(userId);
             if (!exists) {
-                return GetMyProfileResponseDto.userNotFound();
+                return GetOtherProfileResponseDto.userNotFound();
             }
 
-            return GetMyProfileResponseDto.success(user.orElse(null));
+            return GetOtherProfileResponseDto.success(user.orElse(null));
 
         } catch (Exception e) {
             e.printStackTrace();
-            return GetMyProfileResponseDto.databaseError();
+            return GetOtherProfileResponseDto.databaseError();
         }
     }
 
@@ -252,8 +254,9 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<? super HeartingResponseDto> hearting(HeartingRequestDto dto) {
         try {
             Long heartedId = dto.getHeartedId();
-            boolean exists=userRepository.existsById(heartedId);
-            if(!exists) {
+
+            boolean exists = userRepository.existsById(heartedId);
+            if (!exists) {
                 return HeartingResponseDto.heartedIdNotFound();
             }
 
@@ -342,6 +345,49 @@ public class UserServiceImpl implements UserService {
             return RepasswordResponseDto.databaseError();
         }
         return RepasswordResponseDto.success();
+    }
+
+
+    @Override
+    public ResponseEntity<? super UpdateLocationResponseDto> updateLocation(UpdateLocationInfo info) {
+        try {
+            String accountId = findAccountIdFromJwt();
+            User user = userRepository.findByAccountId(accountId);
+
+            boolean exists = userRepository.existsByAccountId(accountId);
+            if (!exists) {
+                return EditMyProfileResponseDto.editFailed();
+            }
+
+            User updatedUser = UserFactory.createLocationUpdateUser(user, info);
+            userRepository.save(updatedUser);
+
+        } catch (Exception e) {
+            log.info("위치업데이트 실패: {}", e);
+            return UpdateLocationResponseDto.wrongLocation();
+        }
+        return UpdateLocationResponseDto.success();
+    }
+
+    public ResponseEntity<? super UpdateLocationResponseDto> updateUserRegion(){
+        try {
+            String accountId = findAccountIdFromJwt();
+            User user = userRepository.findByAccountId(accountId);
+
+            boolean exists = userRepository.existsByAccountId(accountId);
+            if (!exists) {
+                return GetOtherProfileResponseDto.userNotFound();
+            }
+
+            String region = geocodingService.getRegionFromCoordinates(user.getLatitude(), user.getLongitude());
+            User updateUser = UserFactory.createRegionUpdateUser(user, region);
+
+            userRepository.save(updateUser);
+        } catch (Exception e) {
+            log.info("지역업데이트 실패: {}", e);
+            return UpdateLocationResponseDto.wrongLocation();
+        }
+        return UpdateLocationResponseDto.success();
     }
 
 

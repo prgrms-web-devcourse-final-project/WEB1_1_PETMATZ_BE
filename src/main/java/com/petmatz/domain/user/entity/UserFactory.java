@@ -3,6 +3,7 @@ package com.petmatz.domain.user.entity;
 
 import com.petmatz.domain.user.info.EditMyProfileInfo;
 import com.petmatz.domain.user.info.SignUpInfo;
+import com.petmatz.domain.user.info.UpdateLocationInfo;
 
 import java.time.LocalDateTime;
 
@@ -13,20 +14,21 @@ public class UserFactory {
                 .accountId(info.getAccountId())
                 .password(encodedPassword)
                 .nickname(info.getNickname())
+                .email(info.getAccountId())
+                .profileImg(null)
                 .loginRole(User.LoginRole.ROLE_USER)
+                .loginType(User.LoginType.Normal)
+                .role(User.Role.Dol)
                 .gender(info.getGender())
                 .preferredSize(info.getPreferredSize())
                 .introduction(info.getIntroduction())
                 .isCareAvailable(info.getIsCareAvailable())
-                .role(User.Role.Dol)
-                .loginType(User.LoginType.Normal)
                 .isRegistered(false)
                 .recommendationCount(0)
                 .careCompletionCount(0)
                 .isDeleted(false)
-                .timeWage(info.getTimeWage())
-                .monthWage(info.getMonthWage())
                 .mbti(info.getMbti())
+                .region(null)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -37,20 +39,24 @@ public class UserFactory {
                 .id(user.getId())
                 .accountId(user.getAccountId() + "-deleted")
                 .password("deleted-password")
-                .email(user.getEmail() + "-deleted")
                 .nickname(null)
+                .email(user.getEmail() + "-deleted")
                 .profileImg(null)
                 .loginRole(null)
-                .role(null)
                 .loginType(null)
+                .role(null)
                 .gender(null)
                 .preferredSize(user.getPreferredSize())
                 .introduction(null)
                 .isCareAvailable(user.getIsCareAvailable())
+                .isRegistered(true)
+                .recommendationCount(0)
+                .careCompletionCount(0)
+                .latitude(null)
+                .longitude(null)
                 .isDeleted(true)
-                .timeWage(user.getTimeWage())
-                .monthWage(user.getMonthWage())
-                .mbti(user.getMbti())
+                .mbti("deleted")
+                .region(null)
                 .createdAt(user.getCreatedAt())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -62,27 +68,26 @@ public class UserFactory {
                 .id(user.getId())
                 .accountId(user.getAccountId())
                 .password(user.getPassword())
+                .nickname(info.getNickname())
                 .email(user.getEmail())
-                .nickname(info.getNickname()) // 닉네임 업데이트
                 .profileImg(user.getProfileImg())
                 .loginRole(user.getLoginRole())
-                .role(user.getRole())
                 .loginType(user.getLoginType())
+                .role(user.getRole())
                 .gender(user.getGender())
-                .preferredSize(info.getPreferredSize()) // 선호 크기 업데이트
-                .introduction(info.getIntroduction()) // 자기소개 업데이트
-                .isCareAvailable(info.isCareAvailable()) // 돌봄 가능 여부 업데이트
+                .preferredSize(info.getPreferredSize())
+                .introduction(info.getIntroduction())
+                .isCareAvailable(info.isCareAvailable())
                 .isRegistered(user.getIsRegistered())
                 .recommendationCount(user.getRecommendationCount())
                 .careCompletionCount(user.getCareCompletionCount())
                 .latitude(user.getLatitude())
                 .longitude(user.getLongitude())
-                .isDeleted(user.getIsDeleted()) // 기존 삭제 여부 유지
-                .timeWage(info.getTimeWage()) // 시간당 임금 업데이트
-                .monthWage(info.getMonthWage()) // 월 임금 업데이트
+                .isDeleted(user.getIsDeleted())
                 .mbti(user.getMbti())
+                .region(user.getRegion())
                 .createdAt(user.getCreatedAt())
-                .updatedAt(LocalDateTime.now()) // 수정 시간 갱신
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 
@@ -91,13 +96,13 @@ public class UserFactory {
         return User.builder()
                 .id(user.getId())
                 .accountId(user.getAccountId())
-                .password(encodedRePasswordNum) // 임시 비밀번호로 업데이트
-                .email(user.getEmail())
+                .password(encodedRePasswordNum)
                 .nickname(user.getNickname())
+                .email(user.getEmail())
                 .profileImg(user.getProfileImg())
                 .loginRole(user.getLoginRole())
-                .role(user.getRole())
                 .loginType(user.getLoginType())
+                .role(user.getRole())
                 .gender(user.getGender())
                 .preferredSize(user.getPreferredSize())
                 .introduction(user.getIntroduction())
@@ -107,12 +112,69 @@ public class UserFactory {
                 .careCompletionCount(user.getCareCompletionCount())
                 .latitude(user.getLatitude())
                 .longitude(user.getLongitude())
-                .isDeleted(user.getIsDeleted()) // 기존 삭제 여부 유지
-                .timeWage(user.getTimeWage())
-                .monthWage(user.getMonthWage())
+                .isDeleted(user.getIsDeleted())
                 .mbti(user.getMbti())
+                .region(user.getRegion())
                 .createdAt(user.getCreatedAt())
-                .updatedAt(LocalDateTime.now()) // 수정 시간 갱신
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
+
+    public static User createLocationUpdateUser(User user, UpdateLocationInfo info) {
+        return User.builder()
+                .id(user.getId())
+                .accountId(user.getAccountId())
+                .password(user.getPassword())
+                .nickname(user.getNickname())
+                .email(user.getEmail())
+                .profileImg(user.getProfileImg())
+                .loginRole(user.getLoginRole())
+                .loginType(user.getLoginType())
+                .role(user.getRole())
+                .gender(user.getGender())
+                .preferredSize(user.getPreferredSize())
+                .introduction(user.getIntroduction())
+                .isCareAvailable(user.getIsCareAvailable())
+                .isRegistered(user.getIsRegistered())
+                .recommendationCount(user.getRecommendationCount())
+                .careCompletionCount(user.getCareCompletionCount())
+                .latitude(info.getLatitude())
+                .longitude(info.getLongitude())
+                .isDeleted(user.getIsDeleted())
+                .mbti(user.getMbti())
+                .region(user.getRegion())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+
+    public static User createRegionUpdateUser(User user, String region) {
+        return User.builder()
+                .id(user.getId())
+                .accountId(user.getAccountId())
+                .password(user.getPassword())
+                .nickname(user.getNickname())
+                .email(user.getEmail())
+                .profileImg(user.getProfileImg())
+                .loginRole(user.getLoginRole())
+                .loginType(user.getLoginType())
+                .role(user.getRole())
+                .gender(user.getGender())
+                .preferredSize(user.getPreferredSize())
+                .introduction(user.getIntroduction())
+                .isCareAvailable(user.getIsCareAvailable())
+                .isRegistered(user.getIsRegistered())
+                .recommendationCount(user.getRecommendationCount())
+                .careCompletionCount(user.getCareCompletionCount())
+                .latitude(user.getLatitude())
+                .longitude(user.getLongitude())
+                .isDeleted(user.getIsDeleted())
+                .mbti(user.getMbti())
+                .region(region)
+                .createdAt(user.getCreatedAt())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
 }

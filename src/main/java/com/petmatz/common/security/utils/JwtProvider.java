@@ -19,7 +19,7 @@ import java.util.Date;
  * 주어진 사용자 ID로 JWT 토큰을 생성 -> 토큰의 유효성을 검증하여 사용자 ID를 반환
  */
 @Component
-@Slf4j
+//@Slf4j
 public class JwtProvider {
 
     // JWT 토큰의 서명에 사용할 비밀 키
@@ -68,7 +68,7 @@ public class JwtProvider {
 
         } catch (Exception e) {
             e.printStackTrace();
-            log.info("JWT 검증 실패: {}", e.getMessage());
+//            log.info("JWT 검증 실패: {}", e.getMessage());
             return null;
         }
         return subject;  // 유효한 경우 사용자 ID 반환

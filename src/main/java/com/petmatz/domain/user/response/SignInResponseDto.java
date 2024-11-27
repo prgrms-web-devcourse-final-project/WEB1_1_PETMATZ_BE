@@ -8,6 +8,8 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.stream.Collectors;
+
 @Getter
 public class SignInResponseDto extends LogInResponseDto {
     private Long id;
@@ -21,9 +23,8 @@ public class SignInResponseDto extends LogInResponseDto {
     private Boolean isRegistered;
     private Integer recommendationCount;
     private Integer careCompletionCount;
-    private Integer timeWage;
-    private Integer monthWage;
     private Boolean isCareAvailable;
+    private String mbti;
 
     private SignInResponseDto(User user) {
         super();
@@ -38,9 +39,8 @@ public class SignInResponseDto extends LogInResponseDto {
         this.isRegistered = user.getIsRegistered();
         this.recommendationCount = user.getRecommendationCount();
         this.careCompletionCount = user.getCareCompletionCount();
-        this.timeWage = user.getTimeWage();
-        this.monthWage = user.getMonthWage();
         this.isCareAvailable = user.getIsCareAvailable();
+        this.mbti=user.getMbti();
     }
 
     public static ResponseEntity<SignInResponseDto> success(User user) {
