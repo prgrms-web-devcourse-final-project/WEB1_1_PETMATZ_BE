@@ -1,8 +1,8 @@
 package com.petmatz.domain.match.service;
 
 import com.petmatz.domain.match.repo.MatchUserRepository;
-import com.petmatz.domain.match.response.MatchResultResponse;
-import com.petmatz.domain.match.response.UserResponse;
+import com.petmatz.domain.match.dto.response.MatchScoreResponse;
+import com.petmatz.domain.match.dto.response.UserResponse;
 import com.petmatz.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -67,12 +67,10 @@ public class TotalScoreService {
     }
 
 
-    public List<MatchResultResponse> calculateTotalScore(User user) {
+    public List<MatchScoreResponse> calculateTotalScore(User user) {
         List<UserResponse> targetUsers = getUsersWithinBoundingBox(user);
 
-        List<MatchResultResponse> matchResults = new ArrayList<>();
-
-        for (UserResponse targetUser : targetUsers) {
+        List<MatchScoreResponse> matchResults = targetUsers.stream().map(targetUser -> {
             double distance = matchPlaceService.calculateDistanceOnly(user, targetUser);
             double distanceScore = matchPlaceService.findMatchesWithinDistance(user, targetUser);
             double careScore = matchCareService.calculateCareScore(targetUser.isCareAvailable());
@@ -84,7 +82,7 @@ public class TotalScoreService {
             double mbtiScore = matchMbtiService.calculateMbtiScore(user.getMbti(), targetUser.mbti());
             double totalScore = distanceScore + careScore + sizeScore + mbtiScore;
 
-            MatchResultResponse result = new MatchResultResponse(
+            return new MatchScoreResponse(
                     targetUser.id(),
                     Math.round(distance * 100.0) / 100.0,
                     Math.round(distanceScore * 100.0) / 100.0,
@@ -93,14 +91,18 @@ public class TotalScoreService {
                     Math.round(mbtiScore * 100.0) / 100.0,
                     Math.round(totalScore * 100.0) / 100.0
             );
+        }).collect(Collectors.toList());
 
-            matchResults.add(result);
-        }
+        // 점수로 내림차순 (같으면 거리로 오름차순)
+        matchResults.sort(Comparator
+                .comparingDouble(MatchScoreResponse::totalScore)
+                .thenComparingDouble(MatchScoreResponse::distance).reversed()
+        );
 
+        // Redis에 정렬된 결과 저장
         String redisKey = "matchResult:" + user.getId();
-        redisTemplate.opsForValue().set(redisKey, matchResults);  // json으로
+        redisTemplate.opsForValue().set(redisKey, matchResults);
 
         return matchResults;
     }
-
 }
