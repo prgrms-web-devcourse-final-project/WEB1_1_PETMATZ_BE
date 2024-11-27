@@ -13,7 +13,9 @@ import io.swagger.v3.oas.annotations.Parameters;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,8 +46,9 @@ public class ChatController {
     // TODO 멍멍이 부탁같은 경우 채팅 DTO랑 똑같이 만들기
 
     //TODO 메세지 읽음 처리 ( 구독한 쪽으로 ), senderId, chatRoomId
-    @MessageMapping("/chat")
-    public void sendReadStatus(ChatReadStatusDirect chatReadStatusDirect, @RequestParam("chatRoomId") String chatRoomId) {
+    @MessageMapping("/chat/{chatRoomId}/read")
+    public void sendReadStatus(@Payload ChatReadStatusDirect chatReadStatusDirect,
+                               @DestinationVariable String chatRoomId) {
         String destination = "/topic/chat/" + chatRoomId;
         simpMessagingTemplate.convertAndSend(destination, chatReadStatusDirect);
     }
