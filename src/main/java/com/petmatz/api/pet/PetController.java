@@ -1,6 +1,6 @@
 package com.petmatz.api.pet;
 
-import com.petmatz.api.global.Response;
+import com.petmatz.api.global.dto.Response;
 
 import com.petmatz.api.pet.dto.PetApiRequest;
 import com.petmatz.api.pet.dto.PetInfoDto;

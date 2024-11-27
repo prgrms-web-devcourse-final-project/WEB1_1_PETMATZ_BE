@@ -1,8 +1,11 @@
 package com.petmatz.domain.petmission.entity;
 
+import com.petmatz.domain.petmission.dto.PetMissionInfo;
+import com.petmatz.domain.petmission.dto.PetMissionStatusZip;
 import com.petmatz.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -20,19 +23,13 @@ public class PetMissionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 시작일시
     private LocalDateTime petMissionStarted;
 
-    // 종료일시
     private LocalDateTime petMissionEnd;
 
-    // 부탁 메시지
-    private String comment;
+    @Enumerated(EnumType.STRING)
+    private PetMissionStatusZip status;
 
-    // 돌봄 상태 (true: 진행 중, false: 종료)
-    private Boolean status;
-
-    // 맡김이
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "giver_id", nullable = false)
     private User giver;
@@ -41,10 +38,32 @@ public class PetMissionEntity {
     @JoinColumn(name = "pet_mission_id")
     private List<PetMissionAskEntity> petMissionAsks = new ArrayList<>();
 
-    // 미션 답변 (단일)
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "pet_mission_answer_id")
     private PetMissionAnswerEntity missionAnswer;
 
+    @Builder
+    public PetMissionEntity(LocalDateTime petMissionStarted, LocalDateTime petMissionEnd, PetMissionStatusZip status, User giver, List<PetMissionAskEntity> petMissionAsks, PetMissionAnswerEntity missionAnswer) {
+        this.petMissionStarted = petMissionStarted;
+        this.petMissionEnd = petMissionEnd;
+        this.status = status;
+        this.giver = giver;
+        this.missionAnswer = missionAnswer;
+    }
+
+    public static PetMissionEntity of(User user, PetMissionInfo petMissionInfo) {
+        System.out.println("petMissionInfo.toString() :: " + petMissionInfo.toString());
+        return PetMissionEntity.builder()
+                .petMissionStarted(petMissionInfo.missionStarted())
+                .petMissionEnd(petMissionInfo.missionEnd())
+                .status(PetMissionStatusZip.fromDescription("시작"))
+                .giver(user)
+                .petMissionAsks(
+                        petMissionInfo.petMissionAskInfo().stream()
+                                .map(PetMissionAskEntity::of)
+                                .toList()
+                )
+                .build();
+    }
 
 }

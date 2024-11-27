@@ -13,7 +13,6 @@ public record PetMissionRequest(
         String pet,
         LocalDateTime missionStarted,
         LocalDateTime missionEnd,
-
         List<PetMissionAsk> petMissionAsk
 
 ) {

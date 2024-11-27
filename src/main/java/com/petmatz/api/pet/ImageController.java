@@ -1,6 +1,6 @@
 package com.petmatz.api.pet;
 
-import com.petmatz.api.global.Response;
+import com.petmatz.api.global.dto.Response;
 import com.petmatz.domain.pet.PetService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;

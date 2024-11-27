@@ -29,7 +29,7 @@ public class PetMissionController {
     private final PetMissionService petMissionService;
 
     @PostMapping
-    public void savePetMissionList(PetMissionRequest petMissionRequest) {
+    public void savePetMissionList(@RequestBody PetMissionRequest petMissionRequest) {
         petMissionService.insertPetMission(petMissionRequest.of());
     }
 
