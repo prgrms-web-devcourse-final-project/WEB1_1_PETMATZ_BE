@@ -11,7 +11,7 @@ public interface ResponseCode {
 
     String CERTIFICATION_FAIL = "CF";
 
-    String MAIL_FAIL="MF";
+    String MAIL_FAIL = "MF";
 
     String DATABASE_ERROR = "DBE";
 
@@ -21,9 +21,11 @@ public interface ResponseCode {
 
     String WRONG_ROLE = "WR";
 
-    String WRONG_PASSWORD="WP";
+    String WRONG_PASSWORD = "WP";
 
     String EDIT_FAIL = "EF";
 
     String HEARTED_ID_NOT_FOUND = "HINF";
+
+    String WRONG_LOCATION = "WL";
 }

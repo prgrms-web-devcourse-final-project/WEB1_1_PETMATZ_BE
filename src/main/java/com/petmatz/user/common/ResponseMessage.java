@@ -26,4 +26,6 @@ public interface ResponseMessage {
     String EDIT_FAIL = "Edit profile failed";
 
     String HEARTED_ID_NOT_FOUND = "Hearted Id Not Found";
+
+    String WRONG_LOCATION= "Wrong location";
 }

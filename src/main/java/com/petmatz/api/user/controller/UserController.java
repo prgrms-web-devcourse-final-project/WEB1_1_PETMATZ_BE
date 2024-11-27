@@ -64,8 +64,8 @@ public class UserController {
     }
 
     @GetMapping("/get-otherprofile")
-    public ResponseEntity<? super GetMyProfileResponseDto> getOtherMypage(@RequestParam @Valid Long userId) {
-        ResponseEntity<? super GetMyProfileResponseDto> response = userService.getOtherMypage(userId);
+    public ResponseEntity<? super GetOtherProfileResponseDto> getOtherMypage(@RequestParam @Valid Long userId) {
+        ResponseEntity<? super GetOtherProfileResponseDto> response = userService.getOtherMypage(userId);
         log.info("[getOtherMypage]");
         return response;
     }
@@ -102,6 +102,19 @@ public class UserController {
     public ResponseEntity<? super GetHeartingListResponseDto>getHeartedList() {
         ResponseEntity<? super GetHeartingListResponseDto> response = userService.getHeartedList();
         log.info("[getHeartedList]");
+        return response;
+    }
+
+    @PostMapping("/update-location")
+    public ResponseEntity<? super UpdateLocationResponseDto>updateLocation(@RequestBody @Valid UpdateLocationRequestDto requestBody) {
+        ResponseEntity<? super UpdateLocationResponseDto> response = userService.updateLocation(UpdateLocationRequestDto.of(requestBody));
+        log.info("[updateLocation]");
+        return response;
+    }
+
+    @PostMapping("/update-region")
+    public ResponseEntity<? super UpdateLocationResponseDto> updateUserRegion() {
+        ResponseEntity<? super UpdateLocationResponseDto> response=userService.updateUserRegion();
         return response;
     }
 
