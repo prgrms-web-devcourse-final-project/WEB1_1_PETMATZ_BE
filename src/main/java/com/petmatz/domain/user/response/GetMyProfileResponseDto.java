@@ -24,7 +24,7 @@ public class GetMyProfileResponseDto extends LogInResponseDto {
     private Double latitude;
     private Double longitude;
     private String mbti;
-    private Integer heartCount;
+    private String region;
 
     public GetMyProfileResponseDto(User user) {
         super();
@@ -42,7 +42,7 @@ public class GetMyProfileResponseDto extends LogInResponseDto {
         this.latitude = user.getLatitude();
         this.longitude = user.getLongitude();
         this.mbti=user.getMbti();
-        this.heartCount=user.getHeartCount();
+        this.region=user.getRegion();
     }
 
     public static ResponseEntity<LogInResponseDto> userNotFound() {

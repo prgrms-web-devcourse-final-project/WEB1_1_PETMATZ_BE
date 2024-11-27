@@ -57,7 +57,6 @@ public class User extends BaseEntity {
     @Column(name = "gender")
     private Gender gender; // 'Male', 'Female'
 
-    //    @Enumerated(EnumType.STRING)
     @Column(name = "preferred_size", nullable = false)
     private String preferredSize; // 'Small', 'Medium', 'Large'
 
@@ -67,7 +66,7 @@ public class User extends BaseEntity {
     @Column(name = "is_care_available", nullable = false)
     private Boolean isCareAvailable;
 
-    @Column(name = "is_registered")
+    @Column(name = "is_registered",nullable = false)
     private Boolean isRegistered;
 
     @Column(name = "recommendation_count")
@@ -88,8 +87,8 @@ public class User extends BaseEntity {
     @Column(name = "mbti", nullable = false)
     private String mbti;
 
-    @Column(name="heart_count")
-    private Integer heartCount;
+    @Column(name="region")
+    private String region;
 
     public enum LoginRole {
         ROLE_USER, ROLE_ADMIN,
@@ -106,9 +105,5 @@ public class User extends BaseEntity {
     public enum Gender {
         Male, Female
     }
-
-//    public enum PreferredSize {
-//        Small, Medium, Large
-//    }
 
 }

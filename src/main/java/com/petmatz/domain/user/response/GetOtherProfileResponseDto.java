@@ -21,10 +21,8 @@ public class GetOtherProfileResponseDto extends LogInResponseDto {
     private Integer recommendationCount;
     private Integer careCompletionCount;
     private Boolean isCareAvailable;
-    private Double latitude;
-    private Double longitude;
     private String mbti;
-    private Integer heartCount;
+    private String region;
 
     public GetOtherProfileResponseDto(User user) {
         super();
@@ -39,10 +37,8 @@ public class GetOtherProfileResponseDto extends LogInResponseDto {
         this.recommendationCount = user.getRecommendationCount();
         this.careCompletionCount = user.getCareCompletionCount();
         this.isCareAvailable = user.getIsCareAvailable();
-        this.latitude = user.getLatitude();
-        this.longitude = user.getLongitude();
         this.mbti=user.getMbti();
-        this.heartCount = user.getHeartCount();
+        this.region = user.getRegion();
     }
 
     public static ResponseEntity<LogInResponseDto> userNotFound() {

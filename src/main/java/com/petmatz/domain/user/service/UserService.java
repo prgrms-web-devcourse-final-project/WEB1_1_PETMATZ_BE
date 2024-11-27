@@ -26,4 +26,6 @@ public interface UserService {
     ResponseEntity<? super GetHeartingListResponseDto> getHeartedList();
 
     ResponseEntity<? super UpdateLocationResponseDto> updateLocation(UpdateLocationInfo info);
+
+    ResponseEntity<? super UpdateLocationResponseDto> updateUserRegion();
 }

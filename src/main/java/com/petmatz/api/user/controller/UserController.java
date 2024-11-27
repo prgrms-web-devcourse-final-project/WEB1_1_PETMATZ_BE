@@ -112,5 +112,11 @@ public class UserController {
         return response;
     }
 
+    @PostMapping("/update-region")
+    public ResponseEntity<? super UpdateLocationResponseDto> updateUserRegion() {
+        ResponseEntity<? super UpdateLocationResponseDto> response=userService.updateUserRegion();
+        return response;
+    }
+
 }
 
