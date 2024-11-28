@@ -2,8 +2,7 @@ package com.petmatz.api.match.controller;
 
 import com.petmatz.domain.match.dto.response.MatchScoreResponse;
 import com.petmatz.domain.match.dto.response.UserResponse;
-import com.petmatz.domain.match.service.TotalScoreService;
-import com.petmatz.domain.user.entity.User;
+import com.petmatz.domain.match.service.MatchScoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,16 +13,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TotalScoreTestController {
 
-    private final TotalScoreService totalScoreService;
+    private final MatchScoreService matchScoreService;
 
     @PostMapping("/calculate")
     public List<MatchScoreResponse> calculateTotalScore(@RequestBody Long userId) {
-        return totalScoreService.calculateTotalScore(userId);
+        return matchScoreService.calculateTotalScore(userId);
     }
 
     @PostMapping("/get-users")
     public List<UserResponse> getUsersWithinBoundingBox(@RequestBody Long userId) {
-        return totalScoreService.getUsersWithinBoundingBox(userId);
+        return matchScoreService.getUsersWithinBoundingBox(userId);
     }
 }
 

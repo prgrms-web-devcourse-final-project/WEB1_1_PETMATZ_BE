@@ -1,9 +1,9 @@
 package com.petmatz.api.match.controller;
 
+import com.petmatz.api.match.request.PenaltyScore;
 import com.petmatz.domain.match.dto.response.DetailedMatchResultResponse;
-import com.petmatz.domain.match.dto.response.MatchResultResponse;
 import com.petmatz.domain.match.service.MatchService;
-import com.petmatz.domain.match.service.TotalScoreService;
+import com.petmatz.domain.match.service.MatchScoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +16,7 @@ import java.util.List;
 public class MatchController {
 
     private final MatchService matchService;
-    private final TotalScoreService totalScoreService;
+    private final MatchScoreService matchScoreService;
 
     // TODO 추후에 userId 변경 (JWT)
     @GetMapping("/showmetz")
@@ -24,7 +24,7 @@ public class MatchController {
             (@RequestParam Long userId,
              @RequestParam(defaultValue = "0") int page,
              @RequestParam(defaultValue = "5") int size) {
-        totalScoreService.calculateTotalScore(userId);
+//        matchScoreService.calculateTotalScore(userId);
         List<DetailedMatchResultResponse> userDetails = matchService.getPageUserDetailsFromRedis(userId, page, size);
 
         if (userDetails.isEmpty()) {
@@ -33,9 +33,12 @@ public class MatchController {
         return ResponseEntity.ok(userDetails);
     }
 
-//    @PostMapping("/matchfail")
-//    public ResponseEntity<?> matchFail () {
-//    }
+    @PostMapping("/matchfail")
+    // Dto 구조 개선 예정
+    public ResponseEntity<Void> matchFail(@RequestBody PenaltyScore penaltyScore) {
+        matchScoreService.decreaseScore(penaltyScore.userId(), penaltyScore.targetId());
+        return ResponseEntity.ok().build();
+    }
 }
 
 

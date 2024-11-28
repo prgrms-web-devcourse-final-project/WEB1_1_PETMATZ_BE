@@ -1,5 +1,6 @@
 package com.petmatz.domain.match.service;
 
+import com.petmatz.domain.match.exception.MatchException;
 import com.petmatz.domain.match.repo.MatchUserRepository;
 import com.petmatz.domain.match.dto.response.MatchScoreResponse;
 import com.petmatz.domain.match.dto.response.UserResponse;
@@ -12,14 +13,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.petmatz.domain.match.exception.MatchErrorCode.NULL_MATCH_DATA;
+
 @Service
 @RequiredArgsConstructor
-public class TotalScoreService {
+public class MatchScoreService {
 
     private final MatchUserRepository matchUserRepository;
     private final MatchCareService matchCareService;
@@ -31,9 +33,6 @@ public class TotalScoreService {
     private final UserRepository userRepository;
     private final PetRepository petRepository;
 
-
-
-    static final double RANGE_KM = 10.0;
 
     // sql에서 필터링 후 1000명 가져오기
     public List<UserResponse> getUsersWithinBoundingBox(Long userId) {
@@ -126,6 +125,37 @@ public class TotalScoreService {
         return matchResults;
     }
 
+    public void decreaseScore(Long userId, Long targetId) {
+        double penaltyScore = 40.0;
+        String redisKey = "matchResult:" + userId;
+
+        List<MatchScoreResponse> matchResults = (List<MatchScoreResponse>) redisTemplate.opsForValue().get(redisKey);
+
+        if (matchResults == null || matchResults.isEmpty()) {
+            throw new MatchException(NULL_MATCH_DATA);
+        }
+
+        List<MatchScoreResponse> updatedResults = matchResults.stream()
+                .map(match -> {
+                    if (match.id().equals(targetId)) {
+                        double newScore = Math.max(0, match.totalScore() - penaltyScore);
+                        return new MatchScoreResponse(
+                                match.id(),
+                                match.distance(),
+                                match.distanceScore(),
+                                match.careAvailabilityScore(),
+                                match.sizePreferenceScore(),
+                                match.mbtiScore(),
+                                newScore // 수정된 totalScore
+                        );
+                    }
+                    return match; // 다른 값은 그대로 유지
+                })
+                .toList();
+
+        // 수정된 결과를 Redis에 다시 저장
+        redisTemplate.opsForValue().set(redisKey, updatedResults);
+    }
 
     // TODO 펫 서비스쪽으로 옮겨야 함
     public String getTemperamentByUserId(Long userId) {

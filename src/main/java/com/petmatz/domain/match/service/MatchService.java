@@ -20,9 +20,6 @@ import static com.petmatz.domain.match.exception.MatchErrorCode.INVALID_REDIS_DA
 import static com.petmatz.domain.match.exception.MatchErrorCode.NULL_MATCH_DATA;
 import static com.petmatz.domain.sosboard.exception.SosBoardErrorCode.USER_NOT_FOUND;
 
-/**
- *  실질적으로 프로필을 불러오는 클래스
- */
 @Service
 @RequiredArgsConstructor
 public class MatchService {
@@ -82,4 +79,6 @@ public class MatchService {
             throw new IllegalStateException("데이터 타입 캐스팅 오류 발생", e);
         }
     }
+
+
 }
