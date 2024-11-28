@@ -19,7 +19,7 @@ public record PetMissionResponse(
     public static PetMissionResponse of(PetMissionData petMissionData) {
         return PetMissionResponse.builder()
                 .chatRoomId(petMissionData.chatRoomId())
-                .petMissionId(petMissionData.petMission())
+                .petMissionId(petMissionData.petMissionId())
                 .build();
     }
 }
