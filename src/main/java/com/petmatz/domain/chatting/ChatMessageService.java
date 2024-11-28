@@ -1,12 +1,10 @@
 package com.petmatz.domain.chatting;
 
-import com.petmatz.domain.chatting.component.ChatDocsAppend;
 import com.petmatz.domain.chatting.component.ChatMessageReader;
 import com.petmatz.domain.chatting.component.ChatMessageUpdater;
-import com.petmatz.domain.chatting.component.ChatReadStatusUpdater;
 import com.petmatz.domain.chatting.dto.ChatMessageInfo;
 
-import com.petmatz.domain.chatting.dto.ChatReadStatusDocs;
+import com.petmatz.domain.chatting.docs.ChatReadStatusDocs;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -30,7 +28,7 @@ public class ChatMessageService {
 
         // 반환 데이터에 읽음 상태 업데이트
         ChatReadStatusDocs chatReadStatusDocs = chatMessageReader.selectChatMessageLastStatus(chatRoomsId, receiver);
-        LocalDateTime lastReadTimestamp = chatReadStatusDocs != null ? chatReadStatusDocs.getLastReadTimestamp() : null;
+        LocalDateTime lastReadTimestamp = chatReadStatusDocs.checkLastReadTimestamp();
         List<ChatMessageInfo> updatedMessages = messageStatusUpdate(chatMessageInfos, lastReadTimestamp);
 
         // 전체 메시지 개수 가져오기
@@ -40,23 +38,16 @@ public class ChatMessageService {
     }
 
     private List<ChatMessageInfo> messageStatusUpdate(List<ChatMessageInfo> chatMessageInfos, LocalDateTime lastReadTimestamp) {
-        if (lastReadTimestamp == null) {
-            return chatMessageInfos;
-        }
+        if (lastReadTimestamp == null) return chatMessageInfos;
         return chatMessageInfos.stream()
                 .peek(message -> {
-                    boolean isRead = message.getMsgTimestamp().isBefore(lastReadTimestamp) || message.getMsgTimestamp().isEqual(lastReadTimestamp);
-                    message.changeReadStatus(isRead);
+                    message.changeReadStatus(lastReadTimestamp);
                 })
                 .collect(Collectors.toList());
     }
 
     public void updateMessage(ChatMessageInfo chatMessageInfo, String chatRoomId) {
         chatMessageUpdater.updateMessage(chatMessageInfo,chatRoomId);
-//        chatMessageCahing.cachingChatMessage(chatMessageInfo);
     }
 
-//    public void updateMessageStatusRead(ChatReadStatusInfo chatReadStatusInfo) {
-//        chatReadStatusDocsUpdater.updateMessageStatus(chatReadStatusInfo);
-//    }
 }

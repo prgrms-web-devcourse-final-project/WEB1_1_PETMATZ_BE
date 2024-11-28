@@ -33,13 +33,11 @@ public class PetMissionService {
 
         String chatRoomId = userToChatRoomReader.selectChatRoomId(careEmail, receiverEmail);
 
-
-        List<PetMissionEntity> petMissionEntityList = makePetMissionEntityList(users, petMissionInfo);
-        petMissionInseart.insertPetMission(petMissionEntityList);
+        List<PetMissionEntity> petMissionEntityList = petMissionInseart.insertPetMission(makePetMissionEntityList(users, petMissionInfo));
 
         //TODO 반환 DTO 만들기
 
-        return PetMissionData.of(chatRoomId, );
+        return PetMissionData.of(chatRoomId, petMissionEntityList.stream().map(PetMissionEntity::getId).toList());
 
     }
 

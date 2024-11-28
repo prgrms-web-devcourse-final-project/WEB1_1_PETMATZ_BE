@@ -38,15 +38,16 @@ public class PetMissionEntity {
     @JoinColumn(name = "pet_mission_id")
     private List<PetMissionAskEntity> petMissionAsks = new ArrayList<>();
 
-
-
     @Builder
-    public PetMissionEntity(LocalDateTime petMissionStarted, LocalDateTime petMissionEnd, PetMissionStatusZip status, User giver, List<PetMissionAskEntity> petMissionAsks, PetMissionAnswerEntity missionAnswer) {
+    public PetMissionEntity(LocalDateTime petMissionStarted, LocalDateTime petMissionEnd, PetMissionStatusZip status, User giver, List<PetMissionAskEntity> petMissionAsks) {
         this.petMissionStarted = petMissionStarted;
         this.petMissionEnd = petMissionEnd;
         this.status = status;
         this.giver = giver;
+        this.petMissionAsks = petMissionAsks;
     }
+
+
 
     public static PetMissionEntity of(User user, PetMissionInfo petMissionInfo) {
         System.out.println("petMissionInfo.toString() :: " + petMissionInfo.toString());

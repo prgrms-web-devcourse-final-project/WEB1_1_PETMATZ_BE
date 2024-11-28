@@ -1,6 +1,6 @@
 package com.petmatz.domain.chatting.repository;
 
-import com.petmatz.domain.chatting.dto.UserToChatRoomEntity;
+import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

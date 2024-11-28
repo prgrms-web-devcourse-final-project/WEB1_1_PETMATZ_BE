@@ -9,10 +9,10 @@ import java.util.List;
 public record PetMissionData(
 
         String chatRoomId,
-        String petMissionId
+        List<Long> petMissionId
 ) {
 
-    public static PetMissionData of(String chatRoomId, String petMissionId) {
+    public static PetMissionData of(String chatRoomId, List<Long> petMissionId) {
         return PetMissionData.builder()
                 .chatRoomId(chatRoomId)
                 .petMissionId(petMissionId)

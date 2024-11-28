@@ -5,22 +5,21 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class PetMissionAskEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
 
     private String comment;
-
-    private String imgURL;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "pet_mission_answer_id")
@@ -28,16 +27,12 @@ public class PetMissionAskEntity {
 
     @Builder
     public PetMissionAskEntity(String title, String comment, String imgURL) {
-        this.title = title;
         this.comment = comment;
-        this.imgURL = imgURL;
     }
 
     public static PetMissionAskEntity of(PetMissionAskInfo petMissionAskInfos) {
         return PetMissionAskEntity.builder()
-                .title(petMissionAskInfos.title())
                 .comment(petMissionAskInfos.comment())
-                .imgURL(petMissionAskInfos.imgURL())
                 .build();
     };
 

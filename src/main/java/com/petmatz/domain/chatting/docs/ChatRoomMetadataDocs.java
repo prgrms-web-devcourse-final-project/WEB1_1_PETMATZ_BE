@@ -1,12 +1,13 @@
-package com.petmatz.domain.chatting.dto;
+package com.petmatz.domain.chatting.docs;
 
+import com.petmatz.domain.chatting.dto.ChatMessageInfo;
+import com.petmatz.domain.chatting.dto.ChatRoomInfo;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 @Document(collection = "chat_room_metadata")
 @Getter

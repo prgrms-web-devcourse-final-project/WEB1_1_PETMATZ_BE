@@ -14,13 +14,8 @@ public class PetMissionInseart {
 
     private final PetMissionRepository petMissionRepository;
 
-    public void insertPetMission(List<PetMissionEntity> petMissionEntityList) {
-        List<PetMissionEntity> petMissionEntityList1 = petMissionRepository.saveAll(petMissionEntityList);
-        for (PetMissionEntity petMissionEntity : petMissionEntityList1) {
-            for (PetMissionAskEntity petMissionAsk : petMissionEntity.getPetMissionAsks()) {
-                System.out.println(petMissionAsk.toString());
-            }
-        }
+    public List<PetMissionEntity> insertPetMission(List<PetMissionEntity> petMissionEntityList) {
+         return petMissionRepository.saveAll(petMissionEntityList);
     }
 
 }

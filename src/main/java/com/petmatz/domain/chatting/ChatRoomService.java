@@ -1,7 +1,10 @@
 package com.petmatz.domain.chatting;
 
 import com.petmatz.domain.chatting.component.*;
+import com.petmatz.domain.chatting.docs.ChatReadStatusDocs;
 import com.petmatz.domain.chatting.dto.*;
+import com.petmatz.domain.chatting.entity.ChatRoomEntity;
+import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -84,7 +87,7 @@ public class ChatRoomService {
         for (String roomId : chatRoomNumber) {
             String chatRoomId = String.valueOf(roomId);
             ChatReadStatusDocs chatReadStatusDocs = chatReadStatusReader.selectChatMessageLastStatus(chatRoomId, userEmail);
-            LocalDateTime lastReadTimestamp = chatReadStatusDocs != null ? chatReadStatusDocs.getLastReadTimestamp() : null;
+            LocalDateTime lastReadTimestamp = chatReadStatusDocs.checkLastReadTimestamp();
             Integer unreadCount = chatMessageReader.countChatMessagesHistoryToLastDataAndUserName(chatRoomId,userEmail,lastReadTimestamp, startPage, pageSize);
             unreadCountList.put(chatRoomId, unreadCount);
         }

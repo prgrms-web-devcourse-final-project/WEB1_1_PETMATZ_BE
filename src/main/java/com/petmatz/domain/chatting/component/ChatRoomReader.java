@@ -1,19 +1,14 @@
 package com.petmatz.domain.chatting.component;
 
 import com.petmatz.domain.chatting.dto.*;
+import com.petmatz.domain.chatting.entity.ChatRoomEntity;
+import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import com.petmatz.domain.chatting.repository.ChatRoomRepository;
 import com.petmatz.domain.chatting.repository.UserToChatRoomRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor

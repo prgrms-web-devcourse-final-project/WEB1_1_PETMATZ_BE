@@ -1,6 +1,6 @@
 package com.petmatz.domain.chatting.dto;
 
-import com.petmatz.api.chatting.dto.ChatRoomMetaDataInfoResponse;
+import com.petmatz.domain.chatting.docs.ChatRoomMetadataDocs;
 import lombok.Builder;
 
 import java.time.LocalDateTime;

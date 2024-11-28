@@ -42,6 +42,11 @@ public class PetMissionController {
         return Response.success(petMissionResponse);
     }
 
+    @PostMapping("/comment")
+    public Response<?> insertPetMissionComment() {
+
+    }
+
     @GetMapping
     public void selectPetMissionList() {
 
@@ -53,7 +58,7 @@ public class PetMissionController {
     }
 
     @PutMapping
-    public void updatePetMissionList() {
+    public void updatePetMissionStatus() {
 
     }
 

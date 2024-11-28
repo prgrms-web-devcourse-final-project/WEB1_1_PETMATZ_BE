@@ -11,7 +11,7 @@ public record PetMissionResponse(
 
         String chatRoomId,
 
-        String petMissionId
+        List<Long> petMissionId
 
 
 ) {

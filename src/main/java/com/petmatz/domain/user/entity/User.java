@@ -1,6 +1,6 @@
 package com.petmatz.domain.user.entity;
 
-import com.petmatz.domain.chatting.dto.UserToChatRoomEntity;
+import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import com.petmatz.domain.global.BaseEntity;
 import com.petmatz.domain.petmission.entity.PetMissionEntity;
 import jakarta.persistence.*;

@@ -1,7 +1,6 @@
 package com.petmatz.domain.chatting.component;
 
-import com.petmatz.domain.chatting.dto.ChatReadStatusDocs;
-import com.petmatz.domain.chatting.dto.ChatRoomMetadataDocs;
+import com.petmatz.domain.chatting.docs.ChatReadStatusDocs;
 import com.petmatz.domain.chatting.utils.ChatUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
