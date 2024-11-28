@@ -1,6 +1,5 @@
 package com.petmatz.api.example;
 
-import com.petmatz.api.global.dto.Response;
 import com.petmatz.domain.example.TestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

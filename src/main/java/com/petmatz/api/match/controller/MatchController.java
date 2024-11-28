@@ -1,5 +1,6 @@
 package com.petmatz.api.match.controller;
 
+import com.petmatz.domain.match.dto.response.DetailedMatchResultResponse;
 import com.petmatz.domain.match.dto.response.MatchResultResponse;
 import com.petmatz.domain.match.service.MatchService;
 import lombok.RequiredArgsConstructor;
@@ -19,17 +20,20 @@ public class MatchController {
     private final MatchService matchService;
 
     @GetMapping // 추후에 userId contextHolder 로 변경
-    public ResponseEntity<List<MatchResultResponse>> getPageIds(@RequestParam Long userId,
-                                                                @RequestParam(defaultValue = "0") int page,
-                                                                @RequestParam(defaultValue = "5") int size) {
-        List<MatchResultResponse> userIds = matchService.getPageUserIdsFromRedis(userId, page, size);
+    public ResponseEntity<List<DetailedMatchResultResponse>> getPageDetails(@RequestParam Long userId,
+                                                                            @RequestParam(defaultValue = "0") int page,
+                                                                            @RequestParam(defaultValue = "5") int size) {
 
-        if (userIds.isEmpty()) {
+        List<DetailedMatchResultResponse> userDetails = matchService.getPageUserDetailsFromRedis(userId, page, size);
+
+        if (userDetails.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok(userIds);
+        // 결과 반환
+        return ResponseEntity.ok(userDetails);
     }
+
 }
 
 

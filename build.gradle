@@ -45,12 +45,12 @@ dependencies {
 	//
 
 	// Spring Security 의존성 추가
-//	implementation 'org.springframework.boot:spring-boot-starter-security'
+//    implementation 'org.springframework.boot:spring-boot-starter-security'
 
 	//DB 관련 설정들
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-//	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	runtimeOnly 'com.mysql:mysql-connector-j'
@@ -81,9 +81,6 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	runtimeOnly 'com.mysql:mysql-connector-j'
-
-	implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
-	implementation 'org.springdoc:springdoc-openapi-data-rest:1.7.0'
 }
 
 tasks.named('test') {

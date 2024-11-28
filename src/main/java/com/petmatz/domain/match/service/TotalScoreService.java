@@ -21,6 +21,7 @@ public class TotalScoreService {
     private final MatchCareService matchCareService;
     private final MatchMbtiService matchMbtiService;
     private final MatchPlaceService matchPlaceService;
+    private final MatchSizeService matchSizeService;
     private final RedisTemplate<String, Object> redisTemplate;
 
 
@@ -50,7 +51,7 @@ public class TotalScoreService {
                     double latitude = ((Number) row[1]).doubleValue();
                     double longitude = ((Number) row[2]).doubleValue();
                     boolean isCareAvailable = (Boolean) row[3];
-                    String preferredSize = (String) row[4];
+                    List<String> preferredSize = (List<String>) row[4];
                     String mbti = (String) row[5];
 
                     // 거리 계산
@@ -75,10 +76,12 @@ public class TotalScoreService {
             double distanceScore = matchPlaceService.findMatchesWithinDistance(user, targetUser);
             double careScore = matchCareService.calculateCareScore(targetUser.isCareAvailable());
 
-            // 11/25 사용자와 연결된 펫의 크기를 타고 가야할것 같음.
-//            double sizeScore = matchSizeService.calculateDogSizeScore("머지후 개발 ");
+//            List<String> preferredSizes = targetUser.preferredSize(); // targetUser의 선호 크기 리스트
             double sizeScore = 10.0;
+//            double sizeScore = matchSizeService.calculateDogSizeScore(user, preferredSizes);
 
+
+            // 11/27 견bti 로 수정해야함.
             double mbtiScore = matchMbtiService.calculateMbtiScore(user.getMbti(), targetUser.mbti());
             double totalScore = distanceScore + careScore + sizeScore + mbtiScore;
 
@@ -99,7 +102,6 @@ public class TotalScoreService {
                 .thenComparingDouble(MatchScoreResponse::distance).reversed()
         );
 
-        // Redis에 정렬된 결과 저장
         String redisKey = "matchResult:" + user.getId();
         redisTemplate.opsForValue().set(redisKey, matchResults);
 
