@@ -3,7 +3,11 @@ package com.petmatz.domain.match.service;
 import com.petmatz.domain.match.repo.MatchUserRepository;
 import com.petmatz.domain.match.dto.response.MatchScoreResponse;
 import com.petmatz.domain.match.dto.response.UserResponse;
+import com.petmatz.domain.pet.Pet;
+import com.petmatz.domain.pet.PetRepository;
+import com.petmatz.domain.pet.PetService;
 import com.petmatz.domain.user.entity.User;
+import com.petmatz.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -22,16 +26,25 @@ public class TotalScoreService {
     private final MatchMbtiService matchMbtiService;
     private final MatchPlaceService matchPlaceService;
     private final MatchSizeService matchSizeService;
+    private final PetService petService;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final UserRepository userRepository;
+    private final PetRepository petRepository;
+
 
 
     static final double RANGE_KM = 10.0;
 
     // sql에서 필터링 후 1000명 가져오기
-    public List<UserResponse> getUsersWithinBoundingBox(User user) {
+    public List<UserResponse> getUsersWithinBoundingBox(Long userId) {
+//         User user = userService.findUserById(userId);
+        // 임시로 사용
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유저 없음: " + userId));
+
         double userLat = user.getLatitude();
         double userLng = user.getLongitude();
-        double rangeKm = 200.0;  // 필터링 반경 (200km)
+        double rangeKm = 100.0;  // 대략 60km 정도 필터링
 
         // 러프한 범위 작성
         double latChange = rangeKm / 111.0;  // 1도 = 111km
@@ -51,7 +64,8 @@ public class TotalScoreService {
                     double latitude = ((Number) row[1]).doubleValue();
                     double longitude = ((Number) row[2]).doubleValue();
                     boolean isCareAvailable = (Boolean) row[3];
-                    List<String> preferredSize = (List<String>) row[4];
+                    // List<String> preferredSize = (List<String>) row[4];
+                    String preferredSize = (String) row[4];
                     String mbti = (String) row[5];
 
                     // 거리 계산
@@ -67,9 +81,13 @@ public class TotalScoreService {
         return userResponses;
     }
 
+    // TODO 현재는 임시로 유저, pet(mbti) 직접 조회  | 추후에 user, pet  패키지 구현 의뢰 예정
 
-    public List<MatchScoreResponse> calculateTotalScore(User user) {
-        List<UserResponse> targetUsers = getUsersWithinBoundingBox(user);
+    public List<MatchScoreResponse> calculateTotalScore(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
+
+        List<UserResponse> targetUsers = getUsersWithinBoundingBox(userId);
 
         List<MatchScoreResponse> matchResults = targetUsers.stream().map(targetUser -> {
             double distance = matchPlaceService.calculateDistanceOnly(user, targetUser);
@@ -80,9 +98,9 @@ public class TotalScoreService {
             double sizeScore = 10.0;
 //            double sizeScore = matchSizeService.calculateDogSizeScore(user, preferredSizes);
 
+            String dogMbti = getTemperamentByUserId(userId);
 
-            // 11/27 견bti 로 수정해야함.
-            double mbtiScore = matchMbtiService.calculateMbtiScore(user.getMbti(), targetUser.mbti());
+            double mbtiScore = matchMbtiService.calculateMbtiScore(dogMbti, targetUser.mbti());
             double totalScore = distanceScore + careScore + sizeScore + mbtiScore;
 
             return new MatchScoreResponse(
@@ -106,5 +124,18 @@ public class TotalScoreService {
         redisTemplate.opsForValue().set(redisKey, matchResults);
 
         return matchResults;
+    }
+
+
+    // TODO 펫 서비스쪽으로 옮겨야 함
+    public String getTemperamentByUserId(Long userId) {
+        // userId로 Pet 목록 조회
+        List<Pet> pets = petRepository.findByUserId(userId);
+
+        // 첫 번째 Pet의 temperament 반환, 없으면 "Unknown"
+        if (!pets.isEmpty()) {
+            return pets.get(0).getTemperament() != null ? pets.get(0).getTemperament() : "Unknown";
+        }
+        return "Unknown";
     }
 }

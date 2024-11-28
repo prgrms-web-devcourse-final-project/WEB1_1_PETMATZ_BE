@@ -20,6 +20,7 @@ public class MatchSizeService {
 
     private final PetRepository petRepository;
 
+    // TODO 현재는 임시로 펫 직접 조회 추후에 펫 쪽에서 사이즈 구현 의뢰 예정
     public double calculateDogSizeScore(User user, List<String> preferredSizes) {
         {
             List<Pet> userPets = petRepository.findByUserId(user.getId());

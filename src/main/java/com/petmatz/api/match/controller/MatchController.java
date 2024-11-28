@@ -3,12 +3,10 @@ package com.petmatz.api.match.controller;
 import com.petmatz.domain.match.dto.response.DetailedMatchResultResponse;
 import com.petmatz.domain.match.dto.response.MatchResultResponse;
 import com.petmatz.domain.match.service.MatchService;
+import com.petmatz.domain.match.service.TotalScoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,22 +16,26 @@ import java.util.List;
 public class MatchController {
 
     private final MatchService matchService;
+    private final TotalScoreService totalScoreService;
 
-    @GetMapping // 추후에 userId contextHolder 로 변경
-    public ResponseEntity<List<DetailedMatchResultResponse>> getPageDetails(@RequestParam Long userId,
-                                                                            @RequestParam(defaultValue = "0") int page,
-                                                                            @RequestParam(defaultValue = "5") int size) {
-
+    // TODO 추후에 userId 변경 (JWT)
+    @GetMapping("/showmetz")
+    public ResponseEntity<List<DetailedMatchResultResponse>> getPageDetails
+            (@RequestParam Long userId,
+             @RequestParam(defaultValue = "0") int page,
+             @RequestParam(defaultValue = "5") int size) {
+        totalScoreService.calculateTotalScore(userId);
         List<DetailedMatchResultResponse> userDetails = matchService.getPageUserDetailsFromRedis(userId, page, size);
 
         if (userDetails.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-
-        // 결과 반환
         return ResponseEntity.ok(userDetails);
     }
 
+//    @PostMapping("/matchfail")
+//    public ResponseEntity<?> matchFail () {
+//    }
 }
 
 

@@ -17,13 +17,13 @@ public class TotalScoreTestController {
     private final TotalScoreService totalScoreService;
 
     @PostMapping("/calculate")
-    public List<MatchScoreResponse> calculateTotalScore(@RequestBody User user) {
-        return totalScoreService.calculateTotalScore(user);
+    public List<MatchScoreResponse> calculateTotalScore(@RequestBody Long userId) {
+        return totalScoreService.calculateTotalScore(userId);
     }
 
     @PostMapping("/get-users")
-    public List<UserResponse> getUsersWithinBoundingBox(@RequestBody User user) {
-        return totalScoreService.getUsersWithinBoundingBox(user);
+    public List<UserResponse> getUsersWithinBoundingBox(@RequestBody Long userId) {
+        return totalScoreService.getUsersWithinBoundingBox(userId);
     }
 }
 

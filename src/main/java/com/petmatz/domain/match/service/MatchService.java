@@ -2,10 +2,9 @@ package com.petmatz.domain.match.service;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petmatz.domain.match.dto.response.DetailedMatchResultResponse;
-import com.petmatz.domain.match.dto.response.MatchResultResponse;
 import com.petmatz.domain.match.dto.response.MatchScoreResponse;
 import com.petmatz.domain.match.exception.MatchException;
 import com.petmatz.domain.user.entity.User;
@@ -13,14 +12,12 @@ import com.petmatz.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import com.fasterxml.jackson.core.type.TypeReference;
-
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-import static com.petmatz.domain.match.exception.MatchErrorCode.*;
+import static com.petmatz.domain.match.exception.MatchErrorCode.INVALID_REDIS_DATA;
+import static com.petmatz.domain.match.exception.MatchErrorCode.NULL_MATCH_DATA;
 import static com.petmatz.domain.sosboard.exception.SosBoardErrorCode.USER_NOT_FOUND;
 
 /**
@@ -74,7 +71,8 @@ public class MatchService {
                                 user.getNickname(),
                                 user.getProfileImg(),
                                 user.getRecommendationCount(),
-                                user.getRegion()
+                                user.getRegion(),
+                                user.getCareCompletionCount()
                         );
                     })
                     .toList();

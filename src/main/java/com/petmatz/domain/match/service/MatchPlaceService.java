@@ -106,20 +106,26 @@ public class MatchPlaceService {
 
 
     private double calculateDistanceScore(double distance) {
-        if (distance <= 3.0) {
-            return 40.0;
-        } else if (distance <= 4.0) {
-            return 38.0;
-        } else if (distance <= 5.5) {
-            return 35.0;
+        if (distance <= 5.0) {
+            return 70.0;
         } else if (distance <= 7.0) {
+            return 62.0;
+        } else if (distance <= 9.0) {
+            return 53.0;
+        } else if (distance <= 11.0) {
+            return 45.0;
+        } else if (distance <= 15.0) {
+            return 40.0;
+        } else if (distance <= 20.0) {
+            return 35.0;
+        } else if (distance <= 25.0) {
             return 30.0;
-        } else if (distance <= 8.5) {
-            return 28.0;
-        } else if (distance <= 10.0) {
-            return 25.0;
-        } else { // 3km 이상이면 일단 20점만
-            return 20.0;
+        } else if (distance <= 30.0) {
+            return 26.0;
+        } else if (distance <= 40.0) {
+            return 15.0;
+        } else {
+            return 0.0;
         }
     }
 

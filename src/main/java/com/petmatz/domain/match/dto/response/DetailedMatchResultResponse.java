@@ -5,7 +5,8 @@ public record DetailedMatchResultResponse(
         String nickname,
         String profileImg,
         Integer recommendationCount,
-        String region
+        String region,
+        Integer careCompletionCount
         // double distance,
 
 ) {}
