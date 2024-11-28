@@ -38,9 +38,7 @@ public class PetMissionEntity {
     @JoinColumn(name = "pet_mission_id")
     private List<PetMissionAskEntity> petMissionAsks = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "pet_mission_answer_id")
-    private PetMissionAnswerEntity missionAnswer;
+
 
     @Builder
     public PetMissionEntity(LocalDateTime petMissionStarted, LocalDateTime petMissionEnd, PetMissionStatusZip status, User giver, List<PetMissionAskEntity> petMissionAsks, PetMissionAnswerEntity missionAnswer) {
@@ -48,7 +46,6 @@ public class PetMissionEntity {
         this.petMissionEnd = petMissionEnd;
         this.status = status;
         this.giver = giver;
-        this.missionAnswer = missionAnswer;
     }
 
     public static PetMissionEntity of(User user, PetMissionInfo petMissionInfo) {

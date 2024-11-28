@@ -10,7 +10,7 @@ public record PetMissionInfo(
 
         Long careId,
         Long receiverId,
-        String pet,
+        String petId,
         LocalDateTime missionStarted,
         LocalDateTime missionEnd,
 

@@ -1,8 +1,12 @@
 package com.petmatz.api.petmission;
 
+import com.petmatz.api.global.dto.Response;
 import com.petmatz.api.petmission.dto.PetMissionRequest;
+import com.petmatz.api.petmission.dto.PetMissionResponse;
 import com.petmatz.domain.petmission.PetMissionService;
+import com.petmatz.domain.petmission.dto.PetMissionData;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -27,10 +31,15 @@ import org.springframework.web.bind.annotation.*;
 public class PetMissionController {
 
     private final PetMissionService petMissionService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     @PostMapping
-    public void savePetMissionList(@RequestBody PetMissionRequest petMissionRequest) {
-        petMissionService.insertPetMission(petMissionRequest.of());
+    public Response<PetMissionResponse> savePetMissionList(@RequestBody PetMissionRequest petMissionRequest) {
+        PetMissionData petMissionData = petMissionService.insertPetMission(petMissionRequest.of());
+        String destination = "/topic/chat/" + petMissionData.chatRoomId();
+        PetMissionResponse petMissionResponse = PetMissionResponse.of(petMissionData);
+//        simpMessagingTemplate.convertAndSend(destination, petMissionResponse);
+        return Response.success(petMissionResponse);
     }
 
     @GetMapping
@@ -38,13 +47,19 @@ public class PetMissionController {
 
     }
 
+    @GetMapping("/Info")
+    public void selectPetMissionInfo() {
+
+    }
+
     @PutMapping
     public void updatePetMissionList() {
 
     }
-    @DeleteMapping
-    public void deletePetMissionList() {
 
-    }
+//    @DeleteMapping
+//    public void deletePetMissionList() {
+//
+//    }
 
 }

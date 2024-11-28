@@ -10,7 +10,7 @@ public record PetMissionRequest(
 
         Long careId,
         Long receiverId,
-        String pet,
+        String petId,
         LocalDateTime missionStarted,
         LocalDateTime missionEnd,
         List<PetMissionAsk> petMissionAsk
@@ -21,7 +21,7 @@ public record PetMissionRequest(
         return PetMissionInfo.builder()
                 .careId(careId)
                 .receiverId(receiverId)
-                .pet(pet)
+                .petId(petId)
                 .missionStarted(missionStarted)
                 .missionEnd(missionEnd)
                 .petMissionAskInfo(petMissionAsk.stream()

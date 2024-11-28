@@ -22,6 +22,10 @@ public class PetMissionAskEntity {
 
     private String imgURL;
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "pet_mission_answer_id")
+    private PetMissionAnswerEntity missionAnswer;
+
     @Builder
     public PetMissionAskEntity(String title, String comment, String imgURL) {
         this.title = title;

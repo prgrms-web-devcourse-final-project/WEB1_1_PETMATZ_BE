@@ -1,8 +1,8 @@
 package com.petmatz.domain.petmission;
 
-import com.petmatz.domain.chatting.repository.UserToChatRoomRepository;
 import com.petmatz.domain.petmission.component.PetMissionInseart;
 import com.petmatz.domain.petmission.component.UserToChatRoomReader;
+import com.petmatz.domain.petmission.dto.PetMissionData;
 import com.petmatz.domain.petmission.dto.PetMissionInfo;
 import com.petmatz.domain.petmission.entity.PetMissionEntity;
 import com.petmatz.domain.user.entity.User;
@@ -25,7 +25,7 @@ public class PetMissionService {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
 
-    public void insertPetMission(PetMissionInfo petMissionInfo) {
+    public PetMissionData insertPetMission(PetMissionInfo petMissionInfo) {
         List<User> users = makeUserEntityList(petMissionInfo.careId(), petMissionInfo.receiverId());
 
         String careEmail = users.get(0).getAccountId();
@@ -33,8 +33,13 @@ public class PetMissionService {
 
         String chatRoomId = userToChatRoomReader.selectChatRoomId(careEmail, receiverEmail);
 
+
         List<PetMissionEntity> petMissionEntityList = makePetMissionEntityList(users, petMissionInfo);
         petMissionInseart.insertPetMission(petMissionEntityList);
+
+        //TODO 반환 DTO 만들기
+
+        return PetMissionData.of(chatRoomId, );
 
     }
 

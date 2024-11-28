@@ -14,9 +14,7 @@ public record PetMissionAsk(
 
     public PetMissionAskInfo of() {
         return PetMissionAskInfo.builder()
-                .title(title)
                 .comment(comment)
-                .imgURL(imgURL)
                 .build();
     }
 
