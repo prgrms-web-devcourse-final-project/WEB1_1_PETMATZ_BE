@@ -86,24 +86,6 @@ public class SosBoardService {
         }
     }
 
-    /*@Override
-    public void updateSosBoard(Long id, User user, SosBoardCreateRequestDto updatedRequest) {
-        // ID로 게시글 조회
-        SosBoard sosBoard = sosBoardRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
-
-        // 사용자 권한 검증 (작성자만 수정 가능)
-        if (!sosBoard.getUser().equals(user)) {
-            throw new IllegalStateException("해당 게시글을 수정할 권한이 없습니다.");
-        }
-
-        // 게시글 내용 업데이트
-        sosBoard.updateContent(updatedRequest.getTitle(), updatedRequest.getContent(), updatedRequest.getRegion());
-
-        // 변경사항 저장
-        sosBoardRepository.save(sosBoard);
-    }*/
-
     // 3. User의 Pet 정보 불러오기
     public List<PetResponse> getUserPets(Long userId) {
         User user = userRepository.findById(userId)
