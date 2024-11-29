@@ -14,7 +14,7 @@ public record PetMissionInfo(
         LocalDateTime missionStarted,
         LocalDateTime missionEnd,
 
-        List<PetMissionAskInfo> petMissionAskInfo
+        List<String> petMissionAskInfo
 
 ) {
 }

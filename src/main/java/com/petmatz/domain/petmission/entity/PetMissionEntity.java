@@ -35,37 +35,36 @@ public class PetMissionEntity {
     @JoinColumn(name = "pet_id", nullable = false)
     private Pet pet;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "giver_id", nullable = false)
-    private User giver;
+
+//    @OneToMany(mappedBy = "petMission", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<UserToPetMissionEntity> userPetMissions = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "pet_mission_id")
     private List<PetMissionAskEntity> petMissionAsks = new ArrayList<>();
 
     @Builder
-    public PetMissionEntity(LocalDateTime petMissionStarted, LocalDateTime petMissionEnd, PetMissionStatusZip status, Pet pet, User giver, List<PetMissionAskEntity> petMissionAsks) {
+    public PetMissionEntity(LocalDateTime petMissionStarted, LocalDateTime petMissionEnd, PetMissionStatusZip status, Pet pet, List<UserToPetMissionEntity> userPetMissions, List<PetMissionAskEntity> petMissionAsks) {
         this.petMissionStarted = petMissionStarted;
         this.petMissionEnd = petMissionEnd;
         this.status = status;
         this.pet = pet;
-        this.giver = giver;
+//        this.userPetMissions = userPetMissions;
         this.petMissionAsks = petMissionAsks;
     }
 
-    public static PetMissionEntity of(User user, PetMissionInfo petMissionInfo, Pet pet) {
+
+    public static PetMissionEntity of(PetMissionInfo petMissionInfo, Pet pet) {
         System.out.println("petMissionInfo.toString() :: " + petMissionInfo.toString());
         return PetMissionEntity.builder()
                 .petMissionStarted(petMissionInfo.missionStarted())
                 .petMissionEnd(petMissionInfo.missionEnd())
                 .status(PetMissionStatusZip.fromDescription("시작"))
-                .giver(user)
+//                .userPetMissions(userPetMissions)
                 .pet(pet)
-                .petMissionAsks(
-                        petMissionInfo.petMissionAskInfo().stream()
-                                .map(PetMissionAskEntity::of)
-                                .toList()
-                )
+                .petMissionAsks(petMissionInfo.petMissionAskInfo().stream().map(
+                        PetMissionAskEntity::of
+                ).toList())
                 .build();
     }
 

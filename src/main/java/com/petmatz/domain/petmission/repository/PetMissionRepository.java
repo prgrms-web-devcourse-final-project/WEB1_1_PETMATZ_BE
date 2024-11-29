@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface PetMissionRepository extends JpaRepository<PetMissionEntity, Long> {
 
-    @Query("select pet from PetMissionEntity pet where pet.giver.id = :userId")
-    Optional<List<PetMissionEntity>> selectPetMissionList(@Param("userId") String userId);
+//    @Query("select pet from PetMissionEntity pet where pet. = :userId")
+//    Optional<List<PetMissionEntity>> selectPetMissionList(@Param("userId") String userId);
 
 }

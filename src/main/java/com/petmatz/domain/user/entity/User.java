@@ -3,6 +3,7 @@ package com.petmatz.domain.user.entity;
 import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import com.petmatz.domain.global.BaseEntity;
 import com.petmatz.domain.petmission.entity.PetMissionEntity;
+import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -93,9 +94,8 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserToChatRoomEntity> chatRooms = new ArrayList<>();
 
-    // 맡김이가 작성한 미션들
-    @OneToMany(mappedBy = "giver", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PetMissionEntity> givenMissions = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserToPetMissionEntity> userPetMissions = new ArrayList<>();
 
     public enum LoginRole {
         ROLE_USER, ROLE_ADMIN,
@@ -111,6 +111,15 @@ public class User extends BaseEntity {
 
     public enum Gender {
         Male, Female
+    }
+
+    public User checkUUID(List<User> users, Long id) {
+        for (User user : users) {
+            if (user.id.equals(id)) {
+                return user;
+            }
+        }
+        return null;
     }
 
 }

@@ -8,12 +8,13 @@ import java.util.List;
 
 public record PetMissionRequest(
 
+        //JWT 이용
         Long careId,
         Long receiverId,
         String petId,
         LocalDateTime missionStarted,
         LocalDateTime missionEnd,
-        List<PetMissionAsk> petMissionAsk
+        List<String> petMissionAsk
 
 ) {
 
@@ -24,8 +25,7 @@ public record PetMissionRequest(
                 .petId(petId)
                 .missionStarted(missionStarted)
                 .missionEnd(missionEnd)
-                .petMissionAskInfo(petMissionAsk.stream()
-                        .map(PetMissionAsk::of).toList())
+                .petMissionAskInfo(petMissionAsk)
                 .build();
     }
 }

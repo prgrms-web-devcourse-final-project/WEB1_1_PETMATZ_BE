@@ -14,8 +14,8 @@ public class PetMissionInseart {
 
     private final PetMissionRepository petMissionRepository;
 
-    public List<PetMissionEntity> insertPetMission(List<PetMissionEntity> petMissionEntityList) {
-         return petMissionRepository.saveAll(petMissionEntityList);
+    public PetMissionEntity insertPetMission(PetMissionEntity petMissionEntityList) {
+         return petMissionRepository.save(petMissionEntityList);
     }
 
 }

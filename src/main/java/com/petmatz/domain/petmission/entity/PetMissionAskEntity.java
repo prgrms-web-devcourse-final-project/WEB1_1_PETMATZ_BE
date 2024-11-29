@@ -30,9 +30,9 @@ public class PetMissionAskEntity {
         this.comment = comment;
     }
 
-    public static PetMissionAskEntity of(PetMissionAskInfo petMissionAskInfos) {
+    public static PetMissionAskEntity of(String comment) {
         return PetMissionAskEntity.builder()
-                .comment(petMissionAskInfos.comment())
+                .comment(comment)
                 .build();
     };
 

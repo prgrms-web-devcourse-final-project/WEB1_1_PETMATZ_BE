@@ -16,9 +16,10 @@ public class PetMissionReader {
     private final PetMissionRepository petMissionRepository;
 
     public List<PetMissionEntity> selectPetMissionId(Long UUID) {
-        Optional<List<PetMissionEntity>> petMissionEntity = petMissionRepository.selectPetMissionList(String.valueOf(UUID));
-        List<PetMissionEntity> petMissionEntityList = petMissionEntity.get();
-        return petMissionEntityList;
+//        Optional<List<PetMissionEntity>> petMissionEntity = petMissionRepository.selectPetMissionList(String.valueOf(UUID));
+//        List<PetMissionEntity> petMissionEntityList = petMissionEntity.get();
+//        return petMissionEntityList;
+        return null;
     }
 
 }
