@@ -25,7 +25,7 @@ public interface UserService {
 
     ResponseEntity<? super UpdateLocationResponseDto> updateLocation(UpdateLocationInfo info);
 
-    ResponseEntity<? super UpdateLocationResponseDto> updateUserRegion();
-
     ResponseEntity<? super UpdateRecommendationResponseDto> updateRecommend(UpdateRecommendationRequestDto dto);
+
+    GetMyUserDto receiverEmail(String accountId);
 }

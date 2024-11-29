@@ -20,8 +20,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -112,11 +110,12 @@ public class UserServiceImpl implements UserService {
             String encodedPassword = passwordEncoder.encode(password);
             info.setPassword(encodedPassword);
 
-            User user = UserFactory.createNewUser(info, encodedPassword);
+            String region = geocodingService.getRegionFromCoordinates(info.getLatitude(), info.getLongitude());
+            User user = UserFactory.createNewUser(info, encodedPassword, region);
             userRepository.save(user);
 
             // 인증 엔티티 삭제
-            certificationRepository.deleteByAccountId(accountId);
+            certificationRepository.deleteAllByAccountId(accountId);
         } catch (Exception e) {
             log.info("회원 가입 실패: {}", e);
             return LogInResponseDto.databaseError();
@@ -144,8 +143,8 @@ public class UserServiceImpl implements UserService {
                 return SignInResponseDto.signInFail();
             }
 
-            // JWT 생성
-            String token = jwtProvider.create(accountId, user.getLoginRole());
+            // JWT 생성 (userId를 subject로, accountId를 클레임으로 설정)
+            String token = jwtProvider.create(user.getId(), user.getAccountId());
             log.info("JWT 생성 완료: {}", token);
 
             // JWT 쿠키에 저장
@@ -167,9 +166,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<? super DeleteIdResponseDto> deleteId(DeleteIdRequestDto dto) {
         try {
-            String accountId = jwtExtractProvider.findAccountIdFromJwt();
-            User user = userRepository.findByAccountId(accountId);
-            if (user == null) return DeleteIdResponseDto.idNotFound();  // 사용자 조회 실패
+            Long userId = jwtExtractProvider.findIdFromJwt();
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
             // 비밀번호 일치 확인
             String password = dto.getPassword();
@@ -180,7 +179,7 @@ public class UserServiceImpl implements UserService {
             User updatedUser = UserFactory.createDeletedUser(user);
             userRepository.save(updatedUser);
 
-            certificationRepository.deleteByAccountId(accountId);
+            certificationRepository.deleteById(userId);
         } catch (Exception e) {
             log.info("회원 삭제 실패: {}", e);
             return DeleteIdResponseDto.databaseError();  // 데이터베이스 오류 처리
@@ -193,11 +192,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<? super GetMyProfileResponseDto> getMypage() {
         try {
-            String accountId = jwtExtractProvider.findAccountIdFromJwt();
-            User user = userRepository.findByAccountId(accountId);
+            String userId = jwtExtractProvider.findAccountIdFromJwt();
+            User user = userRepository.findByAccountId(userId);
 
 
-            boolean exists = userRepository.existsByAccountId(accountId);
+            boolean exists = userRepository.existsByAccountId(userId);
             if (!exists) {
                 return GetMyProfileResponseDto.userNotFound();
             }
@@ -228,13 +227,15 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+
     @Override
     public ResponseEntity<? super EditMyProfileResponseDto> editMyProfile(EditMyProfileInfo info) {
         try {
-            String accountId = jwtExtractProvider.findAccountIdFromJwt();
-            User user = userRepository.findByAccountId(accountId);
+            Long userId = jwtExtractProvider.findIdFromJwt();
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
-            boolean exists = userRepository.existsByAccountId(accountId);
+            boolean exists = userRepository.existsById(userId);
             if (!exists) {
                 return EditMyProfileResponseDto.editFailed();
             }
@@ -259,8 +260,9 @@ public class UserServiceImpl implements UserService {
                 return HeartingResponseDto.heartedIdNotFound();
             }
 
-            String accountId = jwtExtractProvider.findAccountIdFromJwt();
-            User user = userRepository.findByAccountId(accountId);
+            Long userId = jwtExtractProvider.findIdFromJwt();
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
             Heart heart = Heart.builder()
                     .myId(user.getId())
@@ -281,8 +283,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<? super GetHeartingListResponseDto> getHeartedList() {
         try {
-            String accountId = jwtExtractProvider.findAccountIdFromJwt();
-            User user = userRepository.findByAccountId(accountId);
+            Long userId = jwtExtractProvider.findIdFromJwt();
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
             List<Heart> heartList = heartRepository.findAllByMyId(user.getId());
 
@@ -322,8 +325,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<? super RepasswordResponseDto> repassword(RepasswordInfo info) {
         try {
-            String accountId = jwtExtractProvider.findAccountIdFromJwt();
-            User user = userRepository.findByAccountId(accountId);
+            Long userId = jwtExtractProvider.findIdFromJwt();
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
             String currentPassword = info.getCurrentPassword();
 
@@ -349,44 +353,26 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<? super UpdateLocationResponseDto> updateLocation(UpdateLocationInfo info) {
         try {
-            String accountId = jwtExtractProvider.findAccountIdFromJwt();
-            User user = userRepository.findByAccountId(accountId);
+            Long userId = jwtExtractProvider.findIdFromJwt();
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
-            boolean exists = userRepository.existsByAccountId(accountId);
+            boolean exists = userRepository.existsById(userId);
             if (!exists) {
                 return EditMyProfileResponseDto.editFailed();
             }
+            String region = geocodingService.getRegionFromCoordinates(info.getLatitude(), info.getLongitude());
 
-            User updatedUser = UserFactory.createLocationUpdateUser(user, info);
+            User updatedUser = UserFactory.createLocationUpdateUser(user, info, region);
             userRepository.save(updatedUser);
 
+            return UpdateLocationResponseDto.success(region);
         } catch (Exception e) {
             log.info("위치업데이트 실패: {}", e);
             return UpdateLocationResponseDto.wrongLocation();
         }
-        return UpdateLocationResponseDto.success();
     }
 
-    public ResponseEntity<? super UpdateLocationResponseDto> updateUserRegion() {
-        try {
-            String accountId = jwtExtractProvider.findAccountIdFromJwt();
-            User user = userRepository.findByAccountId(accountId);
-
-            boolean exists = userRepository.existsByAccountId(accountId);
-            if (!exists) {
-                return GetOtherProfileResponseDto.userNotFound();
-            }
-
-            String region = geocodingService.getRegionFromCoordinates(user.getLatitude(), user.getLongitude());
-            User updateUser = UserFactory.createRegionUpdateUser(user, region);
-
-            userRepository.save(updateUser);
-        } catch (Exception e) {
-            log.info("지역업데이트 실패: {}", e);
-            return UpdateLocationResponseDto.wrongLocation();
-        }
-        return UpdateLocationResponseDto.success();
-    }
 
     @Override
     public ResponseEntity<? super UpdateRecommendationResponseDto> updateRecommend(UpdateRecommendationRequestDto dto) {
@@ -399,7 +385,7 @@ public class UserServiceImpl implements UserService {
             if (!exists) {
                 return GetOtherProfileResponseDto.userNotFound();
             }
-            Integer recommendationCount = user.getRecommendationCount()+1;
+            Integer recommendationCount = user.getRecommendationCount() + 1;
 
             User updatedUser = UserFactory.createRecommendationUpdateUser(user, recommendationCount);
 
@@ -412,5 +398,16 @@ public class UserServiceImpl implements UserService {
         return UpdateRecommendationResponseDto.success();
     }
 
+
+    @Override
+    public GetMyUserDto receiverEmail(String accountId) {
+        try {
+            User user = userRepository.findByAccountId(accountId);
+            return new GetMyUserDto(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new GetMyUserDto();
+    }
 
 }

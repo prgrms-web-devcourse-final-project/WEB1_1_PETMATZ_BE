@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class ValidationExceptionHandler {
+public class NotFoundExceptionHandler {
     @ExceptionHandler({MethodArgumentNotValidException.class, HttpMessageNotReadableException.class})
-    public ResponseEntity<LogInResponseDto> validationExceptionHandler(Exception e) {
-        return LogInResponseDto.validationFail();
+    public ResponseEntity<LogInResponseDto> notFoundExceptionHandler(Exception e) {
+        return LogInResponseDto.userNotFound();
     }
 }

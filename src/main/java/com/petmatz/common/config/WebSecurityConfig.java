@@ -6,10 +6,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
@@ -63,12 +61,7 @@ public class WebSecurityConfig {
                 .httpBasic(HttpBasicConfigurer::disable) // HTTP Basic 인증 비활성화
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 비활성화 (JWT 사용)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/", "/api/auth/**", "/oauth2/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/sosboard").permitAll() // /api/sosboard GET 요청 허용
-                        .requestMatchers(HttpMethod.GET, "/api/sosboard/user/{nickname}").permitAll()// 인증 없이 접근 가능
-                        .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN") // USER, ADMIN둘다 가능
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN") // ADMIN 역할 필요
-                        .anyRequest().authenticated()//.permitAll()
+                                .anyRequest().permitAll()
 
                 )
                 .oauth2Login(oauth2 -> oauth2

@@ -1,7 +1,7 @@
 package com.petmatz.domain.user.entity;
 
-import com.petmatz.domain.chatting.dto.UserToChatRoomEntity;
 import com.petmatz.domain.global.BaseEntity;
+import com.petmatz.domain.user.constant.*;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -56,8 +55,9 @@ public class User extends BaseEntity {
     @Column(name = "gender")
     private Gender gender; // 'Male', 'Female'
 
-    @Column(name = "preferred_size", nullable = false)
-    private String preferredSize; // 'Small', 'Medium', 'Large',
+    @Convert(converter = PreferredSizeConverter.class)
+    @Column(name = "preferred_size")
+    private List<PreferredSize> preferredSizes; // 'Small', 'Medium', 'Large', 'None'
 
     @Column(name = "introduction")
     private String introduction;
@@ -88,24 +88,7 @@ public class User extends BaseEntity {
 
     @Column(name="region")
     private String region;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserToChatRoomEntity> chatRooms = new ArrayList<>();
-
-    public enum LoginRole {
-        ROLE_USER, ROLE_ADMIN,
-    }
-
-    public enum Role {
-        Dol, Mat
-    }
-
-    public enum LoginType {
-        Normal, Kakao
-    }
-
-    public enum Gender {
-        Male, Female
-    }
-
+//
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<UserToChatRoomEntity> chatRooms = new ArrayList<>();
 }
