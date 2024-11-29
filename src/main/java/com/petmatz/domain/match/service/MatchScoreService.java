@@ -1,5 +1,8 @@
 package com.petmatz.domain.match.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petmatz.domain.match.exception.MatchException;
 import com.petmatz.domain.match.repo.MatchUserRepository;
 import com.petmatz.domain.match.dto.response.MatchScoreResponse;
@@ -17,6 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.petmatz.domain.match.exception.MatchErrorCode.INVALID_REDIS_DATA;
 import static com.petmatz.domain.match.exception.MatchErrorCode.NULL_MATCH_DATA;
 
 @Service
@@ -126,18 +130,37 @@ public class MatchScoreService {
     }
 
     public void decreaseScore(Long userId, Long targetId) {
-        double penaltyScore = 40.0;
+        double penaltyScore = 30.0;  // 감소시킬 점수
         String redisKey = "matchResult:" + userId;
 
-        List<MatchScoreResponse> matchResults = (List<MatchScoreResponse>) redisTemplate.opsForValue().get(redisKey);
+        // Redis에서 캐시된 데이터를 가져옴
+        Object rawData = redisTemplate.opsForValue().get(redisKey);
 
-        if (matchResults == null || matchResults.isEmpty()) {
+        if (rawData == null) {
             throw new MatchException(NULL_MATCH_DATA);
         }
 
-        List<MatchScoreResponse> updatedResults = matchResults.stream()
+        List<MatchScoreResponse> matchScores;
+
+        // Redis에서 가져온 데이터를 JSON 문자열로 처리
+        try {
+            if (rawData instanceof String) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                matchScores = objectMapper.readValue((String) rawData, new TypeReference<List<MatchScoreResponse>>() {});
+            } else if (rawData instanceof List) {
+                matchScores = (List<MatchScoreResponse>) rawData;
+            } else {
+                throw new MatchException(INVALID_REDIS_DATA);
+            }
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("JSON 데이터 처리 중 오류 발생", e);
+        }
+
+        // 점수 감소
+        List<MatchScoreResponse> updatedResults = matchScores.stream()
                 .map(match -> {
                     if (match.id().equals(targetId)) {
+                        // targetId에 해당하는 사용자 점수만 감소
                         double newScore = Math.max(0, match.totalScore() - penaltyScore);
                         return new MatchScoreResponse(
                                 match.id(),
@@ -153,9 +176,16 @@ public class MatchScoreService {
                 })
                 .toList();
 
-        // 수정된 결과를 Redis에 다시 저장
-        redisTemplate.opsForValue().set(redisKey, updatedResults);
+        // JSON 형식으로 직렬화 후 Redis에 저장
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String updatedData = objectMapper.writeValueAsString(updatedResults);
+            redisTemplate.opsForValue().set(redisKey, updatedData);  // String으로 저장
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("JSON 직렬화 오류 발생", e);
+        }
     }
+
 
     // TODO 펫 서비스쪽으로 옮겨야 함
     public String getTemperamentByUserId(Long userId) {

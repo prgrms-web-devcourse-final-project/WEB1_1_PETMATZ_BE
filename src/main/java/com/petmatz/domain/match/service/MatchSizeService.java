@@ -29,17 +29,14 @@ public class MatchSizeService {
                 throw new PetServiceException(PET_NOT_FOUND);
             }
 
-            // 입력값 검증
             if (preferredSizes == null || preferredSizes.isEmpty()) {
                 throw new MatchException(NULL_PREFERRED_SIZES);
             }
 
-            // 모든 Pet 크기에 대해 점수를 계산
             double totalScore = userPets.stream()
                     .mapToDouble(pet -> calculateScoreForPet(preferredSizes, pet.getSize().name()))
                     .sum();
 
-            // 평균 점수 계산
             return totalScore / userPets.size();
         }
     }

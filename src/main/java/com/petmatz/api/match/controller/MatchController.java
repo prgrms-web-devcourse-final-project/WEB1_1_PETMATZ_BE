@@ -2,6 +2,7 @@ package com.petmatz.api.match.controller;
 
 import com.petmatz.api.match.request.PenaltyScore;
 import com.petmatz.domain.match.dto.response.DetailedMatchResultResponse;
+import com.petmatz.domain.match.dto.response.PaginatedMatchResponse;
 import com.petmatz.domain.match.service.MatchService;
 import com.petmatz.domain.match.service.MatchScoreService;
 import lombok.RequiredArgsConstructor;
@@ -20,16 +21,17 @@ public class MatchController {
 
     // TODO 추후에 userId 변경 (JWT)
     @GetMapping("/showmetz")
-    public ResponseEntity<List<DetailedMatchResultResponse>> getPageDetails
-            (@RequestParam Long userId,
-             @RequestParam(defaultValue = "0") int page,
-             @RequestParam(defaultValue = "5") int size) {
-//        matchScoreService.calculateTotalScore(userId);
-        List<DetailedMatchResultResponse> userDetails = matchService.getPageUserDetailsFromRedis(userId, page, size);
+    public ResponseEntity<PaginatedMatchResponse> getPageDetails(
+            @RequestParam Long userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
 
-        if (userDetails.isEmpty()) {
+        PaginatedMatchResponse userDetails = matchService.getPageUserDetailsFromRedis(userId, page, size);
+
+        if (userDetails.matchResults().isEmpty()) {
             return ResponseEntity.noContent().build();
         }
+
         return ResponseEntity.ok(userDetails);
     }
 
