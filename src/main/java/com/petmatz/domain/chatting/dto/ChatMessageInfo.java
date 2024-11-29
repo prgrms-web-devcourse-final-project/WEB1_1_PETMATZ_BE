@@ -37,6 +37,4 @@ public class ChatMessageInfo {
         this.readStatus = readStatus;
     }
 
-
-
 }

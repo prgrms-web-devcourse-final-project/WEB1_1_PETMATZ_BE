@@ -50,7 +50,7 @@ public class ChatRoomMetadataDocs {
                 .lastMessageTimestamp(LocalDateTime.now())
                 .messageCount(0)
                 .unreadCount(0)
-                .msg_type(chatMessageInfo.msg_type)
+                .msg_type(chatMessageInfo.msg_type.name())
                 .build();
     }
 }

@@ -1,11 +1,10 @@
 package com.petmatz.api.match.controller;
 
-import com.petmatz.domain.match.response.MatchResultResponse;
-import com.petmatz.domain.match.response.UserResponse;
-import com.petmatz.domain.match.service.TotalScoreService;
-import com.petmatz.domain.user.entity.User;
+import com.petmatz.api.match.request.UserIdRequest;
+import com.petmatz.domain.match.dto.response.MatchScoreResponse;
+import com.petmatz.domain.match.dto.response.UserResponse;
+import com.petmatz.domain.match.service.MatchScoreService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,16 +14,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TotalScoreTestController {
 
-    private final TotalScoreService totalScoreService;
+    private final MatchScoreService matchScoreService;
 
     @PostMapping("/calculate")
-    public List<MatchResultResponse> calculateTotalScore(@RequestBody User user) {
-        return totalScoreService.calculateTotalScore(user);
+    public List<MatchScoreResponse> calculateTotalScore(@RequestBody UserIdRequest userId) {
+        return matchScoreService.calculateTotalScore(userId.userId());
     }
 
     @PostMapping("/get-users")
-    public List<UserResponse> getUsersWithinBoundingBox(@RequestBody User user) {
-        return totalScoreService.getUsersWithinBoundingBox(user);
+    public List<UserResponse> getUsersWithinBoundingBox(@RequestBody UserIdRequest userId) {
+        return matchScoreService.getUsersWithinBoundingBox(userId.userId());
     }
 }
 
