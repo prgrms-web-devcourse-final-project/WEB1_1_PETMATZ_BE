@@ -9,7 +9,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -49,31 +48,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            String accountId = jwtProvider.validate(token);
-            if (accountId == null) {
+            // JWT 유효성 검증 및 사용자 ID 추출
+            Long userId = jwtProvider.validateAndGetUserId(token); // validate 메서드가 userId를 반환하도록 수정
+            if (userId == null) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
             // 사용자 ID로 사용자 정보 조회
-            User userEntity = userRepository.findByAccountId(accountId);
-            User.LoginRole loginRole = userEntity.getLoginRole();
+            User userEntity = userRepository.findById(userId).orElse(null);
+            if (userEntity == null) {
+                filterChain.doFilter(request, response);
+                return;
+            }
 
             // 사용자 권한 설정
+            LoginRole loginRole = userEntity.getLoginRole();
             List<GrantedAuthority> authorities = new ArrayList<>();
             authorities.add(new SimpleGrantedAuthority(String.valueOf(loginRole)));
 
             // 인증 객체 생성 및 SecurityContext에 설정
             SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
             AbstractAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(accountId, null, authorities);
+                    new UsernamePasswordAuthenticationToken(userId, null, authorities); // userId를 principal로 설정
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             securityContext.setAuthentication(authenticationToken);
             SecurityContextHolder.setContext(securityContext);
 
         } catch (Exception e) {
-//            log.info("Invalid JWT token: {}", e.getMessage());
+//            log.error("JWT 인증 실패", e);
         }
 
         filterChain.doFilter(request, response);
@@ -91,4 +95,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         return jwtCookie.map(Cookie::getValue).orElse(null);
     }
+
+
 }

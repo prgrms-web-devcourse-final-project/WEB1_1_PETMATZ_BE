@@ -1,7 +1,7 @@
 package com.petmatz.api.pet;
 
 import com.petmatz.api.global.dto.Response;
-import com.petmatz.domain.pet.PetService;
+import com.petmatz.domain.pet.PetServiceImpl;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -19,14 +19,14 @@ import java.util.Map;
 @Tag(name = "Image API", description = "이미지 관리 API")
 public class ImageController {
 
-    private final PetService petService;
+    private final PetServiceImpl petServiceImpl;
 
     // 이미지 업로드
     @PostMapping("/upload")
     @Operation(summary = "이미지 업로드", description = "이미지를 업로드하고 저장 경로를 반환합니다.")
     @Parameter(name = "file", description = "업로드할 이미지 파일", required = true, schema = @Schema(type = "string", format = "binary"))
     public ResponseEntity<Response<Map<String, String>>> uploadImage(@RequestParam("file") MultipartFile file) {
-        Map<String, String> response = petService.uploadImage(file);
+        Map<String, String> response = petServiceImpl.uploadImage(file);
         return ResponseEntity.ok(Response.success(response));
     }
 }

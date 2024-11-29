@@ -1,5 +1,8 @@
 package com.petmatz.domain.user.response;
 
+import com.petmatz.domain.user.constant.Gender;
+import com.petmatz.domain.user.constant.PreferredSize;
+import com.petmatz.domain.user.constant.Role;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.user.common.LogInResponseDto;
 import com.petmatz.user.common.ResponseCode;
@@ -8,15 +11,17 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 @Getter
 public class GetOtherProfileResponseDto extends LogInResponseDto {
     private Long id;
     private String accountId;
     private String nickname;
     private String profileImg;
-    private User.Role role;
-    private String preferredSize;
-    private User.Gender gender;
+    private Role role;
+    private List<PreferredSize> preferredSize;
+    private Gender gender;
     private Boolean isRegistered;
     private Integer recommendationCount;
     private Integer careCompletionCount;
@@ -31,7 +36,7 @@ public class GetOtherProfileResponseDto extends LogInResponseDto {
         this.nickname = user.getNickname();
         this.profileImg=user.getProfileImg();
         this.role = user.getRole();
-        this.preferredSize =user.getPreferredSize();
+        this.preferredSize = user.getPreferredSizes();
         this.gender = user.getGender();
         this.isRegistered = user.getIsRegistered();
         this.recommendationCount = user.getRecommendationCount();

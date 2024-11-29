@@ -1,16 +1,13 @@
 package com.petmatz.domain.match.service;
 
-import com.petmatz.api.match.request.DistanceRequest;
+import com.petmatz.domain.match.dto.request.DistanceRequest;
 import com.petmatz.domain.match.exception.MatchException;
-import com.petmatz.domain.match.response.UserResponse;
+import com.petmatz.domain.match.dto.response.UserResponse;
 import com.petmatz.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 import static com.petmatz.domain.match.exception.MatchErrorCode.*;
-import static com.petmatz.domain.match.service.TotalScoreService.RANGE_KM;
 
 @Service
 @RequiredArgsConstructor
@@ -51,26 +48,26 @@ public class MatchPlaceService {
     public double findMatchesWithinDistance(User user, UserResponse targetUser) {
         double distanceScore = 0.0;
 
-            if (user.getId() == null || targetUser.id() == null || user.getId().equals(targetUser.id())) {
-                return distanceScore;
-            }
+        if (user.getId() == null || targetUser.id() == null || user.getId().equals(targetUser.id())) {
+            return distanceScore;
+        }
 
-            try {
-                checkLatitudeLongitude(user, "User");
-                System.out.println("user : " + user.getLatitude());
-                checkTargetUserLatitudeLongitude(targetUser, "Target user");
-                System.out.println("target user : " + targetUser.latitude());
+        try {
+            checkLatitudeLongitude(user, "User");
+            System.out.println("user : " + user.getLatitude());
+            checkTargetUserLatitudeLongitude(targetUser, "Target user");
+            System.out.println("target user : " + targetUser.latitude());
 
-                double distance = calculateDistance(createDistanceRequest(user, targetUser));
-                System.out.println("distance : " + distance);
+            double distance = calculateDistance(createDistanceRequest(user, targetUser));
+            System.out.println("distance : " + distance);
 
-                    distanceScore = calculateDistanceScore(distance);
-                    System.out.println("점수는 " + distanceScore);
+            distanceScore = calculateDistanceScore(distance);
+            System.out.println("점수는 " + distanceScore);
 
-            } catch (MatchException e) {
-                throw new MatchException(INVALID_MATCH_DATA,
-                        "Error for user " + user.getId() + " and target " + targetUser.id() + ": " + e.getMessage());
-            }
+        } catch (MatchException e) {
+            throw new MatchException(INVALID_MATCH_DATA,
+                    "Error for user " + user.getId() + " and target " + targetUser.id() + ": " + e.getMessage());
+        }
 
         return distanceScore;
     }
@@ -80,7 +77,12 @@ public class MatchPlaceService {
             throw new MatchException(INSUFFICIENT_LATITUDE_DATA, userType);
         }
         if (user.getLongitude() <= 0) {
-            throw new MatchException(INSUFFICIENT_LONGITUDE_DATA, userType);
+            if (user.getLatitude() == 0.0) {
+                throw new MatchException(INSUFFICIENT_LATITUDE_DATA, userType);
+            }
+            if (user.getLongitude() == 0.0) {
+                throw new MatchException(INSUFFICIENT_LONGITUDE_DATA, userType);
+            }
         }
     }
 
@@ -104,20 +106,26 @@ public class MatchPlaceService {
 
 
     private double calculateDistanceScore(double distance) {
-        if (distance <= 3.0) {
-            return 40.0;
-        } else if (distance <= 4.0) {
-            return 38.0;
-        } else if (distance <= 5.5) {
-            return 35.0;
+        if (distance <= 5.0) {
+            return 70.0;
         } else if (distance <= 7.0) {
+            return 62.0;
+        } else if (distance <= 9.0) {
+            return 53.0;
+        } else if (distance <= 11.0) {
+            return 45.0;
+        } else if (distance <= 15.0) {
+            return 40.0;
+        } else if (distance <= 20.0) {
+            return 35.0;
+        } else if (distance <= 25.0) {
             return 30.0;
-        } else if (distance <= 8.5) {
-            return 28.0;
-        } else if (distance <= 10.0) {
-            return 25.0;
-        } else { // 3km 이상이면 일단 20점만
-            return 20.0;
+        } else if (distance <= 30.0) {
+            return 26.0;
+        } else if (distance <= 40.0) {
+            return 15.0;
+        } else {
+            return 0.0;
         }
     }
 

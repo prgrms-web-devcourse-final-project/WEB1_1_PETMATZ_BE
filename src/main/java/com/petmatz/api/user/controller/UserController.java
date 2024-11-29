@@ -84,7 +84,7 @@ public class UserController {
         return response;
     }
 
-    @PutMapping("/repassword")
+    @PostMapping("/repassword")
     public ResponseEntity<? super RepasswordResponseDto> repassword(@RequestBody @Valid RepasswordRequestDto requestBody) {
         ResponseEntity<? super RepasswordResponseDto> response = userService.repassword(RepasswordRequestDto.of(requestBody));
         log.info("[repassword]: {currentPassword: " + requestBody.getCurrentPassword() + ", newPassword: " + requestBody.getNewPassword() + "}");
@@ -109,12 +109,6 @@ public class UserController {
     public ResponseEntity<? super UpdateLocationResponseDto>updateLocation(@RequestBody @Valid UpdateLocationRequestDto requestBody) {
         ResponseEntity<? super UpdateLocationResponseDto> response = userService.updateLocation(UpdateLocationRequestDto.of(requestBody));
         log.info("[updateLocation]");
-        return response;
-    }
-
-    @PostMapping("/update-region")
-    public ResponseEntity<? super UpdateLocationResponseDto> updateUserRegion() {
-        ResponseEntity<? super UpdateLocationResponseDto> response=userService.updateUserRegion();
         return response;
     }
 

@@ -48,13 +48,9 @@ public class SosBoardService {
     }
 
     // 2. 게시글 작성
-    public SosBoardResponseDto createSosBoard(SosBoardCreateRequestDto requestDto) {
+    public SosBoardResponseDto createSosBoard(User user, SosBoardCreateRequestDto requestDto) {
 
         try {
-            // 유저 확인
-            User user = userRepository.findById(requestDto.userId())
-                    .orElseThrow(() -> new SosBoardServiceException(SosBoardErrorCode.BOARD_NOT_FOUND));
-
             // SosBoard 엔티티 생성
             SosBoard sosBoard = SosBoard.builder()
                     .user(user)

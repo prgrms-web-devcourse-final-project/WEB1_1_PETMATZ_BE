@@ -2,8 +2,8 @@ package com.petmatz.domain.user.entity;
 
 import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import com.petmatz.domain.global.BaseEntity;
-import com.petmatz.domain.petmission.entity.PetMissionEntity;
 import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
+import com.petmatz.domain.user.constant.*;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -58,8 +58,9 @@ public class User extends BaseEntity {
     @Column(name = "gender")
     private Gender gender; // 'Male', 'Female'
 
-    @Column(name = "preferred_size", nullable = false)
-    private String preferredSize; // 'Small', 'Medium', 'Large',
+    @Convert(converter = PreferredSizeConverter.class)
+    @Column(name = "preferred_size")
+    private List<PreferredSize> preferredSizes; // 'Small', 'Medium', 'Large', 'None'
 
     @Column(name = "introduction")
     private String introduction;
