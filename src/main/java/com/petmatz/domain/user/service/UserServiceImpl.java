@@ -176,8 +176,8 @@ public class UserServiceImpl implements UserService {
             boolean isMatched = passwordEncoder.matches(password, encodedPassword);
             if (!isMatched) return DeleteIdResponseDto.idNotMatching();  // 비밀번호 불일치
 
-            User updatedUser = UserFactory.createDeletedUser(user);
-            userRepository.save(updatedUser);
+//            User updatedUser = UserFactory.createDeletedUser(user);
+//            userRepository.save(updatedUser);
 
             certificationRepository.deleteById(userId);
         } catch (Exception e) {
@@ -229,6 +229,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
+    @Transactional
     public ResponseEntity<? super EditMyProfileResponseDto> editMyProfile(EditMyProfileInfo info) {
         try {
             Long userId = jwtExtractProvider.findIdFromJwt();
@@ -239,9 +240,10 @@ public class UserServiceImpl implements UserService {
             if (!exists) {
                 return EditMyProfileResponseDto.editFailed();
             }
+            user.updateProfile(info);
 
-            User updatedUser = UserFactory.createUpdatedUser(user, info);
-            userRepository.save(updatedUser);
+//            User updatedUser = UserFactory.createUpdatedUser(user, info);
+//            userRepository.save(updatedUser);
 
         } catch (Exception e) {
             log.info("프로필 수정 실패: {}", e);
@@ -300,6 +302,7 @@ public class UserServiceImpl implements UserService {
 
     //--------------------------------------------------------------------------------------------------------------------------------------------
     @Override
+    @Transactional
     public ResponseEntity<? super SendRepasswordResponseDto> sendRepassword(SendRepasswordRequestDto dto) {
         try {
             String accountId = dto.getAccountId();
@@ -312,8 +315,9 @@ public class UserServiceImpl implements UserService {
 
             String encodedRePasswordNum = passwordEncoder.encode(rePasswordNum);
 
-            User updatedUser = UserFactory.createUpdatedPasswordUser(user, encodedRePasswordNum);
-            userRepository.save(updatedUser);
+            user.updatePassword(encodedRePasswordNum);
+//            User updatedUser = UserFactory.createUpdatedPasswordUser(user, encodedRePasswordNum);
+//            userRepository.save(updatedUser);
 
         } catch (Exception e) {
             log.info("임시비밀번호 재설정 실패: {}", e);
@@ -323,6 +327,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<? super RepasswordResponseDto> repassword(RepasswordInfo info) {
         try {
             Long userId = jwtExtractProvider.findIdFromJwt();
@@ -339,8 +344,10 @@ public class UserServiceImpl implements UserService {
 
             String encodedNewPassword = passwordEncoder.encode(newPassword);
 
-            User updatedUser = UserFactory.createUpdatedPasswordUser(user, encodedNewPassword);
-            userRepository.save(updatedUser);
+            user.updatePassword(encodedNewPassword);
+
+//            User updatedUser = UserFactory.createUpdatedPasswordUser(user, encodedNewPassword);
+//            userRepository.save(updatedUser);
 
         } catch (Exception e) {
             log.info("비밀번호 재설정 실패: {}", e);
@@ -351,6 +358,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
+    @Transactional
     public ResponseEntity<? super UpdateLocationResponseDto> updateLocation(UpdateLocationInfo info) {
         try {
             Long userId = jwtExtractProvider.findIdFromJwt();
@@ -363,8 +371,10 @@ public class UserServiceImpl implements UserService {
             }
             String region = geocodingService.getRegionFromCoordinates(info.getLatitude(), info.getLongitude());
 
-            User updatedUser = UserFactory.createLocationUpdateUser(user, info, region);
-            userRepository.save(updatedUser);
+            user.updateLocation(info, region);
+
+//            User updatedUser = UserFactory.createLocationUpdateUser(user, info, region);
+//            userRepository.save(updatedUser);
 
             return UpdateLocationResponseDto.success(region);
         } catch (Exception e) {
@@ -375,6 +385,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
+    @Transactional
     public ResponseEntity<? super UpdateRecommendationResponseDto> updateRecommend(UpdateRecommendationRequestDto dto) {
         try {
             Long userId = dto.getUserId();
@@ -387,9 +398,10 @@ public class UserServiceImpl implements UserService {
             }
             Integer recommendationCount = user.getRecommendationCount() + 1;
 
-            User updatedUser = UserFactory.createRecommendationUpdateUser(user, recommendationCount);
+            user.updateRecommendation(recommendationCount);
 
-            userRepository.save(updatedUser);
+//            User updatedUser = UserFactory.createRecommendationUpdateUser(user, recommendationCount);
+//            userRepository.save(updatedUser);
 
         } catch (Exception e) {
             log.info("추천수 업데이트 실패: {}", e);
