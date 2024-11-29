@@ -13,7 +13,7 @@ public class ChatMessageDeleter {
 
     private final MongoTemplate mongoTemplate;
 
-    public void deleteChatMessageDocs(String userName, String roomId) {
+    public void deleteChatMessageDocs(String roomId) {
         Query query = new Query(Criteria.where("_id").is(roomId));
         mongoTemplate.remove(query, ChatRoomDocs.class);
     }

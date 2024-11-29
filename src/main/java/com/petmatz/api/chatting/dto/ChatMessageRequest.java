@@ -1,5 +1,6 @@
 package com.petmatz.api.chatting.dto;
 
+import com.petmatz.common.constants.ChatMessageMsgType;
 import com.petmatz.domain.chatting.dto.ChatMessageInfo;
 
 import java.time.LocalDateTime;
@@ -15,7 +16,7 @@ public record ChatMessageRequest(
 
         String msg,
 
-        String msg_type
+        ChatMessageMsgType msg_type
 
 
 ) {

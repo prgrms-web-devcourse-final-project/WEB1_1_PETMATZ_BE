@@ -1,10 +1,14 @@
 package com.petmatz.domain.chatting;
 
+import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.chatting.component.ChatMessageReader;
 import com.petmatz.domain.chatting.component.ChatMessageUpdater;
 import com.petmatz.domain.chatting.dto.ChatMessageInfo;
 
+import com.petmatz.domain.user.entity.User;
+import com.petmatz.domain.user.repository.UserRepository;
 import com.petmatz.domain.chatting.docs.ChatReadStatusDocs;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,10 +23,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ChatMessageService {
 
+    private final UserRepository userRepository;
+
     private final ChatMessageReader chatMessageReader;
     private final ChatMessageUpdater chatMessageUpdater;
+    private final JwtExtractProvider jwtExtractProvider;
 
-    public Page<ChatMessageInfo> selectMessage(String sender, String receiver, String chatRoomsId, int pageNumber, int pageSize) {
+
+    public Page<ChatMessageInfo> selectMessage(String receiver, String chatRoomsId, int pageNumber, int pageSize) {
+        String sender = jwtExtractProvider.findAccountIdFromJwt();
+
         // 페이징된 메시지 가져오기
         List<ChatMessageInfo> chatMessageInfos = chatMessageReader.selectChatMessagesHistory(chatRoomsId, pageNumber, pageSize);
 
@@ -30,6 +40,9 @@ public class ChatMessageService {
         ChatReadStatusDocs chatReadStatusDocs = chatMessageReader.selectChatMessageLastStatus(chatRoomsId, receiver);
         LocalDateTime lastReadTimestamp = chatReadStatusDocs.checkLastReadTimestamp();
         List<ChatMessageInfo> updatedMessages = messageStatusUpdate(chatMessageInfos, lastReadTimestamp);
+
+        //상대편 정보 조회
+        User byAccountId = userRepository.findByAccountId(receiver);
 
         // 전체 메시지 개수 가져오기
         long totalElements = chatMessageReader.countChatMessages(chatRoomsId);

@@ -16,17 +16,22 @@ public class ChatRoomMetadataDocs {
     private String room_id;
     private String lastMessage;
     private LocalDateTime lastMessageTimestamp;
+    private String msg_type;
     private int messageCount;
     private int unreadCount;
 
     @Builder
-    public ChatRoomMetadataDocs(String room_id, String lastMessage, LocalDateTime lastMessageTimestamp, int messageCount, int unreadCount) {
+    public ChatRoomMetadataDocs(String room_id, String lastMessage, LocalDateTime lastMessageTimestamp, String msg_type, int messageCount, int unreadCount) {
         this.room_id = room_id;
         this.lastMessage = lastMessage;
         this.lastMessageTimestamp = lastMessageTimestamp;
+        this.msg_type = msg_type;
         this.messageCount = messageCount;
         this.unreadCount = unreadCount;
     }
+
+
+
 
     public static ChatRoomMetadataDocs initChatRoomMetaData(ChatRoomInfo chatRoomInfo, long chatRoomId) {
         return ChatRoomMetadataDocs.builder()
@@ -45,6 +50,7 @@ public class ChatRoomMetadataDocs {
                 .lastMessageTimestamp(LocalDateTime.now())
                 .messageCount(0)
                 .unreadCount(0)
+                .msg_type(chatMessageInfo.getMsg_type().name())
                 .build();
     }
 }

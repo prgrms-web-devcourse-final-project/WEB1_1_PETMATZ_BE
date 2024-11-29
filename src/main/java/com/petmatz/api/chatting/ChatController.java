@@ -7,6 +7,7 @@ import com.petmatz.api.chatting.dto.ChatReadStatusDirect;
 import com.petmatz.api.global.dto.Response;
 import com.petmatz.domain.chatting.ChatMessageService;
 import com.petmatz.domain.chatting.dto.ChatMessageInfo;
+import com.petmatz.domain.user.service.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -17,7 +18,6 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,6 +31,7 @@ public class ChatController {
 
     private final ChatMessageService chatService;
     private final SimpMessagingTemplate simpMessagingTemplate;
+    private final UserServiceImpl userService;
 
 
     //TODO 메세지 전송 ( 구독한 쪽으로 )
@@ -58,23 +59,21 @@ public class ChatController {
     @GetMapping("/chat/message")
     @Operation(summary = "메세지 내역 긁어오기", description = "채팅방의 메세지 내역을 긁어오는 API")
     @Parameters({
-            @Parameter(name = "sender", description = "메세지를 보낸 유저의 ID", example = "테스트"),
             @Parameter(name = "receiver", description = "메세지를 받는 유저의 ID", example = "2"),
             @Parameter(name = "chatRoomId", description = "채팅방 번호", example = "1"),
             @Parameter(name = "pageSize", description = "긁어올 페이지의 사이즈", example = "20 ( Default : 15 )"),
             @Parameter(name = "startPage", description = "현재 페이지의 번호 ( 0은 안됨!! )", example = "3 ( Default 1 )")
     })
     public Response<?> selectChatMessage(
-                                         @RequestParam String senderEmail,
                                          @RequestParam String receiverEmail,
                                          @RequestParam String chatRoomId,
                                          @RequestParam(defaultValue = "15") int pageSize,
                                          @RequestParam(defaultValue = "1") int startPage
     ) {
 
-        Page<ChatMessageInfo> chatMessageInfos = chatService.selectMessage(senderEmail, receiverEmail, chatRoomId, startPage, pageSize);
-        //User 조회하는거 필요
-
+        Page<ChatMessageInfo> chatMessageInfos = chatService.selectMessage(receiverEmail, chatRoomId, startPage, pageSize);
+        //TODO User 조회하는거 필요
+        //TODO 건우님이 만들어주시면 그거 이용하기
         log.info("chatMessageInfos.getContent() : " + chatMessageInfos.getContent());
         return Response.success(ChatMessageResponse.of(
                 chatMessageInfos.getContent()
