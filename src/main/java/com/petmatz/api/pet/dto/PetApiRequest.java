@@ -1,9 +1,7 @@
 package com.petmatz.api.pet.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.petmatz.domain.pet.dto.PetServiceDto;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public record PetApiRequest(
         String dogRegNo,
         String ownerNm
