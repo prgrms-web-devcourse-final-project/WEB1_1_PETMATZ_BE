@@ -1,15 +1,13 @@
 package com.petmatz.domain.chatting.component;
 
-import com.petmatz.domain.chatting.dto.ChatRoomEntity;
+import com.petmatz.domain.chatting.entity.ChatRoomEntity;
 import com.petmatz.domain.chatting.dto.ChatRoomInfo;
-import com.petmatz.domain.chatting.dto.UserToChatRoomEntity;
+import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import com.petmatz.domain.chatting.repository.ChatRoomRepository;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 
 @Component

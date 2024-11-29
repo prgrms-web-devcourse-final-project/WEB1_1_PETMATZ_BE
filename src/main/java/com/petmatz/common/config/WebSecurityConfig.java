@@ -99,7 +99,6 @@ public class WebSecurityConfig {
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", corsConfiguration); // API 경로에 대해 CORS 설정 적용
-
         return source;
     }
 }

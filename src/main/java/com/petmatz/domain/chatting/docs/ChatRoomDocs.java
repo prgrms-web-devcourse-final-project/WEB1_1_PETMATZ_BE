@@ -1,5 +1,7 @@
-package com.petmatz.domain.chatting.dto;
+package com.petmatz.domain.chatting.docs;
 
+import com.petmatz.domain.chatting.dto.ChatMessageInfo;
+import com.petmatz.domain.chatting.dto.ChatRoomInfo;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

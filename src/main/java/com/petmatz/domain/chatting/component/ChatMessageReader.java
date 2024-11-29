@@ -1,8 +1,8 @@
 package com.petmatz.domain.chatting.component;
 
 import com.petmatz.domain.chatting.dto.ChatMessageInfo;
-import com.petmatz.domain.chatting.dto.ChatReadStatusDocs;
-import com.petmatz.domain.chatting.dto.ChatRoomDocs;
+import com.petmatz.domain.chatting.docs.ChatReadStatusDocs;
+import com.petmatz.domain.chatting.docs.ChatRoomDocs;
 import com.petmatz.domain.chatting.utils.ChatUtils;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;

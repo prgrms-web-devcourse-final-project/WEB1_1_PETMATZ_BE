@@ -1,6 +1,8 @@
 package com.petmatz.domain.user.entity;
 
+import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import com.petmatz.domain.global.BaseEntity;
+import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import com.petmatz.domain.user.constant.*;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -9,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -88,7 +91,20 @@ public class User extends BaseEntity {
 
     @Column(name="region")
     private String region;
-//
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<UserToChatRoomEntity> chatRooms = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserToChatRoomEntity> chatRooms = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserToPetMissionEntity> userPetMissions = new ArrayList<>();
+
+    public User checkUUID(List<User> users, Long id) {
+        for (User user : users) {
+            if (user.id.equals(id)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
 }

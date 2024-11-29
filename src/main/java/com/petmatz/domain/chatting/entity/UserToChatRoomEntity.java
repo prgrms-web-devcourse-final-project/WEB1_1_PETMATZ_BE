@@ -1,11 +1,8 @@
-package com.petmatz.domain.chatting.dto;
+package com.petmatz.domain.chatting.entity;
 
 import com.petmatz.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
@@ -24,7 +21,6 @@ public class UserToChatRoomEntity {
     private ChatRoomEntity chatRoom; // 채팅방
 
     public UserToChatRoomEntity() {
-
     }
 
     public void addUser(User user) {

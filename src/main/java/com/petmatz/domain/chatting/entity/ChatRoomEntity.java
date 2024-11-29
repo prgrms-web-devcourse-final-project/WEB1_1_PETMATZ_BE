@@ -1,7 +1,8 @@
-package com.petmatz.domain.chatting.dto;
+package com.petmatz.domain.chatting.entity;
 
+import com.petmatz.domain.chatting.dto.ChatRoomListInfo;
+import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import com.petmatz.domain.global.BaseEntity;
-import com.petmatz.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
