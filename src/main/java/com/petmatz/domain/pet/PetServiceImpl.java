@@ -27,7 +27,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class PetService {
+public class PetServiceImpl implements PetService{
 
     private final PetRepository repository;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -89,6 +89,11 @@ public class PetService {
     public void updatePet(Long petId, User user, PetServiceDto updatedDto) {
         Pet existingPet = repository.findByIdAndUser(petId, user)
                 .orElseThrow(() -> new PetServiceException(PetErrorCode.PET_NOT_FOUND));
+
+        // 현재 사용자가 리소스 소유자인지 검증
+        if (!existingPet.getUser().equals(user)) {
+            throw new SecurityException("권한이 없습니다.");
+        }
 
         try {
             // 병합된 DTO를 기반으로 엔티티 생성
