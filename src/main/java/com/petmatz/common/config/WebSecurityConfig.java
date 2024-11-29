@@ -68,7 +68,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/sosboard/user/{nickname}").permitAll()// 인증 없이 접근 가능
                         .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN") // USER, ADMIN둘다 가능
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // ADMIN 역할 필요
-                        .anyRequest().authenticated()//.permitAll()
+                        .anyRequest().permitAll()//.permitAll()
 
                 )
                 .oauth2Login(oauth2 -> oauth2
