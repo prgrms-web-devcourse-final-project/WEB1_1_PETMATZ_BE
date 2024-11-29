@@ -1,5 +1,6 @@
 package com.petmatz.common.security.filter;
 
+import com.petmatz.domain.user.constant.LoginRole;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.common.security.utils.JwtProvider;
 import com.petmatz.domain.user.repository.UserRepository;
@@ -9,8 +10,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;

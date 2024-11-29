@@ -98,22 +98,6 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserToPetMissionEntity> userPetMissions = new ArrayList<>();
 
-    public enum LoginRole {
-        ROLE_USER, ROLE_ADMIN,
-    }
-
-    public enum Role {
-        Dol, Mat
-    }
-
-    public enum LoginType {
-        Normal, Kakao
-    }
-
-    public enum Gender {
-        Male, Female
-    }
-
     public User checkUUID(List<User> users, Long id) {
         for (User user : users) {
             if (user.id.equals(id)) {
