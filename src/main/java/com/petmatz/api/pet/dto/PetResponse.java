@@ -65,7 +65,5 @@ public record PetResponse(
                 pet.getPreferredWalkingLocation()
         );
     }
-
-
 }
 

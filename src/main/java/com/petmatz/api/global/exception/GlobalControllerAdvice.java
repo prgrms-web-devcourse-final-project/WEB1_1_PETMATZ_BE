@@ -1,6 +1,6 @@
 package com.petmatz.api.global.exception;
 
-import com.petmatz.api.global.Response;
+import com.petmatz.api.global.dto.Response;
 import com.petmatz.common.exception.CustomException;
 import com.petmatz.common.exception.ErrorReason;
 import jakarta.servlet.http.HttpServletRequest;
