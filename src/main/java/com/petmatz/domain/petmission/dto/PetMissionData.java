@@ -9,6 +9,8 @@ import java.util.List;
 public record PetMissionData(
 
         String chatRoomId,
+
+
         List<Long> petMissionId
 ) {
 

@@ -1,6 +1,10 @@
 package com.petmatz.domain.petmission;
 
+import com.petmatz.common.security.utils.JwtExtractProvider;
+import com.petmatz.domain.pet.Pet;
+import com.petmatz.domain.pet.PetRepository;
 import com.petmatz.domain.petmission.component.PetMissionInseart;
+import com.petmatz.domain.petmission.component.PetMissionReader;
 import com.petmatz.domain.petmission.component.UserToChatRoomReader;
 import com.petmatz.domain.petmission.dto.PetMissionData;
 import com.petmatz.domain.petmission.dto.PetMissionInfo;
@@ -20,12 +24,24 @@ import java.util.Optional;
 public class PetMissionService {
 
     private final UserRepository userRepository;
+    private final PetRepository petRepository;
+
     private final UserToChatRoomReader userToChatRoomReader;
     private final PetMissionInseart petMissionInseart;
+    private final PetMissionReader petMissionReader;
+    private final JwtExtractProvider jwtExtractProvider;
 
     private final SimpMessagingTemplate simpMessagingTemplate;
 
+//    public List<> selectPetMissionList(Long userUUID) {
+////        jwtExtractProvider.findUserId();
+//        return petMissionReader.selectPetMissionId(userUUID);
+//    }
+
     public PetMissionData insertPetMission(PetMissionInfo petMissionInfo) {
+        //이메일 탐색
+//        String accountIdFromJwt = jwtExtractProvider.findAccountIdFromJwt();
+
         List<User> users = makeUserEntityList(petMissionInfo.careId(), petMissionInfo.receiverId());
 
         String careEmail = users.get(0).getAccountId();
@@ -33,11 +49,20 @@ public class PetMissionService {
 
         String chatRoomId = userToChatRoomReader.selectChatRoomId(careEmail, receiverEmail);
 
-        List<PetMissionEntity> petMissionEntityList = petMissionInseart.insertPetMission(makePetMissionEntityList(users, petMissionInfo));
+        //TODO 예외처리 해야 함
+        Optional<Pet> byId = petRepository.findById(Long.valueOf(petMissionInfo.petId()));
+        Pet pet = byId.get();
+
+        List<PetMissionEntity> petMissionEntityList = petMissionInseart.insertPetMission(makePetMissionEntityList(users, petMissionInfo, pet));
 
         //TODO 반환 DTO 만들기
 
         return PetMissionData.of(chatRoomId, petMissionEntityList.stream().map(PetMissionEntity::getId).toList());
+
+    }
+
+    public void selectPetMissionList(Long userUUID) {
+        List<PetMissionEntity> petMissionEntityList = petMissionReader.selectPetMissionId(userUUID);
 
     }
 
@@ -48,10 +73,10 @@ public class PetMissionService {
         return userList;
     }
 
-    private List<PetMissionEntity> makePetMissionEntityList(List<User> users,PetMissionInfo petMissionInfo) {
+    private List<PetMissionEntity> makePetMissionEntityList(List<User> users,PetMissionInfo petMissionInfo, Pet pet) {
         List<PetMissionEntity> petMissionEntityList = new ArrayList<>();
         for (User user : users) {
-            petMissionEntityList.add(PetMissionEntity.of(user, petMissionInfo));
+            petMissionEntityList.add(PetMissionEntity.of(user, petMissionInfo, pet));
         }
         return petMissionEntityList;
     }

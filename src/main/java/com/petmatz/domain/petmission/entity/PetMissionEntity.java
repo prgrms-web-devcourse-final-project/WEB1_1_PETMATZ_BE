@@ -1,5 +1,6 @@
 package com.petmatz.domain.petmission.entity;
 
+import com.petmatz.domain.pet.Pet;
 import com.petmatz.domain.petmission.dto.PetMissionInfo;
 import com.petmatz.domain.petmission.dto.PetMissionStatusZip;
 import com.petmatz.domain.user.entity.User;
@@ -30,6 +31,10 @@ public class PetMissionEntity {
     @Enumerated(EnumType.STRING)
     private PetMissionStatusZip status;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pet_id", nullable = false)
+    private Pet pet;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "giver_id", nullable = false)
     private User giver;
@@ -39,23 +44,23 @@ public class PetMissionEntity {
     private List<PetMissionAskEntity> petMissionAsks = new ArrayList<>();
 
     @Builder
-    public PetMissionEntity(LocalDateTime petMissionStarted, LocalDateTime petMissionEnd, PetMissionStatusZip status, User giver, List<PetMissionAskEntity> petMissionAsks) {
+    public PetMissionEntity(LocalDateTime petMissionStarted, LocalDateTime petMissionEnd, PetMissionStatusZip status, Pet pet, User giver, List<PetMissionAskEntity> petMissionAsks) {
         this.petMissionStarted = petMissionStarted;
         this.petMissionEnd = petMissionEnd;
         this.status = status;
+        this.pet = pet;
         this.giver = giver;
         this.petMissionAsks = petMissionAsks;
     }
 
-
-
-    public static PetMissionEntity of(User user, PetMissionInfo petMissionInfo) {
+    public static PetMissionEntity of(User user, PetMissionInfo petMissionInfo, Pet pet) {
         System.out.println("petMissionInfo.toString() :: " + petMissionInfo.toString());
         return PetMissionEntity.builder()
                 .petMissionStarted(petMissionInfo.missionStarted())
                 .petMissionEnd(petMissionInfo.missionEnd())
                 .status(PetMissionStatusZip.fromDescription("시작"))
                 .giver(user)
+                .pet(pet)
                 .petMissionAsks(
                         petMissionInfo.petMissionAskInfo().stream()
                                 .map(PetMissionAskEntity::of)
@@ -63,5 +68,7 @@ public class PetMissionEntity {
                 )
                 .build();
     }
+
+
 
 }
