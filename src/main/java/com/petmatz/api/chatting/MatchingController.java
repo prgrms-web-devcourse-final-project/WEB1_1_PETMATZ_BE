@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -65,38 +66,28 @@ public class MatchingController {
     @GetMapping
     @Operation(summary = "채팅방 조회", description = "해당 사용자가 보유하고 있는 채팅방 조회 API")
     @Parameters({
-            @Parameter(name = "JWT [ userEmail 추후 대체 ]", description = "토큰을 받아와 쓸 예정", example = "입력금지"),
-            @Parameter(name = "userEmail", description = "현재 자기 자신의 userEmail", example = "테스트"),
             @Parameter(name = "pageSize", description = "default : 5", example = "5"),
             @Parameter(name = "startPage", description = "default : 1", example = "1"),
     })
-    public Response<Map<String,ChatRoomMetaDataInfoResponse>> chatRoomsList(
-            @RequestParam String userEmail,
+    public Response<List<ChatRoomMetaDataInfoResponse>> chatRoomsList(
             @RequestParam(defaultValue = "5") int pageSize,
             @RequestParam(defaultValue = "1") int startPage
     ) {
-        Map<String,ChatRoomMetaDataInfo> chatRoomList = chatRoomService.getChatRoomList(userEmail, pageSize, startPage);
-        System.out.println(chatRoomList);
-        return Response.success(chatRoomList.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey, // 람다로 키를 가져옴
-                        entry -> ChatRoomMetaDataInfoResponse.of(entry.getValue()) // 값 변환
-                )));
+        List<ChatRoomMetaDataInfo> chatRoomList = chatRoomService.getChatRoomList(pageSize, startPage);
+        return Response.success(
+                chatRoomList.stream()
+                        .map(ChatRoomMetaDataInfoResponse::of)
+                        .collect(Collectors.toList())
+        );
     }
 
-    //TODO Token에서 이메일 가져오기
     @DeleteMapping
     @Operation(summary = "채팅방 삭제", description = "해당 사용자가 지정한 채팅방을 삭제한다")
     @Parameters({
-            @Parameter(name = "JWT [ userEmail 추후 대체 ]", description = "토큰을 받아와 쓸 예정", example = "입력금지"),
-            @Parameter(name = "userEmail", description = "현재 자기 자신의 userEmail", example = "테스트"),
             @Parameter(name = "romId", description = "삭제하려는 Chat Room Id", example = "1"),
     })
-    public Response<Void> deleteChatRoom(
-            @RequestParam String userEmail,
-            @RequestParam String roomId
-    ) {
-        chatRoomService.deletRoom(userEmail, roomId);
+    public Response<Void> deleteChatRoom(@RequestParam String roomId) {
+        chatRoomService.deletRoom(roomId);
         return Response.success("성공적으로 삭제 되었습니다.");
     }
 

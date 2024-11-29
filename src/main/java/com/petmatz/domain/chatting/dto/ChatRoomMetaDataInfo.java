@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 
 @Builder
 public record ChatRoomMetaDataInfo(
+
+        String chatRoomId,
         String lastMessage,
         LocalDateTime lastMessageTimestamp,
         int messageCount,
@@ -16,6 +18,7 @@ public record ChatRoomMetaDataInfo(
 
     public static ChatRoomMetaDataInfo of(ChatRoomMetadataDocs chatRoomMetadataDocs, int messageCount, int unreadCount, IChatUserInfo iChatUserInfo) {
         return ChatRoomMetaDataInfo.builder()
+                .chatRoomId(chatRoomMetadataDocs.getRoom_id())
                 .lastMessage(chatRoomMetadataDocs.getLastMessage())
                 .lastMessageTimestamp(chatRoomMetadataDocs.getLastMessageTimestamp())
                 .messageCount(messageCount)

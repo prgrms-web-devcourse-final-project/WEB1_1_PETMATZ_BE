@@ -1,5 +1,6 @@
 package com.petmatz.domain.chatting.dto;
 
+import com.petmatz.common.constants.ChatMessageMsgType;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ public class ChatMessageInfo {
 
     private LocalDateTime msgTimestamp;
 
+    ChatMessageMsgType msg_type;
 
     private boolean readStatus = true;
 

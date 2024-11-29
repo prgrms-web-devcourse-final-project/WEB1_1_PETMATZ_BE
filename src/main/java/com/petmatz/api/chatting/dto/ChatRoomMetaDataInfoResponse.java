@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 
 @Builder
 public record ChatRoomMetaDataInfoResponse(
+
+        String chatRoomId,
         String lastMessage,
         LocalDateTime lastMessageTimestamp,
         int messageCount,

@@ -1,6 +1,6 @@
 package com.petmatz.api.sosboard;
 
-import com.petmatz.api.global.Response;
+import com.petmatz.api.global.dto.Response;
 import com.petmatz.api.pet.dto.PetResponse;
 import com.petmatz.api.sosboard.dto.SosBoardCreateRequestDto;
 import com.petmatz.api.sosboard.dto.SosBoardResponseDto;

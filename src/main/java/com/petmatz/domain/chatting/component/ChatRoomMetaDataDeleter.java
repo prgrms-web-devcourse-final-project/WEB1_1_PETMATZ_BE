@@ -14,7 +14,7 @@ public class ChatRoomMetaDataDeleter {
 
     private final MongoTemplate mongoTemplate;
 
-    public void deleteChatRoomMetaDataDocs(String userName, String roomId) {
+    public void deleteChatRoomMetaDataDocs(String roomId) {
         Query query = new Query(Criteria.where("_id").is(roomId));
         mongoTemplate.remove(query, ChatRoomMetadataDocs.class);
     }

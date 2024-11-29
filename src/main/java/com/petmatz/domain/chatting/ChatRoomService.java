@@ -1,5 +1,6 @@
 package com.petmatz.domain.chatting;
 
+import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.chatting.component.*;
 import com.petmatz.domain.chatting.dto.*;
 import com.petmatz.domain.chatting.repository.UserToChatRoomRepository;
@@ -28,7 +29,7 @@ public class ChatRoomService {
     private final ChatRoomMetaDataDeleter chatRoomMetaDataDeleter;
     private final ChatReadStatusDeleter chatReadStatusDeleter;
 
-
+    private final JwtExtractProvider jwtExtractProvider;
 
 
     
@@ -49,7 +50,9 @@ public class ChatRoomService {
 
 
     //TODO other 추가
-    public Map<String,ChatRoomMetaDataInfo> getChatRoomList(String userEmail, int pageSize, int startPage) {
+    public List<ChatRoomMetaDataInfo> getChatRoomList(int pageSize, int startPage) {
+        String userEmail = jwtExtractProvider.findAccountIdFromJwt();
+
         List<UserToChatRoomEntity> chatRoomNumber = chatRoomReader.findChatRoomNumber(userEmail);
         List<String> roomNumberList = chatRoomNumber.stream()
                 .map(chatRoomEntity -> String.valueOf(chatRoomEntity.getChatRoom().getId()))
@@ -96,13 +99,14 @@ public class ChatRoomService {
         return unreadCountList;
     }
 
-    public void deletRoom(String userName, String roomId) {
+    public void deletRoom(String roomId) {
+        String userEmail = jwtExtractProvider.findAccountIdFromJwt();
         List<String> strings = chatRoomReader.selectChatRoomUserList(roomId).get();
         System.out.println("테스트입니다아아앙 : " + strings);
 
-        chatRoomDeleter.deleteDocs(userName, roomId);
-        chatMessageDeleter.deleteChatMessageDocs(userName, roomId);
-        chatRoomMetaDataDeleter.deleteChatRoomMetaDataDocs(userName, roomId);
+        chatRoomDeleter.deleteChatRoom(userEmail, roomId);
+        chatMessageDeleter.deleteChatMessageDocs(roomId);
+        chatRoomMetaDataDeleter.deleteChatRoomMetaDataDocs(roomId);
         chatReadStatusDeleter.deleteChatReadStatusDocs(strings, roomId);
     }
 }

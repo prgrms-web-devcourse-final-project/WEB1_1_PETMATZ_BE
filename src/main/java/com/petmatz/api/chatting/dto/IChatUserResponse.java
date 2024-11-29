@@ -6,14 +6,19 @@ import lombok.Builder;
 @Builder
 public record IChatUserResponse(
 
+        String userId,
         String userName,
+
+        String userEmail,
         String profileURL
 
 ) {
 
     public static IChatUserResponse of(IChatUserInfo iChatUserInfo) {
         return IChatUserResponse.builder()
-                .userName(iChatUserInfo.userEmail())
+                .userId(iChatUserInfo.userId())
+                .userName(iChatUserInfo.userName())
+                .userEmail(iChatUserInfo.userEmail())
                 .profileURL(iChatUserInfo.profileURL())
                 .build();
     }
