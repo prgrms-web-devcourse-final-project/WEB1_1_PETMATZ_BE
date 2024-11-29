@@ -33,8 +33,12 @@ public class ChatMessageInfo {
         this.readStatus = readStatus;
     }
 
-    public void changeReadStatus(boolean readStatus) {
-        this.readStatus = readStatus;
+//    public void changeReadStatus(boolean readStatus) {
+//        this.readStatus = readStatus;
+//    }
+
+    public void changeReadStatus(LocalDateTime lastReadTimestamp) {
+        this.readStatus = msgTimestamp.isBefore(lastReadTimestamp) || msgTimestamp.isEqual(lastReadTimestamp);
     }
 
 }

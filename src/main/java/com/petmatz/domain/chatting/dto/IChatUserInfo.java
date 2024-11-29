@@ -16,9 +16,9 @@ public record IChatUserInfo(
 
     public static IChatUserInfo of(String userEmail,String profileURL) {
         return IChatUserInfo.builder()
-                .userId()
+//                .userId()
                 .userEmail(userEmail)
-                .userName()
+//                .userName()
                 .profileURL(profileURL)
                 .build();
     }

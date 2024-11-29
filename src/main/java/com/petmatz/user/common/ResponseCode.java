@@ -28,4 +28,6 @@ public interface ResponseCode {
     String HEARTED_ID_NOT_FOUND = "HINF";
 
     String WRONG_LOCATION = "WL";
+
+    String USER_NOT_FOUND = "UNF";
 }

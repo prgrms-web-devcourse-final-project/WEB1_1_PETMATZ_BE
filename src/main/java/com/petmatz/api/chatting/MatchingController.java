@@ -36,8 +36,8 @@ public class MatchingController {
     @Operation(summary = "채팅방 생성", description = "채팅방을 생성하는 API API")
     @Parameters({
             @Parameter(name = "JWT [ caregiverInfo 추후 대체 ]", description = "토큰을 받아와 쓸 예정", example = "입력금지"),
-            @Parameter(name = "caregiverInfo", description = "반려인 닉네임", example = "반려인이름"),
-            @Parameter(name = "entrustedName", description = "돌봄이 닉네임", example = "돌봄이이름")
+            @Parameter(name = "caregiverEmail", description = "반려인 닉네임", example = "반려인이름"),
+            @Parameter(name = "entrustedEmail", description = "돌봄이 닉네임", example = "돌봄이이름")
     })
     public Response<Long> matchUsers(@RequestBody MatchRequest matchRequest) {
         long chatRoomNumber = chatRoomService.createdChatRoom(matchRequest.of());

@@ -1,7 +1,9 @@
 package com.petmatz.domain.user.entity;
 
-import com.petmatz.domain.chatting.dto.UserToChatRoomEntity;
+import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import com.petmatz.domain.global.BaseEntity;
+import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
+import com.petmatz.domain.user.constant.*;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -56,8 +58,9 @@ public class User extends BaseEntity {
     @Column(name = "gender")
     private Gender gender; // 'Male', 'Female'
 
-    @Column(name = "preferred_size", nullable = false)
-    private String preferredSize; // 'Small', 'Medium', 'Large',
+    @Convert(converter = PreferredSizeConverter.class)
+    @Column(name = "preferred_size")
+    private List<PreferredSize> preferredSizes; // 'Small', 'Medium', 'Large', 'None'
 
     @Column(name = "introduction")
     private String introduction;
@@ -92,20 +95,16 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserToChatRoomEntity> chatRooms = new ArrayList<>();
 
-    public enum LoginRole {
-        ROLE_USER, ROLE_ADMIN,
-    }
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserToPetMissionEntity> userPetMissions = new ArrayList<>();
 
-    public enum Role {
-        Dol, Mat
-    }
-
-    public enum LoginType {
-        Normal, Kakao
-    }
-
-    public enum Gender {
-        Male, Female
+    public User checkUUID(List<User> users, Long id) {
+        for (User user : users) {
+            if (user.id.equals(id)) {
+                return user;
+            }
+        }
+        return null;
     }
 
 }

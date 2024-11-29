@@ -1,11 +1,7 @@
 package com.petmatz.api.pet;
 
 import com.petmatz.api.global.dto.Response;
-<<<<<<< HEAD
-import com.petmatz.domain.pet.PetService;
-=======
 import com.petmatz.domain.pet.PetServiceImpl;
->>>>>>> 6f950d720c5e24af49fee2d9bc095cf2ca4a965c
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

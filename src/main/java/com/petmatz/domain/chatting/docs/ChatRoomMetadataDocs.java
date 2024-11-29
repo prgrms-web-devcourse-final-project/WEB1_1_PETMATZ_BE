@@ -1,13 +1,13 @@
-package com.petmatz.domain.chatting.dto;
+package com.petmatz.domain.chatting.docs;
 
-import com.petmatz.common.constants.ChatMessageMsgType;
+import com.petmatz.domain.chatting.dto.ChatMessageInfo;
+import com.petmatz.domain.chatting.dto.ChatRoomInfo;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 @Document(collection = "chat_room_metadata")
 @Getter
@@ -50,7 +50,7 @@ public class ChatRoomMetadataDocs {
                 .lastMessageTimestamp(LocalDateTime.now())
                 .messageCount(0)
                 .unreadCount(0)
-                .msg_type(chatMessageInfo.msg_type.name())
+                .msg_type(chatMessageInfo.getMsg_type().name())
                 .build();
     }
 }
