@@ -12,7 +12,9 @@ public enum MatchErrorCode implements BaseErrorCode {
     INSUFFICIENT_LONGITUDE_DATA(400, "INSUFFICIENT_LONGITUDE_DATA", "경도가 없습니다."),
     INVALID_MATCH_DATA(400, "INVALID_MATCH_DATA", "위도 또는 경도가 누락되었습니다."),
     NULL_PREFERRED_SIZES(400, "NULL_PREFERRED_SIZES", "선호 크기 목록이 없습니다."),
-    NULL_TARGET_SIZE(400, "NULL_TARGET_SIZE", "타겟 크기가 없습니다.");
+    NULL_TARGET_SIZE(400, "NULL_TARGET_SIZE", "타겟 크기가 없습니다."),
+    NULL_MATCH_DATA(204, "NULL_MATCH_DATA", "매칭 데이터가 없습니다."),
+    INVALID_REDIS_DATA(404, "INVALID_REDIS_DATA", "redis 데이터를 불러올 수 없습니다.");
 
 
 

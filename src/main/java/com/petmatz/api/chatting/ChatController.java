@@ -4,7 +4,7 @@ import com.petmatz.api.chatting.dto.ChatMessage;
 import com.petmatz.api.chatting.dto.ChatMessageRequest;
 import com.petmatz.api.chatting.dto.ChatMessageResponse;
 import com.petmatz.api.chatting.dto.ChatReadStatusDirect;
-import com.petmatz.api.global.dto.Response;
+import com.petmatz.api.global.Response;
 import com.petmatz.domain.chatting.ChatMessageService;
 import com.petmatz.domain.chatting.dto.ChatMessageInfo;
 import io.swagger.v3.oas.annotations.Operation;

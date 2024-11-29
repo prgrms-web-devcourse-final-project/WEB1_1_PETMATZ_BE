@@ -1,4 +1,6 @@
-package com.petmatz.domain.match.response;
+package com.petmatz.domain.match.dto.response;
+
+import java.util.List;
 
 public record UserResponse (
         Long id,
