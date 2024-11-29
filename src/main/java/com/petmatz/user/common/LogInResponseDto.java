@@ -26,6 +26,11 @@ public class LogInResponseDto {
         return ResponseEntity.status(500).body(responseBody); //500 Error == Internal Server Error
     }
 
+    public static ResponseEntity<LogInResponseDto> userNotFound() {
+        LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.USER_NOT_FOUND, ResponseMessage.USER_NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseBody); // 404 Error == Not Found
+    }
+
     public static ResponseEntity<LogInResponseDto> validationFail(){
         LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.VALIDATION_FAIL, ResponseMessage.VALIDATION_FAIL);
         return ResponseEntity.status(400).body(responseBody); //400 Error == Bad Request

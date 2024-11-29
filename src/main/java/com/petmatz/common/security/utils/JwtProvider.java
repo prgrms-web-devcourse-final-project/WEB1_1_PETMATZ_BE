@@ -13,6 +13,8 @@ import java.security.Key;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * JWT 토큰 생성 및 검증을 담당하는 클래스.
@@ -27,12 +29,12 @@ public class JwtProvider {
     private String secretKey;
 
     /**
-     * 주어진 사용자 ID로 JWT 토큰을 생성하는 메서드.
-     * 토큰은 1시간 동안 유효하며, 사용자 ID를 서브젝트로 설정.
+     * 주어진 사용자 ID와 계정 ID로 JWT 토큰을 생성하는 메서드.
+     * 토큰은 1시간 동안 유효하며, 사용자 ID를 서브젝트로 설정하고 계정 ID를 클레임으로 추가.
      * @return 생성된 JWT 토큰 문자열
      */
-    public String create(String accountId, User.LoginRole loginRole) {
-        // 토큰 만료 시간 설정 (1시간 후)(시간늘림 가능)
+    public String create(Long userId, String accountId) {
+        // 토큰 만료 시간 설정 (1시간 후)
         Date expireDate = Date.from(Instant.now().plus(1, ChronoUnit.HOURS));
 
         // 비밀 키 생성
@@ -41,36 +43,80 @@ public class JwtProvider {
         // JWT 토큰 생성
         String jwt = Jwts.builder()
                 .signWith(key, SignatureAlgorithm.HS256)  // 서명 알고리즘 및 키 설정
-                .setSubject(accountId).claim("loginRole",loginRole).setIssuedAt(new Date()).setExpiration(expireDate)
+                .setSubject(userId.toString())            // 서브젝트에 사용자 ID 설정
+                .claim("accountId", accountId)            // 계정 ID를 클레임으로 추가
+                .setIssuedAt(new Date())                  // 토큰 발행 시간
+                .setExpiration(expireDate)                // 토큰 만료 시간
                 .compact();
 
         return jwt;
     }
 
     /**
-     * 주어진 JWT 토큰의 유효성을 검증 -> 유효한 경우 사용자 ID를 반환
+     * 주어진 JWT 토큰의 유효성을 검증하고, 사용자 ID와 계정 ID를 반환.
      * @param jwt JWT 토큰
-     * @return 유효한 경우 사용자 ID 반환, 유효하지 않은 경우 null 반환
+     * @return 유효한 경우 사용자 ID와 계정 ID를 포함한 맵 반환, 유효하지 않은 경우 null 반환
      */
-    public String validate(String jwt) {
-        String subject = null;
-        // 비밀 키 생성
+    public Map<String, Object> validate(String jwt) {
         Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
 
         try {
-            // JWT 토큰의 서명을 검증하고, 서브젝트(사용자 ID)를 추출
-            subject = Jwts.parserBuilder()
-                    .setSigningKey(key)  // 서명 검증에 사용할 키 설정
+            var claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
                     .build()
-                    .parseClaimsJws(jwt)  // JWT 토큰 검증 및 파싱
-                    .getBody()
-                    .getSubject();  // 서브젝트(사용자 ID) 추출
+                    .parseClaimsJws(jwt)
+                    .getBody();
+
+            // 서브젝트에서 사용자 ID 추출
+            Long userId = Long.parseLong(claims.getSubject());
+            // 클레임에서 계정 ID 추출
+            String accountId = claims.get("accountId", String.class);
+
+            // 결과 맵 생성
+            Map<String, Object> result = new HashMap<>();
+            result.put("userId", userId);
+            result.put("accountId", accountId);
+            return result;
 
         } catch (Exception e) {
             e.printStackTrace();
-//            log.info("JWT 검증 실패: {}", e.getMessage());
+            return null; // 예외 발생 시 null 반환
+        }
+    }
+
+    public Long validateAndGetUserId(String token) {
+        try {
+            Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+            String subject = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+
+            return Long.parseLong(subject); // subject를 Long 타입으로 변환
+        } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
-        return subject;  // 유효한 경우 사용자 ID 반환
     }
+
+    public String validateAndGetAccountId(String token) {
+        try {
+            // 비밀 키 생성
+            Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+
+            // JWT 토큰 파싱 및 검증
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token) // 토큰 파싱
+                    .getBody()
+                    .getSubject(); // accountId를 subject로 저장한 경우 반환
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // JWT가 유효하지 않거나 예외가 발생한 경우 null 반환
+        }
+    }
+
 }

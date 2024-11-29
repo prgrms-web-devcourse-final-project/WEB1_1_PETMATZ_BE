@@ -28,4 +28,6 @@ public interface ResponseMessage {
     String HEARTED_ID_NOT_FOUND = "Hearted Id Not Found";
 
     String WRONG_LOCATION= "Wrong location";
+
+    String USER_NOT_FOUND = "User Not Found";
 }

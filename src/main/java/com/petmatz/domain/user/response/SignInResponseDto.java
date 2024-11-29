@@ -1,5 +1,6 @@
 package com.petmatz.domain.user.response;
 
+import com.petmatz.domain.user.constant.*;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.user.common.LogInResponseDto;
 import com.petmatz.user.common.ResponseCode;
@@ -8,23 +9,24 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Getter
 public class SignInResponseDto extends LogInResponseDto {
     private Long id;
     private String accountId;
     private String nickname;
-    private User.LoginRole loginRole;
-    private User.LoginType loginType;
-    private User.Role role;
-    private String preferredSize;
-    private User.Gender gender;
+    private LoginRole loginRole;
+    private LoginType loginType;
+    private Role role;
+    private List<PreferredSize> preferredSizes; // 변경된 필드
+    private Gender gender;
     private Boolean isRegistered;
     private Integer recommendationCount;
     private Integer careCompletionCount;
     private Boolean isCareAvailable;
     private String mbti;
+    private String region;
 
     private SignInResponseDto(User user) {
         super();
@@ -34,13 +36,14 @@ public class SignInResponseDto extends LogInResponseDto {
         this.loginRole = user.getLoginRole();
         this.loginType = user.getLoginType();
         this.role = user.getRole();
-        this.preferredSize =user.getPreferredSize();
+        this.preferredSizes = user.getPreferredSizes(); // 리스트를 직접 할당
         this.gender = user.getGender();
         this.isRegistered = user.getIsRegistered();
         this.recommendationCount = user.getRecommendationCount();
         this.careCompletionCount = user.getCareCompletionCount();
         this.isCareAvailable = user.getIsCareAvailable();
-        this.mbti=user.getMbti();
+        this.mbti = user.getMbti();
+        this.region = user.getRegion();
     }
 
     public static ResponseEntity<SignInResponseDto> success(User user) {
