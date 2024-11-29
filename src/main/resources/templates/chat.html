@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1:1 Chat with Room Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .chat-container {
+      margin-top: 20px;
+    }
+    textarea {
+      width: 100%;
+      resize: none;
+    }
+    .error {
+      color: red;
+    }
+    .success {
+      color: green;
+    }
+    .room-item {
+      cursor: pointer;
+      padding: 5px;
+      border: 1px solid #ccc;
+      margin-bottom: 5px;
+    }
+    .room-item:hover {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+<h1>1:1 Chat Application</h1>
+
+<div>
+  <label for="caregiverInfo">Your Nickname:</label>
+  <input type="text" id="caregiverInfo" placeholder="Your nickname">
+</div>
+<div>
+  <label for="entrustedInfo">Partner's Nickname:</label>
+  <input type="text" id="entrustedInfo" placeholder="Partner's nickname">
+</div>
+
+<div>
+  <button id="createRoomBtn">Create Room</button>
+  <button id="joinRoomBtn">Fetch Chat Rooms</button>
+</div>
+
+<div id="statusMessage" class="error"></div>
+
+<div id="chatRoomsContainer" style="margin-top: 20px;"></div>
+
+<div class="chat-container" id="chatContainer" style="display:none;">
+  <h2>Chat Room</h2>
+  <p>Chat Room ID: <span id="chatRoomNumber"></span></p>
+  <textarea id="chatMessageInfos" rows="15" readonly placeholder="Messages will appear here"></textarea>
+  <input type="text" id="messageInput" placeholder="Enter your message">
+  <button id="sendMessageBtn">Send Message</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.2/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script>
+  const stompClient = Stomp.over(new SockJS('/ws'));
+  let chatRoomNumber = null;
+
+  const caregiverInfoInput = document.getElementById('caregiverInfo');
+  const entrustedInfoInput = document.getElementById('entrustedInfo');
+  const createRoomBtn = document.getElementById('createRoomBtn');
+  const joinRoomBtn = document.getElementById('joinRoomBtn');
+  const chatRoomsContainer = document.getElementById('chatRoomsContainer');
+  const chatContainer = document.getElementById('chatContainer');
+  const chatRoomNumberSpan = document.getElementById('chatRoomNumber');
+  const chatMessageInfos = document.getElementById('chatMessageInfos');
+  const messageInput = document.getElementById('messageInput');
+  const sendMessageBtn = document.getElementById('sendMessageBtn');
+  const statusMessage = document.getElementById('statusMessage');
+
+  function updateStatus(message, isSuccess = false) {
+    statusMessage.textContent = message;
+    statusMessage.className = isSuccess ? 'success' : 'error';
+  }
+
+  stompClient.connect({}, () => {
+    console.log('Connected to WebSocket!');
+  });
+
+  createRoomBtn.addEventListener('click', () => {
+    const caregiverInfo = caregiverInfoInput.value.trim();
+    const entrustedInfo = entrustedInfoInput.value.trim();
+
+    if (!caregiverInfo || !entrustedInfo) {
+      updateStatus('Please enter both your nickname and your partner\'s nickname!');
+      return;
+    }
+
+    fetch('/api/v1/match', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ caregiverEmail: caregiverInfo, entrustedEmail: entrustedInfo })
+    })
+            .then(response => response.json())
+            .then(data => {
+              if (data.responseCode === "SUCCESS") {
+                chatRoomNumber = data.result;
+                chatRoomNumberSpan.textContent = chatRoomNumber;
+                updateStatus(`Chat room created: ${chatRoomNumber}`, true);
+                subscribeToChatRoom(chatRoomNumber);
+              } else {
+                updateStatus(`Failed to create chat room: ${data.responseCode}`);
+              }
+            })
+            .catch(error => {
+              console.error('Error during room creation:', error);
+              updateStatus('Error during room creation.');
+            });
+  });
+
+  joinRoomBtn.addEventListener('click', () => {
+    const caregiverInfo = caregiverInfoInput.value.trim();
+
+    if (!caregiverInfo) {
+      updateStatus('Please enter your nickname!');
+      return;
+    }
+
+    fetch(`/api/v1/match?userEmail=${encodeURIComponent(caregiverInfo)}`)
+            .then(response => response.json())
+            .then(data => {
+              if (data.responseCode === "SUCCESS") {
+                displayChatRooms(data.result);
+                updateStatus('Fetched chat rooms successfully.', true);
+              } else {
+                updateStatus(`Failed to fetch chat rooms: ${data.responseCode}`);
+              }
+            })
+            .catch(error => {
+              console.error('Error fetching chat rooms:', error);
+              updateStatus('Error fetching chat rooms.');
+            });
+  });
+
+  function displayChatRooms(chatRooms) {
+    chatRoomsContainer.innerHTML = '<h2>Your Chat Rooms</h2>';
+    Object.entries(chatRooms).forEach(([chatRoomId, chatRoomData]) => {
+      const roomElement = document.createElement('div');
+      roomElement.className = 'room-item';
+      roomElement.textContent = `Room ID: ${chatRoomId}, Last Message: ${chatRoomData.lastMessage}, Unread: ${chatRoomData.unreadCount}`;
+      roomElement.addEventListener('click', () => {
+        chatRoomNumber = chatRoomId;
+        chatRoomNumberSpan.textContent = chatRoomId;
+        chatContainer.style.display = 'block';
+        subscribeToChatRoom(chatRoomId);
+      });
+      chatRoomsContainer.appendChild(roomElement);
+    });
+  }
+
+  function subscribeToChatRoom(chatRoomId) {
+    stompClient.subscribe(`/topic/chat/${chatRoomId}`, message => {
+      const chatMessage = JSON.parse(message.body);
+      displayNewMessage(chatMessage, chatRoomId);
+    });
+    updateStatus(`Subscribed to chat room ${chatRoomId}`, true);
+  }
+
+  sendMessageBtn.addEventListener('click', () => {
+    const content = messageInput.value.trim();
+    if (!content) {
+      updateStatus('Please enter a message!');
+      return;
+    }
+
+    stompClient.send(`/app/chat`, {}, JSON.stringify({
+      chatRoomId: chatRoomNumber,
+      senderEmail: caregiverInfoInput.value.trim(),
+      receiverEmail: entrustedInfoInput.value.trim(),
+      msg: content
+    }));
+    messageInput.value = '';
+  });
+
+  function displayNewMessage(chatMessage, chatRoomId) {
+    if (chatRoomNumber === chatRoomId) {
+      chatMessageInfos.value += `[${chatMessage.senderEmail}] ${chatMessage.msg}\n`;
+      chatMessageInfos.scrollTop = chatMessageInfos.scrollHeight;
+    } else {
+      console.log(`New message for room ${chatRoomId}:`, chatMessage);
+    }
+  }
+</script>
+
+</body>
+</html>
