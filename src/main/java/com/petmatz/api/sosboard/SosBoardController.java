@@ -81,8 +81,12 @@ public class SosBoardController {
     }
 
     private User getAuthenticatedUser() {
-        String accountId = jwtExtractProvider.findAccountIdFromJwt();
-        return userRepository.findByAccountId(accountId);
+        Long userId = jwtExtractProvider.findIdFromJwt();
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found :" + userId));
+
+        return user;
     }
 }
 
