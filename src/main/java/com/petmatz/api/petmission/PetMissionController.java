@@ -5,6 +5,7 @@ import com.petmatz.api.petmission.dto.PetMissionRequest;
 import com.petmatz.api.petmission.dto.PetMissionResponse;
 import com.petmatz.domain.petmission.PetMissionService;
 import com.petmatz.domain.petmission.dto.PetMissionData;
+import com.petmatz.domain.petmission.dto.PetMissionListInfo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -13,6 +14,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 //TODD 돌봄 시작을 누르면 상태가 바뀌게 됨.코멘트필요
@@ -40,31 +42,37 @@ public class PetMissionController {
 
     @Operation(summary = "멍멍이의 부탁 등록", description = "멍멍이의 부탁을 등록하는 API")
     @Parameters({
-            @Parameter(name = "careId", description = "맡김이 ID", example = "1"),
+//            @Parameter(name = "careId", description = "맡김이 ID", example = "1"),
             @Parameter(name = "receiverId", description = "돌봄이 ID", example = "2"),
             @Parameter(name = "petId", description = "채팅방 번호", example = "10"),
             @Parameter(name = "missionStarted", description = "멍멍이의 부탁 시작일", example = "히힛"),
             @Parameter(name = "missionEnd", description = "멍멍이의 부탁 마감", example = "하핫"),
             @Parameter(name = "comment", description = "멍멍이의 부탁 제목", example = "호수공원 산책하기")
     })
+
+    //    @PostMapping("/comment")
+//    public Response<?> insertPetMissionComment(@RequestBody ) {
+//
+//    }
+
     @PostMapping
     public Response<PetMissionResponse> savePetMissionList(@RequestBody PetMissionRequest petMissionRequest) {
         PetMissionData petMissionData = petMissionService.insertPetMission(petMissionRequest.of());
         String destination = "/topic/chat/" + petMissionData.chatRoomId();
         PetMissionResponse petMissionResponse = PetMissionResponse.of(petMissionData);
-//        simpMessagingTemplate.convertAndSend(destination, petMissionResponse);
+        simpMessagingTemplate.convertAndSend(destination, petMissionResponse);
         return Response.success(petMissionResponse);
     }
 
-//    @PostMapping("/comment")
-//    public Response<?> insertPetMissionComment(@RequestBody ) {
-//
-//    }
+
 
     @GetMapping
-    public void selectPetMissionList(@RequestParam("userUUID") Long userUUID) {
+    public Response<List<PetMissionListInfo>> selectPetMissionList() {
 
-        petMissionService.selectPetMissionList(userUUID);
+//        List<PetMissionListInfo> petMissionListInfos = petMissionService.selectPetMissionList();
+
+//        return Response.success(petMissionListInfos);
+        return null;
     }
 
     @GetMapping("/Info")
