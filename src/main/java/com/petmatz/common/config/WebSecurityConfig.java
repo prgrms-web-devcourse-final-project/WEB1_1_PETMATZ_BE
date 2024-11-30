@@ -6,7 +6,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -96,6 +95,7 @@ public class WebSecurityConfig {
         corsConfiguration.addAllowedOrigin("*"); // 모든 Origin 허용
         corsConfiguration.addAllowedHeader("*"); // 모든 Header 허용
         corsConfiguration.addAllowedMethod("*"); // 모든 Method 허용
+        corsConfiguration.setAllowCredentials(true);
         corsConfiguration.addAllowedOriginPattern("*"); // 모든 Origin 허용
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
