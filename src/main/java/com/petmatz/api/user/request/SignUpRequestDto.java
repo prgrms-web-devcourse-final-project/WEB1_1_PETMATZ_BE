@@ -20,7 +20,6 @@ public class SignUpRequestDto {
     private String accountId; // account_id와 매핑
 
     @NotBlank
-    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9]{8,20}$")
     private String password;
 
     @NotBlank

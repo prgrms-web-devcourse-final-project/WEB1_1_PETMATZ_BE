@@ -4,6 +4,8 @@ import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import com.petmatz.domain.global.BaseEntity;
 import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import com.petmatz.domain.user.constant.*;
+import com.petmatz.domain.user.info.EditMyProfileInfo;
+import com.petmatz.domain.user.info.UpdateLocationInfo;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -107,6 +109,26 @@ public class User extends BaseEntity {
         return null;
     }
 
-    public
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
+
+    public void updateRecommendation(Integer recommendationCount) {
+        this.recommendationCount = recommendationCount;
+    }
+
+    public void updateProfile(EditMyProfileInfo info) {
+        this.profileImg=info.getProfileImg();
+        this.nickname=info.getNickname();
+        this.introduction=info.getIntroduction();
+        this.preferredSizes=info.getPreferredSizes();
+        this.isCareAvailable=info.isCareAvailable();
+    }
+
+    public void updateLocation(UpdateLocationInfo info, String region){
+        this.latitude=info.getLatitude();
+        this.longitude=info.getLongitude();
+        this.region=region;
+    }
 
 }

@@ -64,7 +64,7 @@ public class ChatController {
             @Parameter(name = "pageSize", description = "긁어올 페이지의 사이즈", example = "20 ( Default : 15 )"),
             @Parameter(name = "startPage", description = "현재 페이지의 번호 ( 0은 안됨!! )", example = "3 ( Default 1 )")
     })
-    public Response<?> selectChatMessage(
+    public Response<ChatMessageResponse> selectChatMessage(
                                          @RequestParam String receiverEmail,
                                          @RequestParam String chatRoomId,
                                          @RequestParam(defaultValue = "15") int pageSize,
