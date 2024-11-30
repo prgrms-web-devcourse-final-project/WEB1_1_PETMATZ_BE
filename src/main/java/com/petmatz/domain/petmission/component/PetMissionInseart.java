@@ -2,6 +2,7 @@ package com.petmatz.domain.petmission.component;
 
 import com.petmatz.domain.petmission.entity.PetMissionAskEntity;
 import com.petmatz.domain.petmission.entity.PetMissionEntity;
+import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import com.petmatz.domain.petmission.repository.PetMissionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -14,7 +15,7 @@ public class PetMissionInseart {
 
     private final PetMissionRepository petMissionRepository;
 
-    public PetMissionEntity insertPetMission(PetMissionEntity petMissionEntityList) {
+    public UserToPetMissionEntity insertPetMission(UserToPetMissionEntity petMissionEntityList) {
          return petMissionRepository.save(petMissionEntityList);
     }
 
