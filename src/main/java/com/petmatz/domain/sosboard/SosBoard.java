@@ -1,7 +1,7 @@
 package com.petmatz.domain.sosboard;
 
 
-import com.petmatz.api.sosboard.dto.SosBoardCreateRequestDto;
+
 import com.petmatz.domain.user.entity.User;
 import jakarta.persistence.GeneratedValue;
 import com.petmatz.domain.global.BaseEntity;

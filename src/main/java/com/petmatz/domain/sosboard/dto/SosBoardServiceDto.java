@@ -1,7 +1,6 @@
 package com.petmatz.domain.sosboard.dto;
 
 import com.petmatz.api.pet.dto.PetResponse;
-import com.petmatz.api.sosboard.dto.SosBoardCreateRequestDto;
 import com.petmatz.domain.sosboard.PaymentType;
 import com.petmatz.domain.sosboard.SosBoard;
 import com.petmatz.domain.user.entity.User;

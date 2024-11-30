@@ -1,6 +1,5 @@
 package com.petmatz.domain.pet;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.petmatz.domain.global.BaseEntity;
 import com.petmatz.domain.user.entity.User;
 import jakarta.persistence.*;
