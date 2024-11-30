@@ -1,12 +1,10 @@
 package com.petmatz.api.chatting;
 
-import com.petmatz.api.chatting.dto.ChatMessage;
-import com.petmatz.api.chatting.dto.ChatMessageRequest;
-import com.petmatz.api.chatting.dto.ChatMessageResponse;
-import com.petmatz.api.chatting.dto.ChatReadStatusDirect;
+import com.petmatz.api.chatting.dto.*;
 import com.petmatz.api.global.dto.Response;
 import com.petmatz.domain.chatting.ChatMessageService;
 import com.petmatz.domain.chatting.dto.ChatMessageInfo;
+import com.petmatz.domain.user.info.UserInfo;
 import com.petmatz.domain.user.service.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -56,6 +54,7 @@ public class ChatController {
 
 
     //TODO sender는 Token 파싱해서 사용, Pagin적용해서 보내기
+    //TODO 토큰으로 해당 채팅방에 사용자가 있는지 판단
     @GetMapping("/chat/message")
     @Operation(summary = "메세지 내역 긁어오기", description = "채팅방의 메세지 내역을 긁어오는 API")
     @Parameters({
@@ -72,15 +71,14 @@ public class ChatController {
     ) {
 
         Page<ChatMessageInfo> chatMessageInfos = chatService.selectMessage(receiverEmail, chatRoomId, startPage, pageSize);
-        userService.selectUserInfo(receiverEmail);
+        UserInfo userInfo = userService.selectUserInfo(receiverEmail);
 
-        //TODO User 조회하는거 필요
-        //TODO 건우님이 만들어주시면 그거 이용하기
+
         log.info("chatMessageInfos.getContent() : " + chatMessageInfos.getContent());
         return Response.success(ChatMessageResponse.of(
                 chatMessageInfos.getContent()
                         .stream().map(ChatMessage::of).toList(),
-                null,
+                IChatUserResponse.of(userInfo),
                 chatRoomId,
                 chatMessageInfos.getNumber() + 1,
                 chatMessageInfos.getTotalPages(),

@@ -19,6 +19,7 @@ public record ChatRoomMetaDataInfoResponse(
 
     public static ChatRoomMetaDataInfoResponse of(ChatRoomMetaDataInfo chatRoomMetaDataInfo) {
         return ChatRoomMetaDataInfoResponse.builder()
+                .chatRoomId(chatRoomMetaDataInfo.chatRoomId())
                 .lastMessage(chatRoomMetaDataInfo.lastMessage())
                 .lastMessageTimestamp(chatRoomMetaDataInfo.lastMessageTimestamp())
                 .unreadCount(chatRoomMetaDataInfo.unreadCount())

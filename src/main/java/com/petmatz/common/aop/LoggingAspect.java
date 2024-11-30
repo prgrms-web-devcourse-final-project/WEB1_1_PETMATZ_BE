@@ -1,5 +1,6 @@
 package com.petmatz.common.aop;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,17 @@ public class LoggingAspect {
         logMap.put("Request Params", request.getQueryString());
         logMap.put("User-Agent", request.getHeader("User-Agent"));
         logMap.put("Referer", request.getHeader("Referer"));
+        // 쿠키 값을 확인하여 로그에 추가
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            Map<String, String> cookieMap = new HashMap<>();
+            for (Cookie cookie : cookies) {
+                cookieMap.put(cookie.getName(), cookie.getValue());
+            }
+            logMap.put("Cookies", cookieMap);
+        } else {
+            logMap.put("Cookies", "No cookies present");
+        }
     }
 
     private static Object logRequest(ProceedingJoinPoint joinPoint, HttpServletResponse response, Map<String, Object> logMap) throws Throwable {

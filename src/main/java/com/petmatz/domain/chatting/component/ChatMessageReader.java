@@ -65,6 +65,7 @@ public class ChatMessageReader {
 
     //chat_read_status의 마지막 시간대를 조회, 조회대는 대상은 자기자신을 기준으로 상대방의 마지막 채팅 시간 조회
     public ChatReadStatusDocs selectChatMessageLastStatus(String chatRoomId, String userEmail) {
+        System.out.println("chatRoomId :: " + chatRoomId);
         Query query = new Query(Criteria.where("_id").is(ChatUtils.addString(chatRoomId,userEmail)).and("userEmail").is(userEmail));
         return mongoTemplate.findOne(query, ChatReadStatusDocs.class);
     }

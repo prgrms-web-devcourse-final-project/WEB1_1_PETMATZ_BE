@@ -1,12 +1,13 @@
 package com.petmatz.api.chatting.dto;
 
 import com.petmatz.domain.chatting.dto.IChatUserInfo;
+import com.petmatz.domain.user.info.UserInfo;
 import lombok.Builder;
 
 @Builder
 public record IChatUserResponse(
 
-        String userId,
+        Long userId,
         String userName,
 
         String userEmail,
@@ -20,6 +21,15 @@ public record IChatUserResponse(
                 .userName(iChatUserInfo.userName())
                 .userEmail(iChatUserInfo.userEmail())
                 .profileURL(iChatUserInfo.profileURL())
+                .build();
+    }
+
+    public static IChatUserResponse of(UserInfo userInfo) {
+        return IChatUserResponse.builder()
+                .userId(userInfo.id())
+                .userName(userInfo.nickname())
+                .userEmail(userInfo.email())
+                .profileURL(userInfo.profileImg())
                 .build();
     }
 

@@ -32,6 +32,7 @@ public class MatchingController {
     //TODO 반려인 닉네임 -> Token
     //TODO 채팅방 생성시 동작하도록  ( 구독 )
     //TODO 채팅방 고유 ID 가 NULL이면 없는 채팅방으로 간주하고 새로 생성한다.
+    //TODO caregiverEmail -> JWT으로 바꾸기
     @PostMapping
     @Operation(summary = "채팅방 생성", description = "채팅방을 생성하는 API API")
     @Parameters({
@@ -74,6 +75,10 @@ public class MatchingController {
             @RequestParam(defaultValue = "1") int startPage
     ) {
         List<ChatRoomMetaDataInfo> chatRoomList = chatRoomService.getChatRoomList(pageSize, startPage);
+        for (ChatRoomMetaDataInfo chatRoomMetaDataInfo : chatRoomList) {
+            System.out.println(chatRoomMetaDataInfo.toString());
+        }
+
         return Response.success(
                 chatRoomList.stream()
                         .map(ChatRoomMetaDataInfoResponse::of)

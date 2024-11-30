@@ -48,8 +48,6 @@ public class ChatRoomService {
         return chatRoomId;
     }
 
-
-    //TODO other 추가
     public List<ChatRoomMetaDataInfo> getChatRoomList(int pageSize, int startPage) {
         String userEmail = jwtExtractProvider.findAccountIdFromJwt();
 
@@ -60,7 +58,6 @@ public class ChatRoomService {
                 .toList();
 
         Map<String, Integer> unreadCountList = updateMessageStatus(roomNumberList, userEmail, pageSize, startPage);
-        //User 추가해서 아래의 메서드에 넘기기
         Map<String, IChatUserInfo> userList = getUserList(chatRoomNumber, userEmail);
 
         return chatRoomMetaDataReader.findChatRoomMetaDataInfo(roomNumberList, unreadCountList, userList);
@@ -74,8 +71,7 @@ public class ChatRoomService {
             for (UserToChatRoomEntity participant : participants) {
                 if (!participant.getUser().getAccountId().equals(userEmail)) {
                     IChatUserInfo userInfo = IChatUserInfo.of(
-                            participant.getUser().getAccountId(),
-                            participant.getUser().getProfileImg()
+                            participant.getUser()
                     );
                     userList.put(userToChatRoomEntity.getChatRoom().getId().toString(), userInfo);
                     break; // 다른 참여자를 하나만 찾으면 됨

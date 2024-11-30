@@ -6,6 +6,7 @@ import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import com.petmatz.domain.user.constant.*;
 import com.petmatz.domain.user.info.EditMyProfileInfo;
 import com.petmatz.domain.user.info.UpdateLocationInfo;
+import com.petmatz.domain.user.info.UserInfo;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -131,4 +132,12 @@ public class User extends BaseEntity {
         this.region=region;
     }
 
+    public UserInfo of() {
+        return UserInfo.builder()
+                .id(id)
+                .nickname(nickname)
+                .email(email)
+                .profileImg(profileImg)
+                .build();
+    }
 }
