@@ -150,7 +150,7 @@ public class UserServiceImpl implements UserService {
             // JWT 쿠키에 저장
             Cookie jwtCookie = new Cookie("jwt", token);
             jwtCookie.setHttpOnly(true);  // XSS 방지
-            jwtCookie.setSecure(true);   // HTTPS만 허용
+//            jwtCookie.setSecure(true);   // HTTPS만 허용
             jwtCookie.setPath("/");      // 모든 경로에서 접근 가능
             jwtCookie.setMaxAge(3600);   // 1시간 유효기간
             response.addCookie(jwtCookie);
@@ -176,9 +176,6 @@ public class UserServiceImpl implements UserService {
             boolean isMatched = passwordEncoder.matches(password, encodedPassword);
             if (!isMatched) return DeleteIdResponseDto.idNotMatching();  // 비밀번호 불일치
 
-//            User updatedUser = UserFactory.createDeletedUser(user);
-//            userRepository.save(updatedUser);
-
             certificationRepository.deleteById(userId);
         } catch (Exception e) {
             log.info("회원 삭제 실패: {}", e);
@@ -194,7 +191,6 @@ public class UserServiceImpl implements UserService {
         try {
             String userId = jwtExtractProvider.findAccountIdFromJwt();
             User user = userRepository.findByAccountId(userId);
-
 
             boolean exists = userRepository.existsByAccountId(userId);
             if (!exists) {
@@ -212,14 +208,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<? super GetOtherProfileResponseDto> getOtherMypage(Long userId) {
         try {
-            Optional<User> user = userRepository.findById(userId);
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
             boolean exists = userRepository.existsById(userId);
             if (!exists) {
                 return GetOtherProfileResponseDto.userNotFound();
             }
 
-            return GetOtherProfileResponseDto.success(user.orElse(null));
+            return GetOtherProfileResponseDto.success(user);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -242,8 +239,6 @@ public class UserServiceImpl implements UserService {
             }
             user.updateProfile(info);
 
-//            User updatedUser = UserFactory.createUpdatedUser(user, info);
-//            userRepository.save(updatedUser);
 
         } catch (Exception e) {
             log.info("프로필 수정 실패: {}", e);
@@ -316,8 +311,6 @@ public class UserServiceImpl implements UserService {
             String encodedRePasswordNum = passwordEncoder.encode(rePasswordNum);
 
             user.updatePassword(encodedRePasswordNum);
-//            User updatedUser = UserFactory.createUpdatedPasswordUser(user, encodedRePasswordNum);
-//            userRepository.save(updatedUser);
 
         } catch (Exception e) {
             log.info("임시비밀번호 재설정 실패: {}", e);
@@ -346,9 +339,6 @@ public class UserServiceImpl implements UserService {
 
             user.updatePassword(encodedNewPassword);
 
-//            User updatedUser = UserFactory.createUpdatedPasswordUser(user, encodedNewPassword);
-//            userRepository.save(updatedUser);
-
         } catch (Exception e) {
             log.info("비밀번호 재설정 실패: {}", e);
             return RepasswordResponseDto.databaseError();
@@ -373,9 +363,6 @@ public class UserServiceImpl implements UserService {
 
             user.updateLocation(info, region);
 
-//            User updatedUser = UserFactory.createLocationUpdateUser(user, info, region);
-//            userRepository.save(updatedUser);
-
             return UpdateLocationResponseDto.success(region);
         } catch (Exception e) {
             log.info("위치업데이트 실패: {}", e);
@@ -399,9 +386,6 @@ public class UserServiceImpl implements UserService {
             Integer recommendationCount = user.getRecommendationCount() + 1;
 
             user.updateRecommendation(recommendationCount);
-
-//            User updatedUser = UserFactory.createRecommendationUpdateUser(user, recommendationCount);
-//            userRepository.save(updatedUser);
 
         } catch (Exception e) {
             log.info("추천수 업데이트 실패: {}", e);
