@@ -72,6 +72,8 @@ public class ChatController {
     ) {
 
         Page<ChatMessageInfo> chatMessageInfos = chatService.selectMessage(receiverEmail, chatRoomId, startPage, pageSize);
+        userService.selectUserInfo(receiverEmail);
+
         //TODO User 조회하는거 필요
         //TODO 건우님이 만들어주시면 그거 이용하기
         log.info("chatMessageInfos.getContent() : " + chatMessageInfos.getContent());

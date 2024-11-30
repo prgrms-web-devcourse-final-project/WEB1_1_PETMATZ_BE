@@ -410,4 +410,8 @@ public class UserServiceImpl implements UserService {
         return new GetMyUserDto();
     }
 
+    public void selectUserInfo(String receiverEmail) {
+        User byAccountId = userRepository.findByAccountId(receiverEmail);
+//        return User.of
+    }
 }
