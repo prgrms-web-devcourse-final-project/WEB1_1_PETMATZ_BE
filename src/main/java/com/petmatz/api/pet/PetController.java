@@ -12,7 +12,6 @@ import com.petmatz.domain.user.entity.User;
 import com.petmatz.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -69,12 +68,12 @@ public class PetController {
     }
 
     private User getAuthenticatedUser() {
-        Long userId = jwtExtractProvider.findIdFromJwt();
+            Long userId = jwtExtractProvider.findIdFromJwt();
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found :" + userId));
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found :" + userId));
 
-        return user;
+            return user;
     }
 }
 

@@ -1,6 +1,7 @@
 package com.petmatz.domain.sosboard;
 
 
+
 import com.petmatz.domain.user.entity.User;
 import jakarta.persistence.GeneratedValue;
 import com.petmatz.domain.global.BaseEntity;
@@ -14,7 +15,6 @@ import java.util.List;
 @Entity
 @Table(name = "sos_board")
 @Getter
-@Setter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -44,26 +44,32 @@ public class SosBoard extends BaseEntity{
     @Column(name = "price")
     private Integer price; // 금액 (시급/일급의 경우 필수, 협의는 null 허용)
 
-    @Column(name = "region", length = 255)
-    private String region;
-
     @Column(name = "start_date", nullable = false)
     private String startDate; // yyyy-MM-dd HH:mm 형식
 
     @Column(name = "end_date", nullable = false)
     private String endDate; // yyyy-MM-dd HH:mm 형식
 
-    public enum PaymentType {
-        HOURLY, DAILY, NEGOTIABLE;
-
-        public static PaymentType fromString(String value) {
-            return switch (value.toUpperCase()) {
-                case "HOURLY" -> HOURLY;
-                case "DAILY" -> DAILY;
-                case "NEGOTIABLE" -> NEGOTIABLE;
-                default -> throw new IllegalArgumentException("잘못된 결제 유형: " + value);
-            };
+    public void addPetSosBoards(List<PetSosBoard> petSosBoards) {
+        if (this.petSosBoards == null) {
+            this.petSosBoards = new ArrayList<>();
         }
+        this.petSosBoards.addAll(petSosBoards);
+        // 양방향 연관 관계 설정
+        petSosBoards.forEach(petSosBoard -> petSosBoard.setSosBoard(this));
     }
 
+    public void updateFields(String title, PaymentType paymentType, Integer price, String comment,
+                       String startDate, String endDate) {
+        this.title = title;
+        this.paymentType = paymentType;
+        this.price = price;
+        this.comment = comment;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    public void clearPetSosBoards() {
+        this.petSosBoards.clear(); // 기존 리스트 비우기
+    }
 }
