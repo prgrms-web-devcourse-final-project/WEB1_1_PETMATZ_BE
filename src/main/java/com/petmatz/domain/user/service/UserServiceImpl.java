@@ -101,27 +101,33 @@ public class UserServiceImpl implements UserService {
             String certificationNumber = info.getCertificationNumber();
 
             // 인증 번호 확인
-            Certification Certification = certificationRepository.findTopByAccountIdOrderByCreatedAtDesc(accountId);
-            boolean isMatched = Certification.getAccountId().equals(accountId) &&
-                    Certification.getCertificationNumber().equals(certificationNumber);
-            if (!isMatched) return SignUpResponseDto.certificationFail();
+            Certification certification = certificationRepository.findTopByAccountIdOrderByCreatedAtDesc(accountId);
+            if (certification == null || !certification.getCertificationNumber().equals(certificationNumber)) {
+                return SignUpResponseDto.certificationFail();
+            }
 
             // 비밀번호 암호화 후 저장
             String password = info.getPassword();
             String encodedPassword = passwordEncoder.encode(password);
             info.setPassword(encodedPassword);
 
+            // 외부 호출 분리
             String region = geocodingService.getRegionFromCoordinates(info.getLatitude(), info.getLongitude());
+
             User user = UserFactory.createNewUser(info, encodedPassword, region);
             userRepository.save(user);
 
             // 인증 엔티티 삭제
             certificationRepository.deleteAllByAccountId(accountId);
+
+            return SignUpResponseDto.success();
+        } catch (RuntimeException e) {
+            log.error("회원 가입 실패: {}", e);
+            throw e;
         } catch (Exception e) {
-            log.info("회원 가입 실패: {}", e);
-            return LogInResponseDto.databaseError();
+            log.error("회원 가입 중 처리되지 않은 예외 발생: {}", e);
+            throw new RuntimeException("회원 가입 중 처리되지 않은 예외", e);
         }
-        return SignUpResponseDto.success();  // 회원 가입 성공 응답
     }
 
     @Override
@@ -148,13 +154,12 @@ public class UserServiceImpl implements UserService {
             String token = jwtProvider.create(user.getId(), user.getAccountId());
             log.info("JWT 생성 완료: {}", token);
 
-            // JWT 쿠키에 저장
             ResponseCookie responseCookie = ResponseCookie.from("jwt", token)
                     .httpOnly(true)           // XSS 방지
                     .secure(true)             // HTTPS만 허용
                     .path("/")                // 모든 경로에서 접근 가능
                     .sameSite("None")         // SameSite=None 설정
-                    .maxAge((3600*24))             // 1시간 유효기간
+                    .maxAge((3600))
                     .build();
             response.addHeader("Set-Cookie", responseCookie.toString());
 
