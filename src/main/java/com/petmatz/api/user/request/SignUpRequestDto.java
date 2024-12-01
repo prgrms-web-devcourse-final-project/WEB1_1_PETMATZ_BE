@@ -4,7 +4,6 @@ import com.petmatz.domain.user.constant.Gender;
 import com.petmatz.domain.user.constant.PreferredSize;
 import com.petmatz.domain.user.info.SignUpInfo;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
