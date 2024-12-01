@@ -1,6 +1,5 @@
 package com.petmatz.domain.pet;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.petmatz.domain.global.BaseEntity;
 import com.petmatz.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -36,7 +35,6 @@ public class Pet extends BaseEntity {
     @Column(name = "gender", nullable = false)
     private Gender gender; // 성별
 
-    // String 그대로 반환
     @Getter
     @Column(name = "is_neutered", columnDefinition = "VARCHAR(10)", nullable = false)
     private String neuterYn; // 중성화 여부
@@ -59,32 +57,5 @@ public class Pet extends BaseEntity {
 
     @Column(name = "comment")
     private String comment; // 코멘트
-
-    public enum Gender {
-        수컷,
-        암컷;
-
-        public static Gender fromString(String gender) {
-            return switch (gender) {
-                case "수컷" -> 수컷;
-                case "암컷" -> 암컷;
-                default -> throw new IllegalArgumentException("Invalid gender: " + gender);
-            };
-        }
-    }
-
-    public enum Size {
-        Small, Medium, Large;
-
-        public static Size fromString(String size) {
-            return switch (size.toUpperCase()) {
-                case "SMALL" -> Small;
-                case "MEDIUM" -> Medium;
-                case "LARGE" -> Large;
-                default -> throw new IllegalArgumentException("Invalid size: " + size);
-            };
-        }
-    }
-
 }
 
