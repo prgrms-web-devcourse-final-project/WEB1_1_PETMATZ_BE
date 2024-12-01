@@ -69,7 +69,7 @@ public class ChatController {
                                          @RequestParam(defaultValue = "15") int pageSize,
                                          @RequestParam(defaultValue = "1") int startPage
     ) {
-
+        //TODO receiverEmail 조회하는거 추가
         Page<ChatMessageInfo> chatMessageInfos = chatService.selectMessage(receiverEmail, chatRoomId, startPage, pageSize);
         UserInfo userInfo = userService.selectUserInfo(receiverEmail);
 

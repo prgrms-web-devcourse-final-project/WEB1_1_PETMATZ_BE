@@ -154,7 +154,6 @@ public class UserServiceImpl implements UserService {
             jwtCookie.setPath("/");      // 모든 경로에서 접근 가능
             jwtCookie.setMaxAge(3600);   // 1시간 유효기간
             response.addCookie(jwtCookie);
-
             // 로그인 성공 응답 반환
             return SignInResponseDto.success(user); // User 객체 전달
         } catch (Exception e) {
