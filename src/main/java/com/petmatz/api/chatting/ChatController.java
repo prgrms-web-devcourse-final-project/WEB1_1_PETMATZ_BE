@@ -55,6 +55,7 @@ public class ChatController {
 
     //TODO sender는 Token 파싱해서 사용, Pagin적용해서 보내기
     //TODO 토큰으로 해당 채팅방에 사용자가 있는지 판단
+    //TDO readStatus, enderId, receverId
     @GetMapping("/chat/message")
     @Operation(summary = "메세지 내역 긁어오기", description = "채팅방의 메세지 내역을 긁어오는 API")
     @Parameters({

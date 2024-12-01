@@ -48,7 +48,7 @@ public class ChatRoomService {
         return chatRoomId;
     }
 
-    public List<ChatRoomMetaDataInfo> getChatRoomList(int pageSize, int startPage) {
+    public List<ChatRoomMetaDataInfo> selectChatRoomList(int pageSize, int startPage) {
         String userEmail = jwtExtractProvider.findAccountIdFromJwt();
 
         List<UserToChatRoomEntity> chatRoomNumber = chatRoomReader.findChatRoomNumber(userEmail);

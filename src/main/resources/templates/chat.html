@@ -145,20 +145,44 @@
   });
 
   function displayChatRooms(chatRooms) {
-    chatRoomsContainer.innerHTML = '<h2>Your Chat Rooms</h2>';
-    Object.entries(chatRooms).forEach(([chatRoomId, chatRoomData]) => {
+    chatRoomsContainer.innerHTML = '<h2>Your Chat Rooms</h2>'; // 채팅방 컨테이너 초기화
+
+    chatRooms.forEach(room => {
       const roomElement = document.createElement('div');
       roomElement.className = 'room-item';
-      roomElement.textContent = `Room ID: ${chatRoomId}, Last Message: ${chatRoomData.lastMessage}, Unread: ${chatRoomData.unreadCount}`;
+
+      // 채팅방 정보를 표시
+      roomElement.innerHTML = `
+      <div>
+        <strong>Room ID:</strong> ${room.chatRoomId}
+      </div>
+      <div>
+        <strong>Last Message:</strong> ${room.lastMessage || 'No messages yet'}
+      </div>
+      <div>
+        <strong>Last Active:</strong> ${room.lastMessageTimestamp || 'N/A'}
+      </div>
+      <div>
+        <strong>Unread Messages:</strong> ${room.unreadCount}
+      </div>
+      <div>
+        <strong>Partner:</strong> ${room.other.userName} (${room.other.userEmail})
+        <img src="${room.other.profileURL}" alt="Profile Image" style="width: 50px; height: 50px; border-radius: 50%; margin-left: 10px;">
+      </div>
+    `;
+
+      // 클릭 이벤트로 채팅방 구독
       roomElement.addEventListener('click', () => {
-        chatRoomNumber = chatRoomId;
-        chatRoomNumberSpan.textContent = chatRoomId;
+        chatRoomNumber = room.chatRoomId;
+        chatRoomNumberSpan.textContent = room.chatRoomId;
         chatContainer.style.display = 'block';
-        subscribeToChatRoom(chatRoomId);
+        subscribeToChatRoom(room.chatRoomId);
       });
-      chatRoomsContainer.appendChild(roomElement);
+
+      chatRoomsContainer.appendChild(roomElement); // 컨테이너에 추가
     });
   }
+
 
   function subscribeToChatRoom(chatRoomId) {
     stompClient.subscribe(`/topic/chat/${chatRoomId}`, message => {
