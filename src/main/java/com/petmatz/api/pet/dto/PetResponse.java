@@ -15,7 +15,8 @@ public record PetResponse(
         int age,
         String temperament,
         String size,
-        String preferredWalkingLocation
+        String preferredWalkingLocation,
+        String comment
 ) {
     public static PetResponse of(PetServiceDto serviceDto) {
         return new PetResponse(
@@ -29,7 +30,8 @@ public record PetResponse(
                 serviceDto.age(),
                 serviceDto.temperament(),
                 serviceDto.size(),
-                serviceDto.preferredWalkingLocation()
+                serviceDto.preferredWalkingLocation(),
+                serviceDto.comment()
         );
     }
 
@@ -45,7 +47,9 @@ public record PetResponse(
                 dto.age() != null ? dto.age() : 0, // age (null 값 처리)
                 dto.temperament(),                // temperament
                 dto.size(),                       // size
-                dto.preferredWalkingLocation()    // preferredWalkingLocation
+                dto.preferredWalkingLocation(),   // preferredWalkingLocation
+                dto.comment()
+
         );
     }
 
@@ -62,7 +66,8 @@ public record PetResponse(
                 pet.getAge() != null ? pet.getAge() : 0,
                 pet.getTemperament(),
                 pet.getSize().toString(),
-                pet.getPreferredWalkingLocation()
+                pet.getPreferredWalkingLocation(),
+                pet.getComment()
         );
     }
 }

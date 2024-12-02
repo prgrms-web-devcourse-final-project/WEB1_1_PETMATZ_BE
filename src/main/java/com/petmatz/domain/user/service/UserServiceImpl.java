@@ -19,6 +19,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -100,27 +101,33 @@ public class UserServiceImpl implements UserService {
             String certificationNumber = info.getCertificationNumber();
 
             // 인증 번호 확인
-            Certification Certification = certificationRepository.findTopByAccountIdOrderByCreatedAtDesc(accountId);
-            boolean isMatched = Certification.getAccountId().equals(accountId) &&
-                    Certification.getCertificationNumber().equals(certificationNumber);
-            if (!isMatched) return SignUpResponseDto.certificationFail();
+            Certification certification = certificationRepository.findTopByAccountIdOrderByCreatedAtDesc(accountId);
+            if (certification == null || !certification.getCertificationNumber().equals(certificationNumber)) {
+                return SignUpResponseDto.certificationFail();
+            }
 
             // 비밀번호 암호화 후 저장
             String password = info.getPassword();
             String encodedPassword = passwordEncoder.encode(password);
             info.setPassword(encodedPassword);
 
+            // 외부 호출 분리
             String region = geocodingService.getRegionFromCoordinates(info.getLatitude(), info.getLongitude());
+
             User user = UserFactory.createNewUser(info, encodedPassword, region);
             userRepository.save(user);
 
             // 인증 엔티티 삭제
             certificationRepository.deleteAllByAccountId(accountId);
+
+            return SignUpResponseDto.success();
+        } catch (RuntimeException e) {
+            log.error("회원 가입 실패: {}", e);
+            throw e;
         } catch (Exception e) {
-            log.info("회원 가입 실패: {}", e);
-            return LogInResponseDto.databaseError();
+            log.error("회원 가입 중 처리되지 않은 예외 발생: {}", e);
+            throw new RuntimeException("회원 가입 중 처리되지 않은 예외", e);
         }
-        return SignUpResponseDto.success();  // 회원 가입 성공 응답
     }
 
     @Override
@@ -147,6 +154,7 @@ public class UserServiceImpl implements UserService {
             String token = jwtProvider.create(user.getId(), user.getAccountId());
             log.info("JWT 생성 완료: {}", token);
 
+<<<<<<< HEAD
             // JWT 쿠키에 저장
             Cookie jwtCookie = new Cookie("jwt", token);
             jwtCookie.setHttpOnly(true);  // XSS 방지
@@ -154,6 +162,17 @@ public class UserServiceImpl implements UserService {
             jwtCookie.setPath("/");      // 모든 경로에서 접근 가능
             jwtCookie.setMaxAge(3600);   // 1시간 유효기간
             response.addCookie(jwtCookie);
+=======
+            ResponseCookie responseCookie = ResponseCookie.from("jwt", token)
+                    .httpOnly(true)           // XSS 방지
+                    .secure(true)             // HTTPS만 허용
+                    .path("/")                // 모든 경로에서 접근 가능
+                    .sameSite("None")         // SameSite=None 설정
+                    .maxAge((3600))
+                    .build();
+            response.addHeader("Set-Cookie", responseCookie.toString());
+
+>>>>>>> 591a4f4de2d5564861b64f9b4a819c6cd773968c
             // 로그인 성공 응답 반환
             return SignInResponseDto.success(user); // User 객체 전달
         } catch (Exception e) {
@@ -203,19 +222,27 @@ public class UserServiceImpl implements UserService {
             return GetMyProfileResponseDto.databaseError();
         }
     }
-
     @Override
     public ResponseEntity<? super GetOtherProfileResponseDto> getOtherMypage(Long userId) {
         try {
+            // 현재 로그인한 사용자 ID 가져오기
+            Long myId = jwtExtractProvider.findIdFromJwt();
+
+            // 조회 대상 사용자 정보 가져오기
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
+            // 조회 대상 사용자가 존재하는지 확인
             boolean exists = userRepository.existsById(userId);
             if (!exists) {
                 return GetOtherProfileResponseDto.userNotFound();
             }
 
-            return GetOtherProfileResponseDto.success(user);
+            // 현재 로그인한 사용자가 조회 대상 사용자를 찜했는지 확인
+            boolean isMyHeartUser = heartRepository.existsByMyIdAndHeartedId(myId, userId);
+
+            // 응답 생성
+            return GetOtherProfileResponseDto.success(user, isMyHeartUser);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -247,19 +274,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<? super HeartingResponseDto> hearting(HeartingRequestDto dto) {
         try {
             Long heartedId = dto.getHeartedId();
 
+            // 대상 사용자가 존재하는지 확인
             boolean exists = userRepository.existsById(heartedId);
             if (!exists) {
                 return HeartingResponseDto.heartedIdNotFound();
             }
 
+            // 현재 사용자 ID 가져오기
             Long userId = jwtExtractProvider.findIdFromJwt();
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
+            // DB에서 myId와 heartedId로 Heart 레코드 확인
+            Optional<Heart> existingHeart = heartRepository.findByMyIdAndHeartedId(user.getId(), heartedId);
+
+            if (existingHeart.isPresent()) {
+                // 찜하기 해제 (DB에서 삭제)
+                heartRepository.delete(existingHeart.get());
+                return HeartingResponseDto.success(); // 찜하기 해제 성공 응답
+            }
+
+            // 찜하기 진행 (DB에 저장)
             Heart heart = Heart.builder()
                     .myId(user.getId())
                     .heartedId(heartedId)
@@ -268,14 +308,13 @@ public class UserServiceImpl implements UserService {
                     .build();
             heartRepository.save(heart);
 
+            return HeartingResponseDto.success(); // 찜하기 성공 응답
 
         } catch (Exception e) {
             log.info("찜하기 실패: {}", e);
-            return HeartingResponseDto.databaseError();
+            return HeartingResponseDto.databaseError(); // 데이터베이스 오류 응답
         }
-        return HeartingResponseDto.success();
     }
-
     @Override
     public ResponseEntity<? super GetHeartingListResponseDto> getHeartedList() {
         try {
