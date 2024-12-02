@@ -212,19 +212,27 @@ public class UserServiceImpl implements UserService {
             return GetMyProfileResponseDto.databaseError();
         }
     }
-
     @Override
     public ResponseEntity<? super GetOtherProfileResponseDto> getOtherMypage(Long userId) {
         try {
+            // 현재 로그인한 사용자 ID 가져오기
+            Long myId = jwtExtractProvider.findIdFromJwt();
+
+            // 조회 대상 사용자 정보 가져오기
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
+            // 조회 대상 사용자가 존재하는지 확인
             boolean exists = userRepository.existsById(userId);
             if (!exists) {
                 return GetOtherProfileResponseDto.userNotFound();
             }
 
-            return GetOtherProfileResponseDto.success(user);
+            // 현재 로그인한 사용자가 조회 대상 사용자를 찜했는지 확인
+            boolean isMyHeartUser = heartRepository.existsByMyIdAndHeartedId(myId, userId);
+
+            // 응답 생성
+            return GetOtherProfileResponseDto.success(user, isMyHeartUser);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -256,19 +264,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<? super HeartingResponseDto> hearting(HeartingRequestDto dto) {
         try {
             Long heartedId = dto.getHeartedId();
 
+            // 대상 사용자가 존재하는지 확인
             boolean exists = userRepository.existsById(heartedId);
             if (!exists) {
                 return HeartingResponseDto.heartedIdNotFound();
             }
 
+            // 현재 사용자 ID 가져오기
             Long userId = jwtExtractProvider.findIdFromJwt();
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
+            // DB에서 myId와 heartedId로 Heart 레코드 확인
+            Optional<Heart> existingHeart = heartRepository.findByMyIdAndHeartedId(user.getId(), heartedId);
+
+            if (existingHeart.isPresent()) {
+                // 찜하기 해제 (DB에서 삭제)
+                heartRepository.delete(existingHeart.get());
+                return HeartingResponseDto.success(); // 찜하기 해제 성공 응답
+            }
+
+            // 찜하기 진행 (DB에 저장)
             Heart heart = Heart.builder()
                     .myId(user.getId())
                     .heartedId(heartedId)
@@ -277,14 +298,13 @@ public class UserServiceImpl implements UserService {
                     .build();
             heartRepository.save(heart);
 
+            return HeartingResponseDto.success(); // 찜하기 성공 응답
 
         } catch (Exception e) {
             log.info("찜하기 실패: {}", e);
-            return HeartingResponseDto.databaseError();
+            return HeartingResponseDto.databaseError(); // 데이터베이스 오류 응답
         }
-        return HeartingResponseDto.success();
     }
-
     @Override
     public ResponseEntity<? super GetHeartingListResponseDto> getHeartedList() {
         try {
