@@ -71,7 +71,7 @@ public class WebSecurityConfig {
 
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        .authorizationEndpoint(endpoint -> endpoint.baseUri("/api/auth/oauth2")) // OAuth2 로그인 엔드포인트 설정
+                        .authorizationEndpoint(endpoint -> endpoint.baseUri("/oauth2/authorization")) // OAuth2 로그인 엔드포인트 설정
                         .redirectionEndpoint(endpoint -> endpoint.baseUri("/oauth2/callback/*")) // 리디렉션 엔드포인트 설정
                         .userInfoEndpoint(endpoint -> endpoint.userService(oAuth2UserService)) // 사용자 정보 서비스 설정
                         .successHandler(oAuthSuccessHandler) // 성공 핸들러 설정
