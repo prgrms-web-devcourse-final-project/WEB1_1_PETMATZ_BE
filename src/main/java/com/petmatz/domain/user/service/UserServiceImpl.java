@@ -154,15 +154,7 @@ public class UserServiceImpl implements UserService {
             String token = jwtProvider.create(user.getId(), user.getAccountId());
             log.info("JWT 생성 완료: {}", token);
 
-<<<<<<< HEAD
-            // JWT 쿠키에 저장
-            Cookie jwtCookie = new Cookie("jwt", token);
-            jwtCookie.setHttpOnly(true);  // XSS 방지
-//            jwtCookie.setSecure(true);   // HTTPS만 허용
-            jwtCookie.setPath("/");      // 모든 경로에서 접근 가능
-            jwtCookie.setMaxAge(3600);   // 1시간 유효기간
-            response.addCookie(jwtCookie);
-=======
+
             ResponseCookie responseCookie = ResponseCookie.from("jwt", token)
                     .httpOnly(true)           // XSS 방지
                     .secure(true)             // HTTPS만 허용
@@ -171,8 +163,6 @@ public class UserServiceImpl implements UserService {
                     .maxAge((3600))
                     .build();
             response.addHeader("Set-Cookie", responseCookie.toString());
-
->>>>>>> 591a4f4de2d5564861b64f9b4a819c6cd773968c
             // 로그인 성공 응답 반환
             return SignInResponseDto.success(user); // User 객체 전달
         } catch (Exception e) {

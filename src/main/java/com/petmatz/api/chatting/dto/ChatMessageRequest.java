@@ -28,6 +28,7 @@ public record ChatMessageRequest(
                 .msg(msg)
                 .msg_type(msg_type)
                 .msgTimestamp(LocalDateTime.now())
+                .msg_type(ChatMessageMsgType.MSG)
                 .build();
     }
 

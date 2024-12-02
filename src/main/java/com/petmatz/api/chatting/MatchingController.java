@@ -74,7 +74,7 @@ public class MatchingController {
             @RequestParam(defaultValue = "5") int pageSize,
             @RequestParam(defaultValue = "1") int startPage
     ) {
-        List<ChatRoomMetaDataInfo> chatRoomList = chatRoomService.getChatRoomList(pageSize, startPage);
+        List<ChatRoomMetaDataInfo> chatRoomList = chatRoomService.selectChatRoomList(pageSize, startPage);
         for (ChatRoomMetaDataInfo chatRoomMetaDataInfo : chatRoomList) {
             System.out.println(chatRoomMetaDataInfo.toString());
         }

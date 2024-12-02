@@ -48,7 +48,7 @@ public class ChatRoomService {
         return chatRoomId;
     }
 
-    public List<ChatRoomMetaDataInfo> getChatRoomList(int pageSize, int startPage) {
+    public List<ChatRoomMetaDataInfo> selectChatRoomList(int pageSize, int startPage) {
         String userEmail = jwtExtractProvider.findAccountIdFromJwt();
 
         List<UserToChatRoomEntity> chatRoomNumber = chatRoomReader.findChatRoomNumber(userEmail);
@@ -100,5 +100,12 @@ public class ChatRoomService {
         chatMessageDeleter.deleteChatMessageDocs(roomId);
         chatRoomMetaDataDeleter.deleteChatRoomMetaDataDocs(roomId);
         chatReadStatusDeleter.deleteChatReadStatusDocs(strings, roomId);
+    }
+
+    public String selectChatRoomUserInfo(String chatRoomId) {
+        String userEmail = jwtExtractProvider.findAccountIdFromJwt();
+        Optional<List<String>> userEmailList = chatRoomReader.selectChatRoomUserList(chatRoomId);
+        List<String> list = userEmailList.get();
+        return userEmail.equals(list.get(0)) ? list.get(1) : list.get(0);
     }
 }

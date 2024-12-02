@@ -6,6 +6,7 @@ import com.petmatz.domain.chatting.docs.ChatRoomDocs;
 import com.petmatz.domain.chatting.utils.ChatUtils;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -36,8 +37,8 @@ public class ChatMessageReader {
     }
 
     //채팅 내역을 전부 조회, Page을 사용해 Page단위로 끊어서 조회 및 날짜순으로 정렬
-    public List<ChatMessageInfo> selectChatMessagesHistory(String chatRoomsId, int pageNumber, int pageSize) {
-        Aggregation query = createQuerySelectChatMessagesPaging(chatRoomsId, pageNumber, pageSize);
+    public List<ChatMessageInfo> selectChatMessagesHistory(String chatRoomsId, int pageNumber, int pageSize, LocalDateTime lastFetchTimestamp) {
+        Aggregation query = createQuerySelectChatMessagesPaging(chatRoomsId, pageNumber, pageSize, lastFetchTimestamp);
 
         AggregationResults<ChatMessageInfo> aggregate =
                 mongoTemplate.aggregate(query, "chat_rooms", ChatMessageInfo.class);
@@ -72,19 +73,31 @@ public class ChatMessageReader {
 
     //----아래부터는 쿼리 생성 -----//
 
-    protected Aggregation createQuerySelectChatMessagesPaging(String chatRoomsId, int pageNumber, int pageSize) {
+    protected Aggregation createQuerySelectChatMessagesPaging(String chatRoomsId, int pageNumber, int pageSize, LocalDateTime lastFetchTimestamp) {
         int skipCount = (pageNumber - 1) * pageSize; // 시작 위치 계산
 
+        if (lastFetchTimestamp == null) {
+            lastFetchTimestamp = LocalDateTime.now();
+            System.out.println(lastFetchTimestamp);
+        }
+
+        // 기본 Criteria 생성
+        Criteria criteria = Criteria.where("_id").is(chatRoomsId).and("messages").elemMatch(Criteria.where("msgTimestamp").lt(lastFetchTimestamp));
+
         return Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("_id").is(chatRoomsId)), // 특정 채팅방 필터
+                Aggregation.match(criteria), // 조건 필터링
                 Aggregation.unwind("messages"), // 배열의 각 메시지를 분리
-                Aggregation.project("messages.senderEmail", "messages.receiverEmail", "messages.msg", "messages.msgTimestamp")
+                Aggregation.match(Criteria.where("messages.msgTimestamp").lt(lastFetchTimestamp)), // 분리 후 추가 확인
+                Aggregation.sort(Sort.Direction.DESC, "messages.msgTimestamp"), // 최신 메시지 정렬
+                Aggregation.project("messages.senderEmail", "messages.receiverEmail", "messages.msg", "messages.readStatus", "messages.msg_type", "messages.msgTimestamp")
                         .and("messages.msgTimestamp").as("msgTimestamp"),
-                Aggregation.sort(Sort.Direction.DESC, "msgTimestamp"), // 최신 메시지 정렬
                 Aggregation.skip(skipCount), // 시작 위치
                 Aggregation.limit(pageSize) // 한 페이지의 크기
         );
     }
+
+
+
 
     protected Aggregation createQuerySelectChatMessagesPaging(String chatRoomsId,String userEmail,LocalDateTime lastReadTimestamp, int pageNumber, int pageSize) {
         return Aggregation.newAggregation(
