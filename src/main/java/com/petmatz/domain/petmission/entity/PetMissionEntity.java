@@ -36,9 +36,6 @@ public class PetMissionEntity {
     private Pet pet;
 
 
-//    @OneToMany(mappedBy = "petMission", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<UserToPetMissionEntity> userPetMissions = new ArrayList<>();
-
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "pet_mission_id")
     private List<PetMissionAskEntity> petMissionAsks = new ArrayList<>();
@@ -49,18 +46,15 @@ public class PetMissionEntity {
         this.petMissionEnd = petMissionEnd;
         this.status = status;
         this.pet = pet;
-//        this.userPetMissions = userPetMissions;
         this.petMissionAsks = petMissionAsks;
     }
 
 
     public static PetMissionEntity of(PetMissionInfo petMissionInfo, Pet pet) {
-        System.out.println("petMissionInfo.toString() :: " + petMissionInfo.toString());
         return PetMissionEntity.builder()
                 .petMissionStarted(petMissionInfo.missionStarted())
                 .petMissionEnd(petMissionInfo.missionEnd())
                 .status(PetMissionStatusZip.fromDescription("시작"))
-//                .userPetMissions(userPetMissions)
                 .pet(pet)
                 .petMissionAsks(petMissionInfo.petMissionAskInfo().stream().map(
                         PetMissionAskEntity::of

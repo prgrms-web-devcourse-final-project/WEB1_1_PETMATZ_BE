@@ -1,5 +1,6 @@
 package com.petmatz.api.chatting.dto;
 
+import com.petmatz.common.constants.ChatMessageMsgType;
 import com.petmatz.domain.chatting.dto.ChatMessageInfo;
 import lombok.Builder;
 
@@ -15,6 +16,8 @@ public record ChatMessage(
 
         Boolean readStatus,
 
+        ChatMessageMsgType msg_type,
+
         LocalDateTime msgTimestamp
 ) {
     public static ChatMessage of(ChatMessageInfo chatMessageInfo) {
@@ -22,7 +25,9 @@ public record ChatMessage(
                 .senderId(chatMessageInfo.getSenderEmail())
                 .receiverId(chatMessageInfo.getReceiverEmail())
                 .msg(chatMessageInfo.getMsg())
+                .msg_type(chatMessageInfo.getMsg_type())
                 .msgTimestamp(chatMessageInfo.getMsgTimestamp())
+                .readStatus(chatMessageInfo.isReadStatus())
                 .build();
     }
 }

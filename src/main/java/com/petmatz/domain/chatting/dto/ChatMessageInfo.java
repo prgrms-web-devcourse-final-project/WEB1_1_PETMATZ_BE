@@ -25,11 +25,12 @@ public class ChatMessageInfo {
 
 
     @Builder
-    public ChatMessageInfo(String senderEmail, String receiverEmail, String msg, LocalDateTime msgTimestamp, boolean readStatus) {
+    public ChatMessageInfo(String senderEmail, String receiverEmail, String msg, LocalDateTime msgTimestamp, ChatMessageMsgType msg_type, boolean readStatus) {
         this.senderEmail = senderEmail;
         this.receiverEmail = receiverEmail;
         this.msg = msg;
         this.msgTimestamp = msgTimestamp;
+        this.msg_type = msg_type;
         this.readStatus = readStatus;
     }
 

@@ -48,9 +48,7 @@ public class ChatRoomService {
         return chatRoomId;
     }
 
-
-    //TODO other 추가
-    public List<ChatRoomMetaDataInfo> getChatRoomList(int pageSize, int startPage) {
+    public List<ChatRoomMetaDataInfo> selectChatRoomList(int pageSize, int startPage) {
         String userEmail = jwtExtractProvider.findAccountIdFromJwt();
 
         List<UserToChatRoomEntity> chatRoomNumber = chatRoomReader.findChatRoomNumber(userEmail);
@@ -60,7 +58,6 @@ public class ChatRoomService {
                 .toList();
 
         Map<String, Integer> unreadCountList = updateMessageStatus(roomNumberList, userEmail, pageSize, startPage);
-        //User 추가해서 아래의 메서드에 넘기기
         Map<String, IChatUserInfo> userList = getUserList(chatRoomNumber, userEmail);
 
         return chatRoomMetaDataReader.findChatRoomMetaDataInfo(roomNumberList, unreadCountList, userList);
@@ -74,8 +71,7 @@ public class ChatRoomService {
             for (UserToChatRoomEntity participant : participants) {
                 if (!participant.getUser().getAccountId().equals(userEmail)) {
                     IChatUserInfo userInfo = IChatUserInfo.of(
-                            participant.getUser().getAccountId(),
-                            participant.getUser().getProfileImg()
+                            participant.getUser()
                     );
                     userList.put(userToChatRoomEntity.getChatRoom().getId().toString(), userInfo);
                     break; // 다른 참여자를 하나만 찾으면 됨
@@ -104,5 +100,12 @@ public class ChatRoomService {
         chatMessageDeleter.deleteChatMessageDocs(roomId);
         chatRoomMetaDataDeleter.deleteChatRoomMetaDataDocs(roomId);
         chatReadStatusDeleter.deleteChatReadStatusDocs(strings, roomId);
+    }
+
+    public String selectChatRoomUserInfo(String chatRoomId) {
+        String userEmail = jwtExtractProvider.findAccountIdFromJwt();
+        Optional<List<String>> userEmailList = chatRoomReader.selectChatRoomUserList(chatRoomId);
+        List<String> list = userEmailList.get();
+        return userEmail.equals(list.get(0)) ? list.get(1) : list.get(0);
     }
 }

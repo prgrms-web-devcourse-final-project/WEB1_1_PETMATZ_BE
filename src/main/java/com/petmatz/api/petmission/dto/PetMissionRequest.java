@@ -8,8 +8,8 @@ import java.util.List;
 
 public record PetMissionRequest(
 
-        //JWT 이용
-        Long careId,
+//        //JWT 이용
+//        Long careId,
         Long receiverId,
         String petId,
         LocalDateTime missionStarted,
@@ -20,7 +20,7 @@ public record PetMissionRequest(
 
     public PetMissionInfo of() {
         return PetMissionInfo.builder()
-                .careId(careId)
+//                .careId(careId)
                 .receiverId(receiverId)
                 .petId(petId)
                 .missionStarted(missionStarted)
