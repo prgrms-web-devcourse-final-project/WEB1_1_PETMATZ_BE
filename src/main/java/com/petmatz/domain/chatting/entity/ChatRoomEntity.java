@@ -1,7 +1,5 @@
 package com.petmatz.domain.chatting.entity;
 
-import com.petmatz.domain.chatting.dto.ChatRoomListInfo;
-import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import com.petmatz.domain.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,23 +24,6 @@ public class ChatRoomEntity extends BaseEntity {
     public void addParticipant(UserToChatRoomEntity participant) {
         this.participants.add(participant);
         participant.addChatRoom(this); // 연관관계 편의 메서드
-    }
-
-    public ChatRoomListInfo toChatRoomListInfo(String userName) {
-        return ChatRoomListInfo.builder()
-                .chatRoomId(String.valueOf(id))
-                .chatRoomName(choseUserName(userName))
-                .build();
-    }
-
-    private String choseUserName(String userName) {
-        for (UserToChatRoomEntity participant : participants) {
-            if (!participant.getUser().getEmail().equals(userName)) {
-                // 현재 사용자가 아닌 참여자의 이름 반환
-                return participant.getUser().getEmail();
-            }
-        }
-        throw new IllegalArgumentException("No other participant found in the chat room for user: " + userName);
     }
 
 }

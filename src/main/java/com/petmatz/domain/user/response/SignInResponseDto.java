@@ -18,7 +18,6 @@ public class SignInResponseDto extends LogInResponseDto {
     private String nickname;
     private LoginRole loginRole;
     private LoginType loginType;
-    private Role role;
     private List<PreferredSize> preferredSizes; // 변경된 필드
     private Gender gender;
     private Boolean isRegistered;
@@ -35,7 +34,6 @@ public class SignInResponseDto extends LogInResponseDto {
         this.nickname = user.getNickname();
         this.loginRole = user.getLoginRole();
         this.loginType = user.getLoginType();
-        this.role = user.getRole();
         this.preferredSizes = user.getPreferredSizes(); // 리스트를 직접 할당
         this.gender = user.getGender();
         this.isRegistered = user.getIsRegistered();
