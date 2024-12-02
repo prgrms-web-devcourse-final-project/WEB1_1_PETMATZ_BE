@@ -10,6 +10,7 @@ import com.petmatz.domain.user.service.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -71,8 +72,8 @@ public class ChatController {
     })
     public Response<ChatMessageResponse> selectChatMessage(
                                          @RequestParam String chatRoomId,
-                                         @RequestParam LocalDateTime lastFetchTimestamp,
-                                         @RequestParam(defaultValue = "2") int pageSize,
+                                         @RequestParam(required = false) @Nullable LocalDateTime lastFetchTimestamp,
+                                         @RequestParam(defaultValue = "10") int pageSize,
                                          @RequestParam(defaultValue = "1") int startPage
     ) {
         String receiverEmail = chatRoomService.selectChatRoomUserInfo(chatRoomId);

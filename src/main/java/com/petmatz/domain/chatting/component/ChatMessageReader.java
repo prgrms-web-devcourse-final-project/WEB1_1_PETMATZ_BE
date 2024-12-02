@@ -76,16 +76,28 @@ public class ChatMessageReader {
     protected Aggregation createQuerySelectChatMessagesPaging(String chatRoomsId, int pageNumber, int pageSize, LocalDateTime lastFetchTimestamp) {
         int skipCount = (pageNumber - 1) * pageSize; // 시작 위치 계산
 
+        if (lastFetchTimestamp == null) {
+            lastFetchTimestamp = LocalDateTime.now();
+            System.out.println(lastFetchTimestamp);
+        }
+
+        // 기본 Criteria 생성
+        Criteria criteria = Criteria.where("_id").is(chatRoomsId).and("messages").elemMatch(Criteria.where("msgTimestamp").lt(lastFetchTimestamp));
+
         return Aggregation.newAggregation(
-                Aggregation.match(Criteria.where("_id").is(chatRoomsId)), // 특정 채팅방 필터
+                Aggregation.match(criteria), // 조건 필터링
                 Aggregation.unwind("messages"), // 배열의 각 메시지를 분리
-                Aggregation.project("messages.senderEmail", "messages.receiverEmail", "messages.msg", "messages.msgTimestamp", "messages.msg_type")
+                Aggregation.match(Criteria.where("messages.msgTimestamp").lt(lastFetchTimestamp)), // 분리 후 추가 확인
+                Aggregation.sort(Sort.Direction.DESC, "messages.msgTimestamp"), // 최신 메시지 정렬
+                Aggregation.project("messages.senderEmail", "messages.receiverEmail", "messages.msg", "messages.readStatus", "messages.msg_type", "messages.msgTimestamp")
                         .and("messages.msgTimestamp").as("msgTimestamp"),
-                Aggregation.sort(Sort.Direction.DESC, "msgTimestamp"), // 최신 메시지 정렬
                 Aggregation.skip(skipCount), // 시작 위치
                 Aggregation.limit(pageSize) // 한 페이지의 크기
         );
     }
+
+
+
 
     protected Aggregation createQuerySelectChatMessagesPaging(String chatRoomsId,String userEmail,LocalDateTime lastReadTimestamp, int pageNumber, int pageSize) {
         return Aggregation.newAggregation(
