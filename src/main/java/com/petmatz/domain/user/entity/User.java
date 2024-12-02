@@ -94,6 +94,9 @@ public class User extends BaseEntity {
     @Column(name="region")
     private String region;
 
+    @Column(name = "region_code")
+    private Integer regionCode;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserToChatRoomEntity> chatRooms = new ArrayList<>();
 
