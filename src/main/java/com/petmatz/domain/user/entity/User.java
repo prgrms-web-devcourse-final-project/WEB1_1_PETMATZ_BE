@@ -50,10 +50,6 @@ public class User extends BaseEntity {
     private LoginType loginType; // 'Normal', 'Kakao'
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role")
-    private Role role; //'Dol' or 'Mat'
-
-    @Enumerated(EnumType.STRING)
     @Column(name = "gender")
     private Gender gender; // 'Male', 'Female'
 

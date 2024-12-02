@@ -2,7 +2,6 @@ package com.petmatz.domain.user.response;
 
 import com.petmatz.domain.user.constant.Gender;
 import com.petmatz.domain.user.constant.PreferredSize;
-import com.petmatz.domain.user.constant.Role;
 import com.petmatz.domain.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +16,6 @@ public class GetMyUserDto {
     private String accountId;
     private String nickname;
     private String profileImg;
-    private Role role;
     private List<PreferredSize> preferredSizes; // 변경: List로 수정
     private Gender gender;
     private String introduction;
@@ -35,7 +33,6 @@ public class GetMyUserDto {
         this.accountId = user.getAccountId();
         this.nickname = user.getNickname();
         this.profileImg = user.getProfileImg();
-        this.role = user.getRole();
         this.preferredSizes = user.getPreferredSizes(); // 수정: 리스트 그대로 할당
         this.gender = user.getGender();
         this.introduction=user.getIntroduction();
