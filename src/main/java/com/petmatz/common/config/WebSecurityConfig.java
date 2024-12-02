@@ -92,14 +92,14 @@ public class WebSecurityConfig {
     @Bean
     protected CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOrigin("*"); // 모든 Origin 허용
+//        corsConfiguration.addAllowedOrigin("*"); // 모든 Origin 허용
         corsConfiguration.addAllowedHeader("*"); // 모든 Header 허용
         corsConfiguration.addAllowedMethod("*"); // 모든 Method 허용
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.addAllowedOriginPattern("*"); // 모든 Origin 허용
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", corsConfiguration); // API 경로에 대해 CORS 설정 적용
+        source.registerCorsConfiguration("/**", corsConfiguration); // API 경로에 대해 CORS 설정 적용
         return source;
     }
 }
