@@ -50,7 +50,7 @@ public class MatchSizeService {
 
         if (preferredSizes.contains(targetSize)) {
             if (totalPreferred == 1) {
-                if (preferredSizes.contains("Small") || preferredSizes.contains("Large")) {
+                if (preferredSizes.contains("SMALL") || preferredSizes.contains("LARGE")) {
                     return 20.0;
                 }
                 return 18.0;
