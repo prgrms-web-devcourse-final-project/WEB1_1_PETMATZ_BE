@@ -3,6 +3,7 @@ package com.petmatz.api.chatting;
 import com.petmatz.api.chatting.dto.*;
 import com.petmatz.api.global.dto.Response;
 import com.petmatz.domain.chatting.ChatMessageService;
+import com.petmatz.domain.chatting.ChatRoomService;
 import com.petmatz.domain.chatting.dto.ChatMessageInfo;
 import com.petmatz.domain.user.info.UserInfo;
 import com.petmatz.domain.user.service.UserServiceImpl;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
@@ -30,6 +33,7 @@ public class ChatController {
     private final ChatMessageService chatService;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final UserServiceImpl userService;
+    private final ChatRoomService chatRoomService;
 
 
     //TODO 메세지 전송 ( 구독한 쪽으로 )
@@ -45,6 +49,7 @@ public class ChatController {
     // TODO 멍멍이 부탁같은 경우 채팅 DTO랑 똑같이 만들기
 
     //TODO 메세지 읽음 처리 ( 구독한 쪽으로 ), senderId, chatRoomId
+    //TDO 상대편 마지막 읽음 시간 재측정,
     @MessageMapping("/chat/{chatRoomId}/read")
     public void sendReadStatus(@Payload ChatReadStatusDirect chatReadStatusDirect,
                                @DestinationVariable String chatRoomId) {
@@ -59,19 +64,19 @@ public class ChatController {
     @GetMapping("/chat/message")
     @Operation(summary = "메세지 내역 긁어오기", description = "채팅방의 메세지 내역을 긁어오는 API")
     @Parameters({
-            @Parameter(name = "receiver", description = "메세지를 받는 유저의 ID", example = "2"),
             @Parameter(name = "chatRoomId", description = "채팅방 번호", example = "1"),
             @Parameter(name = "pageSize", description = "긁어올 페이지의 사이즈", example = "20 ( Default : 15 )"),
-            @Parameter(name = "startPage", description = "현재 페이지의 번호 ( 0은 안됨!! )", example = "3 ( Default 1 )")
+            @Parameter(name = "startPage", description = "현재 페이지의 번호 ( 0은 안됨!! )", example = "3 ( Default 1 )"),
+            @Parameter(name = "lastReadTimestamp", description = "현재 페이지의 번호 ( 0은 안됨!! )", example = "3 ( Default 1 )")
     })
     public Response<ChatMessageResponse> selectChatMessage(
-                                         @RequestParam String receiverEmail,
                                          @RequestParam String chatRoomId,
-                                         @RequestParam(defaultValue = "15") int pageSize,
+                                         @RequestParam LocalDateTime lastReadTimestamp,
+                                         @RequestParam(defaultValue = "2") int pageSize,
                                          @RequestParam(defaultValue = "1") int startPage
     ) {
-
-        Page<ChatMessageInfo> chatMessageInfos = chatService.selectMessage(receiverEmail, chatRoomId, startPage, pageSize);
+        String receiverEmail = chatRoomService.selectChatRoomUserInfo(chatRoomId);
+        Page<ChatMessageInfo> chatMessageInfos = chatService.selectMessage(receiverEmail, chatRoomId, startPage, pageSize, lastReadTimestamp);
         UserInfo userInfo = userService.selectUserInfo(receiverEmail);
 
 

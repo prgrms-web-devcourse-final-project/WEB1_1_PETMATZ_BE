@@ -101,4 +101,11 @@ public class ChatRoomService {
         chatRoomMetaDataDeleter.deleteChatRoomMetaDataDocs(roomId);
         chatReadStatusDeleter.deleteChatReadStatusDocs(strings, roomId);
     }
+
+    public String selectChatRoomUserInfo(String chatRoomId) {
+        String userEmail = jwtExtractProvider.findAccountIdFromJwt();
+        Optional<List<String>> userEmailList = chatRoomReader.selectChatRoomUserList(chatRoomId);
+        List<String> list = userEmailList.get();
+        return userEmail.equals(list.get(0)) ? list.get(1) : list.get(0);
+    }
 }

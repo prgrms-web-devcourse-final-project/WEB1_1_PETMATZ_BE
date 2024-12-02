@@ -132,7 +132,7 @@
             .then(response => response.json())
             .then(data => {
               if (data.responseCode === "SUCCESS") {
-                displayChatRooms(data.result);
+                displayChatRooms(data.result, caregiverInfo);
                 updateStatus('Fetched chat rooms successfully.', true);
               } else {
                 updateStatus(`Failed to fetch chat rooms: ${data.responseCode}`);
@@ -144,7 +144,7 @@
             });
   });
 
-  function displayChatRooms(chatRooms) {
+  function displayChatRooms(chatRooms, caregiverInfo) {
     chatRoomsContainer.innerHTML = '<h2>Your Chat Rooms</h2>'; // 채팅방 컨테이너 초기화
 
     chatRooms.forEach(room => {
@@ -169,9 +169,10 @@
         <strong>Partner:</strong> ${room.other.userName} (${room.other.userEmail})
         <img src="${room.other.profileURL}" alt="Profile Image" style="width: 50px; height: 50px; border-radius: 50%; margin-left: 10px;">
       </div>
+      <button class="unsubscribeBtn">Unsubscribe</button>
     `;
 
-      // 클릭 이벤트로 채팅방 구독
+      // 채팅방 구독 이벤트
       roomElement.addEventListener('click', () => {
         chatRoomNumber = room.chatRoomId;
         chatRoomNumberSpan.textContent = room.chatRoomId;
@@ -179,9 +180,30 @@
         subscribeToChatRoom(room.chatRoomId);
       });
 
+      // 구독 해제 버튼 이벤트
+      const unsubscribeBtn = roomElement.querySelector('.unsubscribeBtn');
+      unsubscribeBtn.addEventListener('click', (event) => {
+        event.stopPropagation(); // 채팅방 클릭 이벤트와 분리
+        unsubscribeFromChatRoom(room.chatRoomId,caregiverInfo);
+      });
+
       chatRoomsContainer.appendChild(roomElement); // 컨테이너에 추가
     });
   }
+
+  // 구독 해제 함수
+  function unsubscribeFromChatRoom(chatRoomId, usrEmail) {
+    stompClient.unsubscribe(`/topic/chat/${chatRoomId}/${usrEmail}`);
+    updateStatus(`Unsubscribed from chat room ${chatRoomId}`, true);
+
+    // UI 처리: 구독 해제 시 특정 동작 추가 가능
+    if (chatRoomNumber === chatRoomId) {
+      chatRoomNumber = null;
+      chatRoomNumberSpan.textContent = '';
+      chatContainer.style.display = 'none';
+    }
+  }
+
 
 
   function subscribeToChatRoom(chatRoomId) {

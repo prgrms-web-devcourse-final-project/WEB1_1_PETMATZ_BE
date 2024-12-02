@@ -6,6 +6,7 @@ import com.petmatz.domain.chatting.docs.ChatRoomDocs;
 import com.petmatz.domain.chatting.utils.ChatUtils;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -36,8 +37,8 @@ public class ChatMessageReader {
     }
 
     //채팅 내역을 전부 조회, Page을 사용해 Page단위로 끊어서 조회 및 날짜순으로 정렬
-    public List<ChatMessageInfo> selectChatMessagesHistory(String chatRoomsId, int pageNumber, int pageSize) {
-        Aggregation query = createQuerySelectChatMessagesPaging(chatRoomsId, pageNumber, pageSize);
+    public List<ChatMessageInfo> selectChatMessagesHistory(String chatRoomsId, int pageNumber, int pageSize, LocalDateTime timestamp) {
+        Aggregation query = createQuerySelectChatMessagesPaging(chatRoomsId, pageNumber, pageSize, timestamp);
 
         AggregationResults<ChatMessageInfo> aggregate =
                 mongoTemplate.aggregate(query, "chat_rooms", ChatMessageInfo.class);
@@ -72,7 +73,7 @@ public class ChatMessageReader {
 
     //----아래부터는 쿼리 생성 -----//
 
-    protected Aggregation createQuerySelectChatMessagesPaging(String chatRoomsId, int pageNumber, int pageSize) {
+    protected Aggregation createQuerySelectChatMessagesPaging(String chatRoomsId, int pageNumber, int pageSize, LocalDateTime timestamp) {
         int skipCount = (pageNumber - 1) * pageSize; // 시작 위치 계산
 
         return Aggregation.newAggregation(
