@@ -29,9 +29,9 @@ public class ChatMessageService {
     private final ChatMessageUpdater chatMessageUpdater;
 
 
-    public Page<ChatMessageInfo> selectMessage(String receiver, String chatRoomsId, int pageNumber, int pageSize, LocalDateTime timestamp) {
+    public Page<ChatMessageInfo> selectMessage(String receiver, String chatRoomsId, int pageNumber, int pageSize, LocalDateTime lastFetchTimestamp) {
         // 페이징된 메시지 가져오기
-        List<ChatMessageInfo> chatMessageInfos = chatMessageReader.selectChatMessagesHistory(chatRoomsId, pageNumber, pageSize,timestamp);
+        List<ChatMessageInfo> chatMessageInfos = chatMessageReader.selectChatMessagesHistory(chatRoomsId, pageNumber, pageSize,lastFetchTimestamp);
 
         // 반환 데이터에 읽음 상태 업데이트
         ChatReadStatusDocs chatReadStatusDocs = chatMessageReader.selectChatMessageLastStatus(chatRoomsId, receiver);

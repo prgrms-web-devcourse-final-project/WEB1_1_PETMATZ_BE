@@ -71,12 +71,12 @@ public class ChatController {
     })
     public Response<ChatMessageResponse> selectChatMessage(
                                          @RequestParam String chatRoomId,
-                                         @RequestParam LocalDateTime lastReadTimestamp,
+                                         @RequestParam LocalDateTime lastFetchTimestamp,
                                          @RequestParam(defaultValue = "2") int pageSize,
                                          @RequestParam(defaultValue = "1") int startPage
     ) {
         String receiverEmail = chatRoomService.selectChatRoomUserInfo(chatRoomId);
-        Page<ChatMessageInfo> chatMessageInfos = chatService.selectMessage(receiverEmail, chatRoomId, startPage, pageSize, lastReadTimestamp);
+        Page<ChatMessageInfo> chatMessageInfos = chatService.selectMessage(receiverEmail, chatRoomId, startPage, pageSize, lastFetchTimestamp);
         UserInfo userInfo = userService.selectUserInfo(receiverEmail);
 
 
