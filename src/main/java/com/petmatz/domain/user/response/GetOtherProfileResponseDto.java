@@ -28,8 +28,9 @@ public class GetOtherProfileResponseDto extends LogInResponseDto {
     private Boolean isCareAvailable;
     private String mbti;
     private String region;
+    private boolean isMyHeartUser;
 
-    public GetOtherProfileResponseDto(User user) {
+    public GetOtherProfileResponseDto(User user, boolean isMyHeartUser) {
         super();
         this.id = user.getId();
         this.accountId = user.getAccountId();
@@ -44,6 +45,7 @@ public class GetOtherProfileResponseDto extends LogInResponseDto {
         this.isCareAvailable = user.getIsCareAvailable();
         this.mbti=user.getMbti();
         this.region = user.getRegion();
+        this.isMyHeartUser=isMyHeartUser;
     }
 
     public static ResponseEntity<LogInResponseDto> userNotFound() {
@@ -51,8 +53,8 @@ public class GetOtherProfileResponseDto extends LogInResponseDto {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseBody);
     }
 
-    public static ResponseEntity<LogInResponseDto> success(User user) {
-        GetOtherProfileResponseDto responseBody = new GetOtherProfileResponseDto(user);
+    public static ResponseEntity<LogInResponseDto> success(User user,boolean isMyHeartUser) {
+        GetOtherProfileResponseDto responseBody = new GetOtherProfileResponseDto(user,isMyHeartUser);
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
