@@ -64,7 +64,7 @@ public class PetMissionService {
         ).toList();
 
         List<UserToPetMissionEntity> userToPetMissionEntities = userToPetMissionInserter.insertUserToPetMission(list);
-        String chatRoomId = userToChatRoomReader.selectChatRoomId(users.get(0).getEmail(), users.get(1).getEmail());
+        String chatRoomId = userToChatRoomReader.selectChatRoomId(users.get(0).getAccountId(), users.get(1).getAccountId());
 
 
         //TODO 반환 DTO 만들기

@@ -18,7 +18,6 @@ public class UserFactory {
                 .accountId(info.getAccountId())
                 .password(encodedPassword)
                 .nickname(info.getNickname())
-                .email(info.getAccountId())
                 .profileImg(info.getProfileImg())
                 .loginRole(LoginRole.ROLE_USER)
                 .loginType(LoginType.NORMAL)
