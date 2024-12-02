@@ -37,9 +37,9 @@ public class ChatRoomEntity extends BaseEntity {
 
     private String choseUserName(String userName) {
         for (UserToChatRoomEntity participant : participants) {
-            if (!participant.getUser().getEmail().equals(userName)) {
+            if (!participant.getUser().getAccountId().equals(userName)) {
                 // 현재 사용자가 아닌 참여자의 이름 반환
-                return participant.getUser().getEmail();
+                return participant.getUser().getAccountId();
             }
         }
         throw new IllegalArgumentException("No other participant found in the chat room for user: " + userName);

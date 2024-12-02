@@ -38,9 +38,6 @@ public class User extends BaseEntity {
     @Column(name = "nickname", nullable = false)
     private String nickname;
 
-    @Column(name = "email")
-    private String email;
-
     @Column(name = "profile_img")
     private String profileImg;
 
@@ -51,10 +48,6 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "login_type")
     private LoginType loginType; // 'Normal', 'Kakao'
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role")
-    private Role role; //'Dol' or 'Mat'
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender")

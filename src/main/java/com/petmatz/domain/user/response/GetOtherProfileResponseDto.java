@@ -2,7 +2,6 @@ package com.petmatz.domain.user.response;
 
 import com.petmatz.domain.user.constant.Gender;
 import com.petmatz.domain.user.constant.PreferredSize;
-import com.petmatz.domain.user.constant.Role;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.user.common.LogInResponseDto;
 import com.petmatz.user.common.ResponseCode;
@@ -19,7 +18,6 @@ public class GetOtherProfileResponseDto extends LogInResponseDto {
     private String accountId;
     private String nickname;
     private String profileImg;
-    private Role role;
     private List<PreferredSize> preferredSize;
     private Gender gender;
     private Boolean isRegistered;
@@ -36,7 +34,6 @@ public class GetOtherProfileResponseDto extends LogInResponseDto {
         this.accountId = user.getAccountId();
         this.nickname = user.getNickname();
         this.profileImg=user.getProfileImg();
-        this.role = user.getRole();
         this.preferredSize = user.getPreferredSizes();
         this.gender = user.getGender();
         this.isRegistered = user.getIsRegistered();
