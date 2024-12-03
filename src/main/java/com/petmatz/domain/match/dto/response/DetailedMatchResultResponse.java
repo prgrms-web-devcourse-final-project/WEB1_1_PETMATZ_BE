@@ -7,7 +7,7 @@ public record DetailedMatchResultResponse(
         Integer recommendationCount,
         String region,
         Integer careCompletionCount,
-        String email
+        String accountId
         // double distance,
 
 ) {}

@@ -83,7 +83,7 @@ public class MatchService {
                                 user.getRecommendationCount(),
                                 user.getRegion(),
                                 user.getCareCompletionCount(),
-                                user.getEmail()
+                                user.getAccountId()
                         );
                     })
                     .collect(Collectors.toList());
