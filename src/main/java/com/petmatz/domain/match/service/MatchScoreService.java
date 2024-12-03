@@ -42,7 +42,6 @@ public class MatchScoreService {
 
     // sql에서 필터링 후 1000명 가져오기
     public List<UserResponse> getUsersWithinBoundingBox(Long userId) {
-//         User user = userService.findUserById(userId);
         // 임시로 사용
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저 없음: " + userId));
@@ -72,10 +71,7 @@ public class MatchScoreService {
                     String preferredSize = (String) row[4];
                     List<String> ListPreferredSize = changeList(preferredSize);
                     String mbti = (String) row[5];
-
-                    // 거리 계산
                     double distance = (double) row[6];
-                    System.out.println("User ID: " + id + ", Distance: " + distance + " meters");
 
                     return new UserResponse(id, latitude, longitude, isCareAvailable, ListPreferredSize, mbti, distance);
                 })
@@ -94,13 +90,18 @@ public class MatchScoreService {
 
         List<UserResponse> targetUsers = getUsersWithinBoundingBox(userId);
 
-        List<MatchScoreResponse> matchResults = targetUsers.stream().map(targetUser -> {
+        // 자기 자신 제외
+        List<UserResponse> filteredTargetUsers = targetUsers.stream()
+                .filter(targetUser -> !targetUser.id().equals(userId))
+                .collect(Collectors.toList());
+
+        List<MatchScoreResponse> matchResults = filteredTargetUsers.stream().map(targetUser -> {
             double distance = matchPlaceService.calculateDistanceOnly(user, targetUser);
             double distanceScore = matchPlaceService.findMatchesWithinDistance(user, targetUser);
             double careScore = matchCareService.calculateCareScore(targetUser.isCareAvailable());
 
             List<String> preferredSizes = targetUser.preferredSize();
-            double sizeScore = matchSizeService.calculateDogSizeScore(targetUser.id(), preferredSizes);
+            double sizeScore = matchSizeService.calculateDogSizeScore(user.getId(), preferredSizes);
 
             String dogMbti = getTemperamentByUserId(userId);
 
@@ -147,7 +148,8 @@ public class MatchScoreService {
         try {
             if (rawData instanceof String) {
                 ObjectMapper objectMapper = new ObjectMapper();
-                matchScores = objectMapper.readValue((String) rawData, new TypeReference<List<MatchScoreResponse>>() {});
+                matchScores = objectMapper.readValue((String) rawData, new TypeReference<List<MatchScoreResponse>>() {
+                });
             } else if (rawData instanceof List) {
                 matchScores = (List<MatchScoreResponse>) rawData;
             } else {

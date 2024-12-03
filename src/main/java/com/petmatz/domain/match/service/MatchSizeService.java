@@ -22,55 +22,42 @@ public class MatchSizeService {
     private final PetRepository petRepository;
 
     // TODO 현재는 임시로 펫 직접 조회 추후에 펫 쪽에서 사이즈 구현 의뢰 예정
-    public double calculateDogSizeScore(Long targetUserId, List<String> preferredSizes) {
-        {
-            List<Pet> userPets = petRepository.findByUserId(targetUserId);
+    public double calculateDogSizeScore(Long userId, List<String> targetPreferredSizes) {
+        List<Pet> userPets = petRepository.findByUserId(userId);
 
-            // 디버깅 로그 추가
-            System.out.println("유저 ID: " + targetUserId);
-            System.out.println("유저 펫 리스트: " + userPets);
-
-            if (userPets.isEmpty()) {
-                throw new PetServiceException(PET_NOT_FOUND);
-            }
-
-            if (preferredSizes == null || preferredSizes.isEmpty()) {
-                throw new MatchException(NULL_PREFERRED_SIZES);
-            }
-
-            double totalScore = userPets.stream()
-                    .mapToDouble(pet -> calculateScoreForPet(preferredSizes, pet.getSize().name()))
-                    .sum();
-
-            System.out.println("두두둥 : " + totalScore / userPets.size());
-            return totalScore / userPets.size();
-
+        if (userPets.isEmpty()) {
+            throw new PetServiceException(PET_NOT_FOUND);
         }
+
+        if (targetPreferredSizes == null || targetPreferredSizes.isEmpty()) {
+            throw new MatchException(NULL_PREFERRED_SIZES);
+        }
+
+        double totalScore = userPets.stream()
+                .mapToDouble(pet -> {
+                    String myPetSize = pet.getSize().name();
+                    return calculateScoreForPet(targetPreferredSizes, myPetSize); // 점수 계산
+                })
+                .sum();
+
+        return totalScore / userPets.size();
     }
 
-    private double calculateScoreForPet(List<String> preferredSizes, String targetSize) {
-        if (targetSize == null) {
+
+    private double calculateScoreForPet(List<String> targetPreferredSizes, String myPetSize) {
+        if (myPetSize == null) {
             throw new MatchException(NULL_TARGET_SIZE);
         }
-
-        // 디버그 로그 추가
-        System.out.println("선호 크기: " + preferredSizes);
-        System.out.println("대상 크기: " + targetSize);
-
-        List<String> normalizedPreferredSizes = preferredSizes.stream()
+        List<String> normalizedTargetPreferredSizes = targetPreferredSizes.stream()
                 .map(String::toUpperCase)
                 .collect(Collectors.toList());
-        String normalizedTargetSize = targetSize.toUpperCase();
+        String normalizedMyPetSize = myPetSize.toUpperCase();
 
-        // 로그 추가
-        System.out.println("정규화된 선호 크기: " + normalizedPreferredSizes);
-        System.out.println("정규화된 대상 크기: " + normalizedTargetSize);
-
-        if (normalizedPreferredSizes.contains(normalizedTargetSize)) {
-            int totalPreferred = normalizedPreferredSizes.size();
+        if (normalizedTargetPreferredSizes.contains(normalizedMyPetSize)) {
+            int totalPreferred = normalizedTargetPreferredSizes.size();
 
             if (totalPreferred == 1) {
-                if (normalizedPreferredSizes.contains("SMALL") || normalizedPreferredSizes.contains("LARGE")) {
+                if (normalizedTargetPreferredSizes.contains("SMALL") || normalizedTargetPreferredSizes.contains("LARGE")) {
                     return 20.0;
                 }
                 return 18.0;
@@ -79,11 +66,11 @@ public class MatchSizeService {
                 return 16.0;
             }
             if (totalPreferred == 3) {
-                return 20.0 * 0.7;
+                return 20.0 * 0.7; // 선호 크기가 3개일 경우 점수 감소
             }
         }
-
-        return 6.0; // 선호 크기에 포함되지 않을 경우 점수 하락
+        return 6.0;
     }
+
 
 }
