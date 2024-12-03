@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 public record SosBoardResponseDto(
         Long id,
+        Long userId,
         String title,
         PaymentType paymentType,
         int price,
@@ -24,6 +25,7 @@ public record SosBoardResponseDto(
     public static SosBoardResponseDto of(SosBoard sosBoard) {
         return new SosBoardResponseDto(
                 sosBoard.getId(),
+                sosBoard.getUser().getId(),
                 sosBoard.getTitle(),
                 sosBoard.getPaymentType(),
                 sosBoard.getPrice(),
@@ -45,6 +47,7 @@ public record SosBoardResponseDto(
         List<PetResponse> petResponses = serviceDto.petResponses();
 
         return new SosBoardResponseDto(
+                serviceDto.id(),
                 serviceDto.userId(),
                 serviceDto.title(),
                 serviceDto.paymentType(),
