@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,15 +69,15 @@ public class MatchScoreService {
                     double latitude = ((Number) row[1]).doubleValue();
                     double longitude = ((Number) row[2]).doubleValue();
                     boolean isCareAvailable = (Boolean) row[3];
-                    // List<String> preferredSize = (List<String>) row[4];
                     String preferredSize = (String) row[4];
+                    List<String> ListPreferredSize = changeList(preferredSize);
                     String mbti = (String) row[5];
 
                     // 거리 계산
                     double distance = (double) row[6];
                     System.out.println("User ID: " + id + ", Distance: " + distance + " meters");
 
-                    return new UserResponse(id, latitude, longitude, isCareAvailable, preferredSize, mbti, distance);
+                    return new UserResponse(id, latitude, longitude, isCareAvailable, ListPreferredSize, mbti, distance);
                 })
                 .sorted(Comparator.comparingDouble(UserResponse::distance)) // 거리로 정렬
                 .limit(1000)
@@ -97,9 +99,8 @@ public class MatchScoreService {
             double distanceScore = matchPlaceService.findMatchesWithinDistance(user, targetUser);
             double careScore = matchCareService.calculateCareScore(targetUser.isCareAvailable());
 
-//            List<String> preferredSizes = targetUser.preferredSize(); // targetUser의 선호 크기 리스트
-            double sizeScore = 10.0;
-//            double sizeScore = matchSizeService.calculateDogSizeScore(user, preferredSizes);
+            List<String> preferredSizes = targetUser.preferredSize();
+            double sizeScore = matchSizeService.calculateDogSizeScore(targetUser.id(), preferredSizes);
 
             String dogMbti = getTemperamentByUserId(userId);
 
@@ -197,5 +198,13 @@ public class MatchScoreService {
             return pets.get(0).getTemperament() != null ? pets.get(0).getTemperament() : "Unknown";
         }
         return "Unknown";
+    }
+
+    //
+    public List<String> changeList(String preferredSizeString) {
+        List<String> preferredSize = preferredSizeString == null || preferredSizeString.isEmpty()
+                ? new ArrayList<>()
+                : Arrays.asList(preferredSizeString.split(","));
+        return preferredSize;
     }
 }

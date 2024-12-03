@@ -82,7 +82,8 @@ public class MatchService {
                                 user.getProfileImg(),
                                 user.getRecommendationCount(),
                                 user.getRegion(),
-                                user.getCareCompletionCount()
+                                user.getCareCompletionCount(),
+                                user.getAccountId()
                         );
                     })
                     .collect(Collectors.toList());
