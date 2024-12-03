@@ -16,15 +16,14 @@ public class AwsClient{
     @Value("${cloud.aws.region.static}")
     private String region;
 
-    private final static String DEFAULT_FOLDER_NAME = "기본이미지_폴더";
 
-    public String uploadImg(String base64EncodedData, String folderName, String fileName) {
+    public String uploadImg(String base64EncodedData, String folderName, String fileName, String defaultFolder) {
         if (base64EncodedData.startsWith("profile")) {
-            String fileKey = DEFAULT_FOLDER_NAME + "/" + base64EncodedData;
-            return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + fileKey + ".svg";
+            String fileKey = defaultFolder + "/" + base64EncodedData;
+            return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + fileKey;
         }
 
-        return s3Client.uploadFile(base64EncodedData, folderName, fileName);
+        return s3Client.uploadFile(defaultFolder, base64EncodedData, folderName, fileName);
     }
 
 }

@@ -3,6 +3,7 @@ package com.petmatz.domain.pet;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petmatz.api.pet.dto.PetInfoDto;
+import com.petmatz.domain.aws.AwsClient;
 import com.petmatz.domain.pet.dto.PetServiceDto;
 import com.petmatz.domain.pet.dto.PetServiceDtoFactory;
 import com.petmatz.domain.pet.exception.ImageErrorCode;
@@ -28,6 +29,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class PetServiceImpl implements PetService{
+
+    private final AwsClient awsClient;
 
     private final PetRepository repository;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -66,6 +69,11 @@ public class PetServiceImpl implements PetService{
             throw new PetServiceException(PetErrorCode.DOG_REG_NO_DUPLICATE);
         }
 
+
+        //사용자의 이미지가 기본 이미지면 default imgURL 반환, 새 이미지면 Upload 및 새 imgURL 반환
+        String imgURL = awsClient.uploadImg(dto.profileImg(), user.getNickname(), (user.getNickname()+"_profileImg"),"강아지_프로필_폴더");
+
+
         // DTO에서 Pet 엔티티 생성
         Pet pet = Pet.builder()
                 .user(user)
@@ -78,7 +86,7 @@ public class PetServiceImpl implements PetService{
                 .age(dto.age())
                 .temperament(dto.temperament())
                 .preferredWalkingLocation(dto.preferredWalkingLocation())
-                .profileImg(dto.profileImg())
+                .profileImg(imgURL)
                 .comment(dto.comment())
                 .build();
 

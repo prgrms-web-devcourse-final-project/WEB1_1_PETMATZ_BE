@@ -3,6 +3,7 @@ package com.petmatz.domain.user.service;
 import com.petmatz.api.user.request.*;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.common.security.utils.JwtProvider;
+import com.petmatz.domain.aws.AwsClient;
 import com.petmatz.domain.user.entity.Certification;
 import com.petmatz.domain.user.entity.Heart;
 import com.petmatz.domain.user.entity.User;
@@ -45,6 +46,8 @@ public class UserServiceImpl implements UserService {
     private final JwtExtractProvider jwtExtractProvider;
 
     private final GeocodingService geocodingService;
+
+    private final AwsClient awsClient;
 
 
     @Override
@@ -136,8 +139,11 @@ public class UserServiceImpl implements UserService {
                 return SignUpResponseDto.locationFail();
             }
 
+            //사용자의 이미지가 기본 이미지면 default imgURL 반환, 새 이미지면 Upload 및 새 imgURL 반환
+            String imgURL = awsClient.uploadImg(info.getProfileImg(), info.getNickname(), (info.getNickname()+"_profileImg"), "유저_프로필_폴더");
+
             // 7. 새로운 User 생성 및 저장
-            User user = UserFactory.createNewUser(info, encodedPassword, regionName, regionCode);
+            User user = UserFactory.createNewUser(info, encodedPassword, regionName, regionCode, imgURL);
             userRepository.save(user);
 
             // 8. 인증 엔티티 삭제

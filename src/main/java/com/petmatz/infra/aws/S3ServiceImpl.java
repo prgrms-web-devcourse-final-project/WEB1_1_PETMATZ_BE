@@ -25,7 +25,7 @@ public class S3ServiceImpl implements S3Client {
     private String region;
 
     @Override
-    public String uploadFile(String base64EncodedData, String folderName, String fileName) {
+    public String uploadFile(String base64EncodedData, String folderName, String fileName, String defaultFolder) {
         byte[] decodedBytes = Base64.getDecoder().decode(base64EncodedData);
         String fileKey;
         try (InputStream inputStream = new ByteArrayInputStream(decodedBytes)) {
@@ -33,14 +33,14 @@ public class S3ServiceImpl implements S3Client {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(decodedBytes.length);
             metadata.setContentType("image/jpeg");
-            fileKey = folderName + "/" + fileName;
+            fileKey = defaultFolder  + "/" + folderName + "/" + fileName;
             // S3에 업로드
             amazonS3Client.putObject(bucketName, fileKey, inputStream, metadata);
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload file to S3", e);
         }
 
-        return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + fileKey + ".svg";
+        return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + fileKey;
     }
 
 
