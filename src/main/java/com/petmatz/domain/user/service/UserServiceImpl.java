@@ -154,6 +154,7 @@ public class UserServiceImpl implements UserService {
             String token = jwtProvider.create(user.getId(), user.getAccountId());
             log.info("JWT 생성 완료: {}", token);
 
+
             ResponseCookie responseCookie = ResponseCookie.from("jwt", token)
                     .httpOnly(true)           // XSS 방지
                     .secure(true)             // HTTPS만 허용
@@ -162,7 +163,6 @@ public class UserServiceImpl implements UserService {
                     .maxAge((3600))
                     .build();
             response.addHeader("Set-Cookie", responseCookie.toString());
-
             // 로그인 성공 응답 반환
             return SignInResponseDto.success(user); // User 객체 전달
         } catch (Exception e) {

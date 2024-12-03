@@ -2,14 +2,12 @@ package com.petmatz.domain.petmission.entity;
 
 import com.petmatz.domain.pet.Pet;
 import com.petmatz.domain.petmission.dto.PetMissionInfo;
-import com.petmatz.domain.petmission.dto.PetMissionStatusZip;
-import com.petmatz.domain.user.entity.User;
+import com.petmatz.common.constants.PetMissionStatusZip;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -60,6 +58,10 @@ public class PetMissionEntity {
                         PetMissionAskEntity::of
                 ).toList())
                 .build();
+    }
+
+    public void updatePetMissionStatusZip(PetMissionStatusZip updateStatus) {
+        status = updateStatus;
     }
 
 

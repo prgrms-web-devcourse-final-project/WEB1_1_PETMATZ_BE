@@ -25,7 +25,6 @@ public class WebSocketEventListener {
     
     //TODO 여기 의존 바꿔야 할 수도
     private final ChatReadStatusUpdater chatReadStatusUpdater;
-    private final JwtExtractProvider jwtExtractProvider;
 
     //TODO 구독이 끊기면 unreadCount 초기화
     @EventListener

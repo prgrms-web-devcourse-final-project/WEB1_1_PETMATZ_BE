@@ -1,4 +1,4 @@
-package com.petmatz.domain.petmission.dto;
+package com.petmatz.common.constants;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
