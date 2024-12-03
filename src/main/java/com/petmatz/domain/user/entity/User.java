@@ -82,6 +82,9 @@ public class User extends BaseEntity {
     @Column(name="region")
     private String region;
 
+    @Column(name="region_code")
+    private Integer regionCode;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserToChatRoomEntity> chatRooms = new ArrayList<>();
 
@@ -113,10 +116,11 @@ public class User extends BaseEntity {
         this.isCareAvailable=info.isCareAvailable();
     }
 
-    public void updateLocation(UpdateLocationInfo info, String region){
+    public void updateLocation(UpdateLocationInfo info, String region, Integer regionCode){
         this.latitude=info.getLatitude();
         this.longitude=info.getLongitude();
         this.region=region;
+        this.regionCode=regionCode;
     }
 
     public UserInfo of() {
