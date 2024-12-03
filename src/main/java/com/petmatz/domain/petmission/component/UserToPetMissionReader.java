@@ -27,7 +27,7 @@ public class UserToPetMissionReader {
     }
 
     public UserToPetMissionEntity selectUserToPetMission(String petMissionId, Long userId) {
-        Optional<UserToPetMissionEntity> userToPetMissionEntity = userToPetMissionRepository.selectUserToPetMission(petMissionId, userId);
+        Optional<UserToPetMissionEntity> userToPetMissionEntity = userToPetMissionRepository.selectUserToPetMission(userId, petMissionId);
         return userToPetMissionEntity.get();
     }
 }
