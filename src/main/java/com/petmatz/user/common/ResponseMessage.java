@@ -30,4 +30,6 @@ public interface ResponseMessage {
     String WRONG_LOCATION= "Wrong location";
 
     String USER_NOT_FOUND = "User Not Found";
+
+    String DELETED_USER = "Deleted User";
 }

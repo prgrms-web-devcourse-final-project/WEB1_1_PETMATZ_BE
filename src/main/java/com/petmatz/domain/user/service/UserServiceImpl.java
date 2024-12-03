@@ -51,6 +51,11 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<? super EmailCertificationResponseDto> emailCertification(EmailCertificationRequestDto dto) {
         try {
             String accountId = dto.getAccountId();
+
+            User user = userRepository.findByAccountId(accountId);
+            if (user != null && user.getIsDeleted() == true) {
+                return EmailCertificationResponseDto.alreadyDeletedUser();
+            }
             //이메일 전송과 동시에 아이디 중복검사
             boolean isExistId = userRepository.existsByAccountId(accountId);
             if (isExistId) return EmailCertificationResponseDto.duplicateId();
@@ -135,7 +140,9 @@ public class UserServiceImpl implements UserService {
         try {
             String accountId = info.getAccountId();
             User user = userRepository.findByAccountId(accountId);
-
+            if (user != null && user.getIsDeleted() == true) {
+                return EmailCertificationResponseDto.alreadyDeletedUser();
+            }
             // 사용자 존재 여부 확인
             if (user == null) {
                 log.info("사용자 조회 실패: {}", accountId);
@@ -172,6 +179,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<? super DeleteIdResponseDto> deleteId(DeleteIdRequestDto dto) {
         try {
             Long userId = jwtExtractProvider.findIdFromJwt();
@@ -185,6 +193,20 @@ public class UserServiceImpl implements UserService {
             if (!isMatched) return DeleteIdResponseDto.idNotMatching();  // 비밀번호 불일치
 
             certificationRepository.deleteById(userId);
+
+            user.setAccountId(user.getAccountId()); // 이메일 변경
+            user.setPassword("deleted-password"); // 비밀번호 변경
+            user.setNickname("Deleted User"); // 닉네임 변경
+            user.setProfileImg(null); // 프로필 이미지 제거
+            user.setIntroduction(null); // 소개 제거
+            user.setPreferredSizes(null); // 선호 크기 초기화
+            user.setIsCareAvailable(false); // 돌봄 가능 여부 초기화
+            user.setRecommendationCount(0);
+            user.setLatitude(null); // 위도 초기화
+            user.setLongitude(null); // 경도 초기화
+            user.setRegion(null); // 지역 초기화
+            user.setIsDeleted(true); // 삭제 상태 플래그 설정
+
         } catch (Exception e) {
             log.info("회원 삭제 실패: {}", e);
             return DeleteIdResponseDto.databaseError();  // 데이터베이스 오류 처리
