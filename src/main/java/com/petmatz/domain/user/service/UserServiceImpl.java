@@ -101,33 +101,57 @@ public class UserServiceImpl implements UserService {
             String accountId = info.getAccountId();
             String certificationNumber = info.getCertificationNumber();
 
-            // 인증 번호 확인
+            // 1. 필수 정보 누락 확인
+            if (accountId == null || certificationNumber == null || info.getPassword() == null) {
+                return SignUpResponseDto.missingRequiredFields();
+            }
+
+            // 2. 인증 번호 확인
             Certification certification = certificationRepository.findTopByAccountIdOrderByCreatedAtDesc(accountId);
             if (certification == null || !certification.getCertificationNumber().equals(certificationNumber)) {
                 return SignUpResponseDto.certificationFail();
             }
 
-            // 비밀번호 암호화 후 저장
-            String password = info.getPassword();
-            String encodedPassword = passwordEncoder.encode(password);
+            // 3. 중복된 ID 확인
+            if (userRepository.existsByAccountId(accountId)) {
+                return SignUpResponseDto.duplicateId();
+            }
+
+            // 5. 비밀번호 암호화 후 저장
+            String encodedPassword = passwordEncoder.encode(info.getPassword());
             info.setPassword(encodedPassword);
 
-            // 외부 호출 분리
-            String region = geocodingService.getRegionFromCoordinates(info.getLatitude(), info.getLongitude());
+            // 6. GeocodingService를 통해 지역명과 6자리 행정코드 가져오기
+            GeocodingService.KakaoRegion kakaoRegion = geocodingService.getRegionFromCoordinates(info.getLatitude(), info.getLongitude());
+            if (kakaoRegion == null) {
+                return SignUpResponseDto.locationFail();
+            }
 
-            User user = UserFactory.createNewUser(info, encodedPassword, region);
+            String regionName = kakaoRegion.getRegionName();
+            Integer regionCode = kakaoRegion.getCodeAsInteger();
+
+            // regionCode가 null일 경우 추가 처리
+            if (regionCode == null) {
+                log.error("Region Code is null for coordinates: {}, {}", info.getLatitude(), info.getLongitude());
+                return SignUpResponseDto.locationFail();
+            }
+
+            // 7. 새로운 User 생성 및 저장
+            User user = UserFactory.createNewUser(info, encodedPassword, regionName, regionCode);
             userRepository.save(user);
 
-            // 인증 엔티티 삭제
+            // 8. 인증 엔티티 삭제
             certificationRepository.deleteAllByAccountId(accountId);
 
+            // 9. 성공 응답 반환
             return SignUpResponseDto.success();
+
         } catch (RuntimeException e) {
-            log.error("회원 가입 실패: {}", e);
+            log.error("회원 가입 실패: {}", e.getMessage(), e);
             throw e;
         } catch (Exception e) {
-            log.error("회원 가입 중 처리되지 않은 예외 발생: {}", e);
-            throw new RuntimeException("회원 가입 중 처리되지 않은 예외", e);
+            log.error("회원 가입 중 처리되지 않은 예외 발생: {}", e.getMessage(), e);
+            return SignUpResponseDto.unknownError();
         }
     }
 
@@ -393,25 +417,40 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public ResponseEntity<? super UpdateLocationResponseDto> updateLocation(UpdateLocationInfo info) {
         try {
+            // JWT에서 사용자 ID 추출
             Long userId = jwtExtractProvider.findIdFromJwt();
+
+            // 사용자 엔티티 조회
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
+            // 사용자 존재 여부 확인
             boolean exists = userRepository.existsById(userId);
             if (!exists) {
-                return EditMyProfileResponseDto.editFailed();
+                return UpdateLocationResponseDto.userNotFound();
             }
-            String region = geocodingService.getRegionFromCoordinates(info.getLatitude(), info.getLongitude());
 
-            user.updateLocation(info, region);
+            // GeocodingService에서 지역명과 행정코드 가져오기
+            GeocodingService.KakaoRegion kakaoRegion = geocodingService.getRegionFromCoordinates(info.getLatitude(), info.getLongitude());
+            if (kakaoRegion == null) {
+                return UpdateLocationResponseDto.wrongLocation(); // Kakao API 호출 실패 처리
+            }
 
-            return UpdateLocationResponseDto.success(region);
+            String regionName = kakaoRegion.getRegionName();
+            Integer regionCode = kakaoRegion.getCodeAsInteger(); // 행정코드를 Integer로 변환
+
+            log.info("Region Name: {}", regionName);
+            log.info("Region Code: {}", regionCode);
+            // 사용자 위치 업데이트
+            user.updateLocation(info, regionName, regionCode);
+
+            // 성공 응답 반환
+            return UpdateLocationResponseDto.success(regionName, regionCode);
         } catch (Exception e) {
-            log.info("위치업데이트 실패: {}", e);
+            log.error("위치 업데이트 실패: {}", e.getMessage(), e);
             return UpdateLocationResponseDto.wrongLocation();
         }
     }
-
 
     @Override
     @Transactional

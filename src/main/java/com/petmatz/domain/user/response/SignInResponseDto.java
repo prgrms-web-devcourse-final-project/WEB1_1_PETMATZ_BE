@@ -26,6 +26,7 @@ public class SignInResponseDto extends LogInResponseDto {
     private Boolean isCareAvailable;
     private String mbti;
     private String region;
+    private Integer regionCode;
 
     private SignInResponseDto(User user) {
         super();
@@ -42,6 +43,7 @@ public class SignInResponseDto extends LogInResponseDto {
         this.isCareAvailable = user.getIsCareAvailable();
         this.mbti = user.getMbti();
         this.region = user.getRegion();
+        this.regionCode=user.getRegionCode();
     }
 
     public static ResponseEntity<SignInResponseDto> success(User user) {

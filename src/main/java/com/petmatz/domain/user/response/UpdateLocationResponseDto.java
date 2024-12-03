@@ -11,10 +11,12 @@ import org.springframework.http.ResponseEntity;
 @Getter
 public class UpdateLocationResponseDto extends LogInResponseDto{
     private String region;
+    private Integer regionCode;
 
-    private UpdateLocationResponseDto(String region){
+    private UpdateLocationResponseDto(String region,Integer regionCode){
         super();
         this.region = region;
+        this.regionCode=regionCode;
     }
 
     public static ResponseEntity<LogInResponseDto> wrongLocation(){
@@ -22,8 +24,8 @@ public class UpdateLocationResponseDto extends LogInResponseDto{
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(responseBody);
     }
 
-    public static ResponseEntity<UpdateLocationResponseDto> success(String region) { // 반환 타입 수정
-        UpdateLocationResponseDto responseBody = new UpdateLocationResponseDto(region);
+    public static ResponseEntity<UpdateLocationResponseDto> success(String region,Integer regionCode) { // 반환 타입 수정
+        UpdateLocationResponseDto responseBody = new UpdateLocationResponseDto(region,regionCode);
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 }
