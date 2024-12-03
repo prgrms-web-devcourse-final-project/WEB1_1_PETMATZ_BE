@@ -1,9 +1,9 @@
 package com.petmatz.domain.sosboard;
 
 import com.petmatz.api.pet.dto.PetResponse;
-import com.petmatz.api.sosboard.dto.SosBoardResponseDto;
 import com.petmatz.domain.pet.Pet;
 import com.petmatz.domain.pet.PetRepository;
+import com.petmatz.domain.sosboard.dto.PageResponseDto;
 import com.petmatz.domain.sosboard.dto.SosBoardPetDto;
 import com.petmatz.domain.sosboard.dto.SosBoardServiceDto;
 import com.petmatz.domain.sosboard.exception.SosBoardErrorCode;
@@ -12,8 +12,10 @@ import com.petmatz.domain.sosboard.exception.SosBoardServiceException;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,23 +30,34 @@ public class SosBoardServiceImpl implements SosBoardService{
     private final PetRepository petRepository;
 
     // 전체 조회 (지역 필터링 + 인덱스 기반 페이지네이션)
-    public List<SosBoardResponseDto> getAllSosBoards(String region, Long lastIndex, int size) {
-        if (lastIndex == null) {
-            lastIndex = Long.MAX_VALUE; // 첫 페이지 조회 시 최대값으로 시작
-        }
+    public PageResponseDto<SosBoardServiceDto> getAllSosBoards(String region, int pageNum, int size) {
+        Pageable pageable = PageRequest.of(pageNum, size, Sort.by(Sort.Direction.DESC, "id"));
 
-        List<SosBoard> sosBoards;
+        Page<SosBoard> sosBoardPage;
         if (region == null || region.isEmpty()) {
-            // 전체 조회
-            sosBoards = sosBoardRepository.findAllByIdLessThanOrderByIdDesc(lastIndex, PageRequest.of(0, size));
+            sosBoardPage = sosBoardRepository.findAll(pageable);
         } else {
-            // 지역 필터링
-            sosBoards = sosBoardRepository.findByUserRegionAndIdLessThanOrderByIdDesc(region, lastIndex, PageRequest.of(0, size));
+            sosBoardPage = sosBoardRepository.findByUserRegion(region, pageable);
         }
 
-        return sosBoards.stream()
-                .map(SosBoardResponseDto::of) // SosBoard → SosBoardResponseDto 변환
+        // SosBoard → SosBoardServiceDto 변환
+        List<SosBoardServiceDto> serviceDtos = sosBoardPage.getContent().stream()
+                .map(sosBoard -> {
+                    List<PetResponse> petResponses = sosBoard.getPetSosBoards().stream()
+                            .map(PetSosBoard::getPet)
+                            .map(PetResponse::of)
+                            .collect(Collectors.toList());
+                    return SosBoardServiceDto.from(sosBoard, petResponses);
+                })
                 .collect(Collectors.toList());
+
+        // 페이지 응답 생성
+        return new PageResponseDto<>(
+                serviceDtos,
+                sosBoardPage.getTotalElements(),
+                sosBoardPage.getTotalPages(),
+                pageNum
+        );
     }
 
     // 게시글 작성
@@ -166,15 +179,31 @@ public class SosBoardServiceImpl implements SosBoardService{
     }
 
     // 해당 닉네임에 해당하는 글 불러오기
-    public List<SosBoardResponseDto> getUserSosBoardsByNickname(String nickname, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public PageResponseDto<SosBoardServiceDto> getUserSosBoardsByNickname(String nickname, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
 
-        List<SosBoard> sosBoards = sosBoardRepository.findByUserNickname(nickname, pageable);
+        Page<SosBoard> sosBoardPage = sosBoardRepository.findByUserNickname(nickname, pageable);
 
-        return sosBoards.stream()
-                .map(SosBoardResponseDto::of)
+        // SosBoard → SosBoardServiceDto 변환
+        List<SosBoardServiceDto> serviceDtos = sosBoardPage.getContent().stream()
+                .map(sosBoard -> {
+                    List<PetResponse> petResponses = sosBoard.getPetSosBoards().stream()
+                            .map(PetSosBoard::getPet)
+                            .map(PetResponse::of)
+                            .collect(Collectors.toList());
+                    return SosBoardServiceDto.from(sosBoard, petResponses);
+                })
                 .collect(Collectors.toList());
+
+        // PageResponseDto 생성
+        return new PageResponseDto<>(
+                serviceDtos,
+                sosBoardPage.getTotalElements(),
+                sosBoardPage.getTotalPages(),
+                page
+        );
     }
+
 }
 
 

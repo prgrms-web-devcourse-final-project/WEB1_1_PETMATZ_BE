@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public record SosBoardServiceDto(
-        Long userId,
+        Long id, //게시글 id
+        Long userId, //유저 id
         String title,
         PaymentType paymentType,
         Integer price,
@@ -27,6 +28,7 @@ public record SosBoardServiceDto(
     // SosBoard → SosBoardServiceDto 변환
     public static SosBoardServiceDto from(SosBoard sosBoard,  List<PetResponse> petResponses) {
         return new SosBoardServiceDto(
+                sosBoard.getId(),
                 sosBoard.getUser().getId(),
                 sosBoard.getTitle(),
                 sosBoard.getPaymentType(),
