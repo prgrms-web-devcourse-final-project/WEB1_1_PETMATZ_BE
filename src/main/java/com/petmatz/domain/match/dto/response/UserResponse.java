@@ -7,7 +7,7 @@ public record UserResponse (
         Double latitude,
         Double longitude,
         Boolean isCareAvailable,
-        String preferredSize,
+        List<String> preferredSize,
         String mbti,
         double distance
 ){

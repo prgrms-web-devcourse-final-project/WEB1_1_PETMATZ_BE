@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 public class UserFactory {
 
-    public static User createNewUser(SignUpInfo info, String encodedPassword, String region) {
+    public static User createNewUser(SignUpInfo info, String encodedPassword, String region,Integer regionCode) {
 
         return User.builder()
                 .accountId(info.getAccountId())
@@ -25,11 +25,11 @@ public class UserFactory {
                 .isRegistered(false)
                 .recommendationCount(0)
                 .careCompletionCount(0)
-                .isDeleted(false)
                 .mbti(info.getMbti())
                 .latitude(info.getLatitude())
                 .longitude(info.getLongitude())
                 .region(region)
+                .regionCode(regionCode)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();

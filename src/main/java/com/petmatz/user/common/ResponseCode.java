@@ -32,4 +32,12 @@ public interface ResponseCode {
     String USER_NOT_FOUND = "UNF";
 
     String DELETED_USER = "DU";
+
+    String LOCATION_FAIL = "LF";
+
+    String INVALID_PASSWORD = "IP";
+
+    String MISSING_FIELDS = "MF";
+
+    String UNKNOWN_ERROR = "UE";
 }
