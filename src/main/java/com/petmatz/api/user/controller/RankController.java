@@ -6,6 +6,7 @@ import com.petmatz.domain.user.service.RankService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -17,13 +18,9 @@ public class RankController {
     private final RankService rankService;
 
     @GetMapping("/top-rankings")
-    public ResponseEntity<List<RankUserResponse>> getTopRankings() {
-        List<RankUserResponse> topRankings = rankService.getTopRankings();
-        // 랭킹 순위 추가
-        for (int i = 0; i < topRankings.size(); i++) {
-            RankUserResponse user = topRankings.get(i);
-            user = new RankUserResponse(i + 1L, user.nickname(), user.recommendationCount(), user.profileImage());
-        }
+    public ResponseEntity<List<RankUserResponse>> getTopRankings(@RequestParam Long userId) {
+//        List<RankUserResponse> topRankings = rankService.getTopRankings();
+        List<RankUserResponse> topRankings = rankService.getTopRankingsByRegion(userId);
         return ResponseEntity.ok(topRankings);
     }
 }
