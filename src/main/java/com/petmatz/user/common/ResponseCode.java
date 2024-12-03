@@ -30,4 +30,6 @@ public interface ResponseCode {
     String WRONG_LOCATION = "WL";
 
     String USER_NOT_FOUND = "UNF";
+
+    String DELETED_USER = "DU";
 }

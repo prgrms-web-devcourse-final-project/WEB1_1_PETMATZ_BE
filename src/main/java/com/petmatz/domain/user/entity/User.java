@@ -8,16 +8,14 @@ import com.petmatz.domain.user.info.EditMyProfileInfo;
 import com.petmatz.domain.user.info.UpdateLocationInfo;
 import com.petmatz.domain.user.info.UserInfo;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Setter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
