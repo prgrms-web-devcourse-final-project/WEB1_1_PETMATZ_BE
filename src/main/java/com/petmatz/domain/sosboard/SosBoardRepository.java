@@ -29,7 +29,6 @@ public interface SosBoardRepository extends JpaRepository<SosBoard, Long> {
     List<SosBoard> findByUserId(Long userId);
 
     // 닉네임 기반 게시글 조회 (id 내림차순 정렬)
-    @Query("SELECT s FROM SosBoard s JOIN s.user u WHERE u.nickname = :nickname ORDER BY s.id DESC")
-    List<SosBoard> findByUserNickname(@Param("nickname") String nickname, Pageable pageable);
+    Page<SosBoard> findByUserNickname(String nickname, Pageable pageable);
 }
 
