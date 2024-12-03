@@ -52,10 +52,6 @@ public class UserServiceImpl implements UserService {
         try {
             String accountId = dto.getAccountId();
 
-            User user = userRepository.findByAccountId(accountId);
-            if (user != null && user.getIsDeleted() == true) {
-                return EmailCertificationResponseDto.alreadyDeletedUser();
-            }
             //이메일 전송과 동시에 아이디 중복검사
             boolean isExistId = userRepository.existsByAccountId(accountId);
             if (isExistId) return EmailCertificationResponseDto.duplicateId();
@@ -140,9 +136,6 @@ public class UserServiceImpl implements UserService {
         try {
             String accountId = info.getAccountId();
             User user = userRepository.findByAccountId(accountId);
-            if (user != null && user.getIsDeleted() == true) {
-                return EmailCertificationResponseDto.alreadyDeletedUser();
-            }
             // 사용자 존재 여부 확인
             if (user == null) {
                 log.info("사용자 조회 실패: {}", accountId);
@@ -183,8 +176,14 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<? super DeleteIdResponseDto> deleteId(DeleteIdRequestDto dto) {
         try {
             Long userId = jwtExtractProvider.findIdFromJwt();
+            boolean exists = userRepository.existsById(userId);
+            if (!exists) {
+                return DeleteIdResponseDto.idNotFound();
+            }
+
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
+
 
             // 비밀번호 일치 확인
             String password = dto.getPassword();
@@ -194,19 +193,8 @@ public class UserServiceImpl implements UserService {
 
             certificationRepository.deleteById(userId);
 
-            user.setAccountId(user.getAccountId()); // 이메일 변경
-            user.setPassword("deleted-password"); // 비밀번호 변경
-            user.setNickname("Deleted User"); // 닉네임 변경
-            user.setProfileImg(null); // 프로필 이미지 제거
-            user.setIntroduction(null); // 소개 제거
-            user.setPreferredSizes(null); // 선호 크기 초기화
-            user.setIsCareAvailable(false); // 돌봄 가능 여부 초기화
-            user.setRecommendationCount(0);
-            user.setLatitude(null); // 위도 초기화
-            user.setLongitude(null); // 경도 초기화
-            user.setRegion(null); // 지역 초기화
-            user.setIsDeleted(true); // 삭제 상태 플래그 설정
-
+            // 사용자 삭제
+            userRepository.deleteUserById(userId);
         } catch (Exception e) {
             log.info("회원 삭제 실패: {}", e);
             return DeleteIdResponseDto.databaseError();  // 데이터베이스 오류 처리
@@ -224,7 +212,7 @@ public class UserServiceImpl implements UserService {
 
             boolean exists = userRepository.existsByAccountId(userId);
             if (!exists) {
-                return GetMyProfileResponseDto.userNotFound();
+                return GetMyProfileResponseDto.idNotFound();
             }
 
             return GetMyProfileResponseDto.success(user);
@@ -239,6 +227,9 @@ public class UserServiceImpl implements UserService {
         try {
             // 현재 로그인한 사용자 ID 가져오기
             Long myId = jwtExtractProvider.findIdFromJwt();
+            if (!userRepository.existsById(myId)) {
+                return GetMyProfileResponseDto.idNotFound();
+            }
 
             // 조회 대상 사용자 정보 가져오기
             User user = userRepository.findById(userId)
@@ -258,7 +249,7 @@ public class UserServiceImpl implements UserService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return GetOtherProfileResponseDto.databaseError();
+            return GetOtherProfileResponseDto.userNotFound();
         }
     }
 
@@ -268,19 +259,20 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<? super EditMyProfileResponseDto> editMyProfile(EditMyProfileInfo info) {
         try {
             Long userId = jwtExtractProvider.findIdFromJwt();
+            boolean exists = userRepository.existsById(userId);
+            if (!exists) {
+                return EditMyProfileResponseDto.idNotFound();
+            }
+
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
-            boolean exists = userRepository.existsById(userId);
-            if (!exists) {
-                return EditMyProfileResponseDto.editFailed();
-            }
             user.updateProfile(info);
 
 
         } catch (Exception e) {
             log.info("프로필 수정 실패: {}", e);
-            return EditMyProfileResponseDto.databaseError();
+            return EditMyProfileResponseDto.editFailed();
         }
         return EditMyProfileResponseDto.success();
     }
@@ -431,7 +423,7 @@ public class UserServiceImpl implements UserService {
 
             boolean exists = userRepository.existsById(userId);
             if (!exists) {
-                return GetOtherProfileResponseDto.userNotFound();
+                return UpdateRecommendationResponseDto.userNotFound();
             }
             Integer recommendationCount = user.getRecommendationCount() + 1;
 
@@ -439,7 +431,7 @@ public class UserServiceImpl implements UserService {
 
         } catch (Exception e) {
             log.info("추천수 업데이트 실패: {}", e);
-            return UpdateRecommendationResponseDto.databaseError();
+            return UpdateRecommendationResponseDto.userNotFound();
         }
         return UpdateRecommendationResponseDto.success();
     }

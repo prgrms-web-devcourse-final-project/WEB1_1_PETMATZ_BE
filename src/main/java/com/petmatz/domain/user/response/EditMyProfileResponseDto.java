@@ -11,6 +11,11 @@ public class EditMyProfileResponseDto extends LogInResponseDto {
         super();
     }
 
+    public static ResponseEntity<LogInResponseDto> idNotFound(){
+        LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.ID_NOT_FOUND, ResponseMessage.ID_NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseBody);
+    }
+
     public static ResponseEntity<LogInResponseDto> editFailed(){
         LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.EDIT_FAIL, ResponseMessage.EDIT_FAIL);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);

@@ -45,7 +45,7 @@ public class GetMyProfileResponseDto extends LogInResponseDto {
         this.region = user.getRegion();
     }
 
-    public static ResponseEntity<LogInResponseDto> userNotFound() {
+    public static ResponseEntity<LogInResponseDto> idNotFound() {
         LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.ID_NOT_FOUND, ResponseMessage.ID_NOT_FOUND);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseBody);
     }
