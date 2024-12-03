@@ -6,6 +6,7 @@ import com.petmatz.api.sosboard.dto.SosBoardCreateRequestDto;
 import com.petmatz.api.sosboard.dto.SosBoardResponseDto;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.sosboard.SosBoardServiceImpl;
+import com.petmatz.domain.sosboard.dto.PageResponseDto;
 import com.petmatz.domain.sosboard.dto.SosBoardServiceDto;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.domain.user.repository.UserRepository;
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/sosboard")
@@ -29,20 +31,38 @@ public class SosBoardController {
 
     // 돌봄 SOS 페이지 글 전체 조회 (지역별 필터링 + 페이지네이션)
     @GetMapping
-    @Operation(summary = "SOS 게시글 전체 조회", description = "지역별 필터링 및 인덱스 기반 페이지네이션으로 SOS 게시글을 조회합니다.")
+    @Operation(summary = "SOS 게시글 전체 조회", description = "지역별 필터링 및 페이지 번호 기반 페이지네이션으로 SOS 게시글을 조회합니다.")
     @Parameters({
             @Parameter(name = "region", description = "필터링할 지역명", example = "Seoul"),
-            @Parameter(name = "lastIndex", description = "마지막 조회 인덱스 (페이징 지원)", example = "100"),
+            @Parameter(name = "pageNum", description = "조회할 페이지 번호 (1부터 시작)", example = "1"),
             @Parameter(name = "size", description = "가져올 게시글 개수", example = "10")
     })
-    public ResponseEntity<Response<List<SosBoardResponseDto>>> getAllSosBoards(
+    public ResponseEntity<Response<PageResponseDto<SosBoardResponseDto>>> getAllSosBoards(
             @RequestParam(required = false) String region,
-            @RequestParam(required = false) Long lastIndex,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "1") int pageNum, // 페이지 번호 기본값 1
+            @RequestParam(defaultValue = "10") int size) { // 페이지 크기 기본값 10
 
-        List<SosBoardResponseDto> sosBoards = sosBoardServiceImpl.getAllSosBoards(region, lastIndex, size);
-        return ResponseEntity.ok(Response.success(sosBoards));
+        int adjustedPage = pageNum - 1;
+
+        // 서비스 호출
+        PageResponseDto<SosBoardServiceDto> serviceDtoPageResponse = sosBoardServiceImpl.getAllSosBoards(region, adjustedPage, size);
+
+        // SosBoardServiceDto → SosBoardResponseDto 변환
+        List<SosBoardResponseDto> responseDtos = serviceDtoPageResponse.content().stream()
+                .map(SosBoardResponseDto::fromServiceDto) // 변환 메서드 활용
+                .collect(Collectors.toList());
+
+        // PageResponseDto 변환
+        PageResponseDto<SosBoardResponseDto> responseDtoPageResponse = new PageResponseDto<>(
+                responseDtos,
+                serviceDtoPageResponse.totalCount(),
+                serviceDtoPageResponse.totalPages(),
+                serviceDtoPageResponse.currentPage()
+        );
+
+        return ResponseEntity.ok(Response.success(responseDtoPageResponse));
     }
+
 
     // 2. 돌봄 SOS 페이지 게시글 작성
     @PostMapping
@@ -63,7 +83,6 @@ public class SosBoardController {
     public ResponseEntity<Response<SosBoardResponseDto>> getSosBoardById(@PathVariable Long id) {
         SosBoardServiceDto serviceDto = sosBoardServiceImpl.getSosBoardById(id);
 
-        // 프레젠테이션 DTO 변환
         SosBoardResponseDto responseDto = SosBoardResponseDto.fromServiceDto(serviceDto);
 
         return ResponseEntity.ok(Response.success(responseDto));
@@ -107,17 +126,35 @@ public class SosBoardController {
     @Operation(summary = "사용자가 작성한 SOS 게시글 조회", description = "특정 사용자가 작성한 SOS 게시글을 조회합니다.")
     @Parameters({
             @Parameter(name = "nickname", description = "사용자 닉네임", example = "test_nickname"),
-            @Parameter(name = "page", description = "페이지 번호", example = "0"),
+            @Parameter(name = "pageNum", description = "페이지 번호", example = "1"),
             @Parameter(name = "size", description = "가져올 게시글 개수", example = "10")
     })
-    public ResponseEntity<Response<List<SosBoardResponseDto>>> getUserSosBoardsByNickname(
+    public ResponseEntity<Response<PageResponseDto<SosBoardResponseDto>>> getUserSosBoardsByNickname(
             @PathVariable String nickname,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "10") int size) {
 
-        List<SosBoardResponseDto> sosBoards = sosBoardServiceImpl.getUserSosBoardsByNickname(nickname, page, size);
-        return ResponseEntity.ok(Response.success(sosBoards));
+        int adjustedPage = pageNum - 1;
+
+        // 서비스 계층 호출
+        PageResponseDto<SosBoardServiceDto> serviceDtoPageResponse = sosBoardServiceImpl.getUserSosBoardsByNickname(nickname, adjustedPage, size);
+
+        // SosBoardServiceDto → SosBoardResponseDto 변환
+        List<SosBoardResponseDto> responseDtos = serviceDtoPageResponse.content().stream()
+                .map(SosBoardResponseDto::fromServiceDto)
+                .collect(Collectors.toList());
+
+        // PageResponseDto 변환
+        PageResponseDto<SosBoardResponseDto> responseDtoPageResponse = new PageResponseDto<>(
+                responseDtos,
+                serviceDtoPageResponse.totalCount(),
+                serviceDtoPageResponse.totalPages(),
+                serviceDtoPageResponse.currentPage()
+        );
+
+        return ResponseEntity.ok(Response.success(responseDtoPageResponse));
     }
+
 
     private User getAuthenticatedUser() {
         Long userId = jwtExtractProvider.findIdFromJwt();

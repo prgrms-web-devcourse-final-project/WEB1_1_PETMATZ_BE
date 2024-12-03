@@ -11,6 +11,7 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 public record SosBoardCreateRequestDto(
+        Long id,
         Long userId,
         String title,
         String paymentType,
@@ -24,6 +25,7 @@ public record SosBoardCreateRequestDto(
     // 변환 메서드, 컨트롤러 계층에서 요청 데이터를 서비스 계층으로 전달할 때 변환함
     public SosBoardServiceDto toServiceDto(User user) {
         return new SosBoardServiceDto(
+                this.id(),
                 user.getId(),
                 this.title(),
                 PaymentType.fromString(this.paymentType()),
