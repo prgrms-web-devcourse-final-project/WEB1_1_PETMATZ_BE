@@ -6,11 +6,9 @@ import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import com.petmatz.domain.user.constant.*;
 import com.petmatz.domain.user.info.EditMyProfileInfo;
 import com.petmatz.domain.user.info.UpdateLocationInfo;
+import com.petmatz.domain.user.info.UserInfo;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
@@ -35,11 +33,8 @@ public class User extends BaseEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "nickname", nullable = false, unique=true)
+    @Column(name = "nickname", nullable = false)
     private String nickname;
-
-    @Column(name = "email")
-    private String email;
 
     @Column(name = "profile_img")
     private String profileImg;
@@ -51,10 +46,6 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "login_type")
     private LoginType loginType; // 'Normal', 'Kakao'
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role")
-    private Role role; //'Dol' or 'Mat'
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender")
@@ -85,14 +76,14 @@ public class User extends BaseEntity {
     @Column(name = "longitude")
     private Double longitude;
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted = false;
-
     @Column(name = "mbti", nullable = false)
     private String mbti;
 
     @Column(name="region")
     private String region;
+
+    @Column(name="region_code")
+    private Integer regionCode;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserToChatRoomEntity> chatRooms = new ArrayList<>();
@@ -125,10 +116,19 @@ public class User extends BaseEntity {
         this.isCareAvailable=info.isCareAvailable();
     }
 
-    public void updateLocation(UpdateLocationInfo info, String region){
+    public void updateLocation(UpdateLocationInfo info, String region, Integer regionCode){
         this.latitude=info.getLatitude();
         this.longitude=info.getLongitude();
         this.region=region;
+        this.regionCode=regionCode;
     }
 
+    public UserInfo of() {
+        return UserInfo.builder()
+                .id(id)
+                .nickname(nickname)
+                .email(accountId)
+                .profileImg(profileImg)
+                .build();
+    }
 }

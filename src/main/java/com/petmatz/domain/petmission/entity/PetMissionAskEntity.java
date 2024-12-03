@@ -2,16 +2,13 @@ package com.petmatz.domain.petmission.entity;
 
 import com.petmatz.domain.petmission.dto.PetMissionAskInfo;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString
+@Getter
 public class PetMissionAskEntity {
 
     @Id

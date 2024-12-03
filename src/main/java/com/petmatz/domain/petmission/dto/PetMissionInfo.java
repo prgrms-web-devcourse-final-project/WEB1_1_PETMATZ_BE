@@ -8,7 +8,7 @@ import java.util.List;
 @Builder
 public record PetMissionInfo(
 
-        Long careId,
+//        Long careId,
         Long receiverId,
         String petId,
         LocalDateTime missionStarted,

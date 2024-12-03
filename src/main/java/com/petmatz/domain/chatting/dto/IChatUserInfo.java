@@ -1,11 +1,12 @@
 package com.petmatz.domain.chatting.dto;
 
+import com.petmatz.domain.user.entity.User;
 import lombok.Builder;
 
 @Builder
 public record IChatUserInfo(
 
-        String userId,
+        Long userId,
         String userEmail,
 
         String userName,
@@ -14,12 +15,12 @@ public record IChatUserInfo(
 
 ) {
 
-    public static IChatUserInfo of(String userEmail,String profileURL) {
+    public static IChatUserInfo of(User user) {
         return IChatUserInfo.builder()
-//                .userId()
-                .userEmail(userEmail)
-//                .userName()
-                .profileURL(profileURL)
+                .userId(user.getId())
+                .userEmail(user.getAccountId())
+                .userName(user.getNickname())
+                .profileURL(user.getProfileImg())
                 .build();
     }
 

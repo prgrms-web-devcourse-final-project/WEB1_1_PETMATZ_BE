@@ -51,6 +51,7 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<? super EmailCertificationResponseDto> emailCertification(EmailCertificationRequestDto dto) {
         try {
             String accountId = dto.getAccountId();
+
             //이메일 전송과 동시에 아이디 중복검사
             boolean isExistId = userRepository.existsByAccountId(accountId);
             if (isExistId) return EmailCertificationResponseDto.duplicateId();
@@ -100,33 +101,57 @@ public class UserServiceImpl implements UserService {
             String accountId = info.getAccountId();
             String certificationNumber = info.getCertificationNumber();
 
-            // 인증 번호 확인
+            // 1. 필수 정보 누락 확인
+            if (accountId == null || certificationNumber == null || info.getPassword() == null) {
+                return SignUpResponseDto.missingRequiredFields();
+            }
+
+            // 2. 인증 번호 확인
             Certification certification = certificationRepository.findTopByAccountIdOrderByCreatedAtDesc(accountId);
             if (certification == null || !certification.getCertificationNumber().equals(certificationNumber)) {
                 return SignUpResponseDto.certificationFail();
             }
 
-            // 비밀번호 암호화 후 저장
-            String password = info.getPassword();
-            String encodedPassword = passwordEncoder.encode(password);
+            // 3. 중복된 ID 확인
+            if (userRepository.existsByAccountId(accountId)) {
+                return SignUpResponseDto.duplicateId();
+            }
+
+            // 5. 비밀번호 암호화 후 저장
+            String encodedPassword = passwordEncoder.encode(info.getPassword());
             info.setPassword(encodedPassword);
 
-            // 외부 호출 분리
-            String region = geocodingService.getRegionFromCoordinates(info.getLatitude(), info.getLongitude());
+            // 6. GeocodingService를 통해 지역명과 6자리 행정코드 가져오기
+            GeocodingService.KakaoRegion kakaoRegion = geocodingService.getRegionFromCoordinates(info.getLatitude(), info.getLongitude());
+            if (kakaoRegion == null) {
+                return SignUpResponseDto.locationFail();
+            }
 
-            User user = UserFactory.createNewUser(info, encodedPassword, region);
+            String regionName = kakaoRegion.getRegionName();
+            Integer regionCode = kakaoRegion.getCodeAsInteger();
+
+            // regionCode가 null일 경우 추가 처리
+            if (regionCode == null) {
+                log.error("Region Code is null for coordinates: {}, {}", info.getLatitude(), info.getLongitude());
+                return SignUpResponseDto.locationFail();
+            }
+
+            // 7. 새로운 User 생성 및 저장
+            User user = UserFactory.createNewUser(info, encodedPassword, regionName, regionCode);
             userRepository.save(user);
 
-            // 인증 엔티티 삭제
+            // 8. 인증 엔티티 삭제
             certificationRepository.deleteAllByAccountId(accountId);
 
+            // 9. 성공 응답 반환
             return SignUpResponseDto.success();
+
         } catch (RuntimeException e) {
-            log.error("회원 가입 실패: {}", e);
+            log.error("회원 가입 실패: {}", e.getMessage(), e);
             throw e;
         } catch (Exception e) {
-            log.error("회원 가입 중 처리되지 않은 예외 발생: {}", e);
-            throw new RuntimeException("회원 가입 중 처리되지 않은 예외", e);
+            log.error("회원 가입 중 처리되지 않은 예외 발생: {}", e.getMessage(), e);
+            return SignUpResponseDto.unknownError();
         }
     }
 
@@ -135,7 +160,6 @@ public class UserServiceImpl implements UserService {
         try {
             String accountId = info.getAccountId();
             User user = userRepository.findByAccountId(accountId);
-
             // 사용자 존재 여부 확인
             if (user == null) {
                 log.info("사용자 조회 실패: {}", accountId);
@@ -154,6 +178,7 @@ public class UserServiceImpl implements UserService {
             String token = jwtProvider.create(user.getId(), user.getAccountId());
             log.info("JWT 생성 완료: {}", token);
 
+
             ResponseCookie responseCookie = ResponseCookie.from("jwt", token)
                     .httpOnly(true)           // XSS 방지
                     .secure(true)             // HTTPS만 허용
@@ -162,7 +187,6 @@ public class UserServiceImpl implements UserService {
                     .maxAge((3600))
                     .build();
             response.addHeader("Set-Cookie", responseCookie.toString());
-
             // 로그인 성공 응답 반환
             return SignInResponseDto.success(user); // User 객체 전달
         } catch (Exception e) {
@@ -172,11 +196,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<? super DeleteIdResponseDto> deleteId(DeleteIdRequestDto dto) {
         try {
             Long userId = jwtExtractProvider.findIdFromJwt();
+            boolean exists = userRepository.existsById(userId);
+            if (!exists) {
+                return DeleteIdResponseDto.idNotFound();
+            }
+
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
+
 
             // 비밀번호 일치 확인
             String password = dto.getPassword();
@@ -185,6 +216,9 @@ public class UserServiceImpl implements UserService {
             if (!isMatched) return DeleteIdResponseDto.idNotMatching();  // 비밀번호 불일치
 
             certificationRepository.deleteById(userId);
+
+            // 사용자 삭제
+            userRepository.deleteUserById(userId);
         } catch (Exception e) {
             log.info("회원 삭제 실패: {}", e);
             return DeleteIdResponseDto.databaseError();  // 데이터베이스 오류 처리
@@ -202,7 +236,7 @@ public class UserServiceImpl implements UserService {
 
             boolean exists = userRepository.existsByAccountId(userId);
             if (!exists) {
-                return GetMyProfileResponseDto.userNotFound();
+                return GetMyProfileResponseDto.idNotFound();
             }
 
             return GetMyProfileResponseDto.success(user);
@@ -212,23 +246,34 @@ public class UserServiceImpl implements UserService {
             return GetMyProfileResponseDto.databaseError();
         }
     }
-
     @Override
     public ResponseEntity<? super GetOtherProfileResponseDto> getOtherMypage(Long userId) {
         try {
+            // 현재 로그인한 사용자 ID 가져오기
+            Long myId = jwtExtractProvider.findIdFromJwt();
+            if (!userRepository.existsById(myId)) {
+                return GetMyProfileResponseDto.idNotFound();
+            }
+
+            // 조회 대상 사용자 정보 가져오기
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
+            // 조회 대상 사용자가 존재하는지 확인
             boolean exists = userRepository.existsById(userId);
             if (!exists) {
                 return GetOtherProfileResponseDto.userNotFound();
             }
 
-            return GetOtherProfileResponseDto.success(user);
+            // 현재 로그인한 사용자가 조회 대상 사용자를 찜했는지 확인
+            boolean isMyHeartUser = heartRepository.existsByMyIdAndHeartedId(myId, userId);
+
+            // 응답 생성
+            return GetOtherProfileResponseDto.success(user, isMyHeartUser);
 
         } catch (Exception e) {
             e.printStackTrace();
-            return GetOtherProfileResponseDto.databaseError();
+            return GetOtherProfileResponseDto.userNotFound();
         }
     }
 
@@ -238,37 +283,51 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<? super EditMyProfileResponseDto> editMyProfile(EditMyProfileInfo info) {
         try {
             Long userId = jwtExtractProvider.findIdFromJwt();
+            boolean exists = userRepository.existsById(userId);
+            if (!exists) {
+                return EditMyProfileResponseDto.idNotFound();
+            }
+
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
-            boolean exists = userRepository.existsById(userId);
-            if (!exists) {
-                return EditMyProfileResponseDto.editFailed();
-            }
             user.updateProfile(info);
 
 
         } catch (Exception e) {
             log.info("프로필 수정 실패: {}", e);
-            return EditMyProfileResponseDto.databaseError();
+            return EditMyProfileResponseDto.editFailed();
         }
         return EditMyProfileResponseDto.success();
     }
 
     @Override
+    @Transactional
     public ResponseEntity<? super HeartingResponseDto> hearting(HeartingRequestDto dto) {
         try {
             Long heartedId = dto.getHeartedId();
 
+            // 대상 사용자가 존재하는지 확인
             boolean exists = userRepository.existsById(heartedId);
             if (!exists) {
                 return HeartingResponseDto.heartedIdNotFound();
             }
 
+            // 현재 사용자 ID 가져오기
             Long userId = jwtExtractProvider.findIdFromJwt();
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
+            // DB에서 myId와 heartedId로 Heart 레코드 확인
+            Optional<Heart> existingHeart = heartRepository.findByMyIdAndHeartedId(user.getId(), heartedId);
+
+            if (existingHeart.isPresent()) {
+                // 찜하기 해제 (DB에서 삭제)
+                heartRepository.delete(existingHeart.get());
+                return HeartingResponseDto.success(); // 찜하기 해제 성공 응답
+            }
+
+            // 찜하기 진행 (DB에 저장)
             Heart heart = Heart.builder()
                     .myId(user.getId())
                     .heartedId(heartedId)
@@ -277,14 +336,13 @@ public class UserServiceImpl implements UserService {
                     .build();
             heartRepository.save(heart);
 
+            return HeartingResponseDto.success(); // 찜하기 성공 응답
 
         } catch (Exception e) {
             log.info("찜하기 실패: {}", e);
-            return HeartingResponseDto.databaseError();
+            return HeartingResponseDto.databaseError(); // 데이터베이스 오류 응답
         }
-        return HeartingResponseDto.success();
     }
-
     @Override
     public ResponseEntity<? super GetHeartingListResponseDto> getHeartedList() {
         try {
@@ -359,25 +417,40 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public ResponseEntity<? super UpdateLocationResponseDto> updateLocation(UpdateLocationInfo info) {
         try {
+            // JWT에서 사용자 ID 추출
             Long userId = jwtExtractProvider.findIdFromJwt();
+
+            // 사용자 엔티티 조회
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
+            // 사용자 존재 여부 확인
             boolean exists = userRepository.existsById(userId);
             if (!exists) {
-                return EditMyProfileResponseDto.editFailed();
+                return UpdateLocationResponseDto.userNotFound();
             }
-            String region = geocodingService.getRegionFromCoordinates(info.getLatitude(), info.getLongitude());
 
-            user.updateLocation(info, region);
+            // GeocodingService에서 지역명과 행정코드 가져오기
+            GeocodingService.KakaoRegion kakaoRegion = geocodingService.getRegionFromCoordinates(info.getLatitude(), info.getLongitude());
+            if (kakaoRegion == null) {
+                return UpdateLocationResponseDto.wrongLocation(); // Kakao API 호출 실패 처리
+            }
 
-            return UpdateLocationResponseDto.success(region);
+            String regionName = kakaoRegion.getRegionName();
+            Integer regionCode = kakaoRegion.getCodeAsInteger(); // 행정코드를 Integer로 변환
+
+            log.info("Region Name: {}", regionName);
+            log.info("Region Code: {}", regionCode);
+            // 사용자 위치 업데이트
+            user.updateLocation(info, regionName, regionCode);
+
+            // 성공 응답 반환
+            return UpdateLocationResponseDto.success(regionName, regionCode);
         } catch (Exception e) {
-            log.info("위치업데이트 실패: {}", e);
+            log.error("위치 업데이트 실패: {}", e.getMessage(), e);
             return UpdateLocationResponseDto.wrongLocation();
         }
     }
-
 
     @Override
     @Transactional
@@ -389,7 +462,7 @@ public class UserServiceImpl implements UserService {
 
             boolean exists = userRepository.existsById(userId);
             if (!exists) {
-                return GetOtherProfileResponseDto.userNotFound();
+                return UpdateRecommendationResponseDto.userNotFound();
             }
             Integer recommendationCount = user.getRecommendationCount() + 1;
 
@@ -397,7 +470,7 @@ public class UserServiceImpl implements UserService {
 
         } catch (Exception e) {
             log.info("추천수 업데이트 실패: {}", e);
-            return UpdateRecommendationResponseDto.databaseError();
+            return UpdateRecommendationResponseDto.userNotFound();
         }
         return UpdateRecommendationResponseDto.success();
     }
@@ -414,8 +487,8 @@ public class UserServiceImpl implements UserService {
         return new GetMyUserDto();
     }
 
-    public void selectUserInfo(String receiverEmail) {
-        User byAccountId = userRepository.findByAccountId(receiverEmail);
-//        return User.of
+    public UserInfo selectUserInfo(String receiverEmail) {
+        User otherUser = userRepository.findByAccountId(receiverEmail);
+        return otherUser.of();
     }
 }

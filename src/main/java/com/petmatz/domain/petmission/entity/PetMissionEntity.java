@@ -2,14 +2,12 @@ package com.petmatz.domain.petmission.entity;
 
 import com.petmatz.domain.pet.Pet;
 import com.petmatz.domain.petmission.dto.PetMissionInfo;
-import com.petmatz.domain.petmission.dto.PetMissionStatusZip;
-import com.petmatz.domain.user.entity.User;
+import com.petmatz.common.constants.PetMissionStatusZip;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,9 +34,6 @@ public class PetMissionEntity {
     private Pet pet;
 
 
-//    @OneToMany(mappedBy = "petMission", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<UserToPetMissionEntity> userPetMissions = new ArrayList<>();
-
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "pet_mission_id")
     private List<PetMissionAskEntity> petMissionAsks = new ArrayList<>();
@@ -49,23 +44,24 @@ public class PetMissionEntity {
         this.petMissionEnd = petMissionEnd;
         this.status = status;
         this.pet = pet;
-//        this.userPetMissions = userPetMissions;
         this.petMissionAsks = petMissionAsks;
     }
 
 
     public static PetMissionEntity of(PetMissionInfo petMissionInfo, Pet pet) {
-        System.out.println("petMissionInfo.toString() :: " + petMissionInfo.toString());
         return PetMissionEntity.builder()
                 .petMissionStarted(petMissionInfo.missionStarted())
                 .petMissionEnd(petMissionInfo.missionEnd())
                 .status(PetMissionStatusZip.fromDescription("시작"))
-//                .userPetMissions(userPetMissions)
                 .pet(pet)
                 .petMissionAsks(petMissionInfo.petMissionAskInfo().stream().map(
                         PetMissionAskEntity::of
                 ).toList())
                 .build();
+    }
+
+    public void updatePetMissionStatusZip(PetMissionStatusZip updateStatus) {
+        status = updateStatus;
     }
 
 

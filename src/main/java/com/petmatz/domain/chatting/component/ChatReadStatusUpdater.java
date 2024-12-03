@@ -2,6 +2,7 @@ package com.petmatz.domain.chatting.component;
 
 import com.petmatz.domain.chatting.docs.ChatReadStatusDocs;
 import com.petmatz.domain.chatting.dto.ChatReadStatusInfo;
+import com.petmatz.domain.chatting.utils.ChatUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -17,20 +18,20 @@ public class ChatReadStatusUpdater {
 
     private final MongoTemplate mongoTemplate;
 
-    //TODO 현재는 사용하지 않음.
-    public void updateMessageStatus(ChatReadStatusInfo chatReadStatusInfo) {
-        Query query = makeQuery(chatReadStatusInfo);
-        Update update = makeUpdate(chatReadStatusInfo);
-        mongoTemplate.upsert(query, update, ChatReadStatusDocs.class);
+
+    public void updateMessageStatusTime(String chatRoomId, String userEmail) {
+        Query query = makeQuery(chatRoomId, userEmail);
+        Update update = makeUpdate();
+        mongoTemplate.updateFirst(query, update, ChatReadStatusDocs.class);
     }
 
-    private Query makeQuery(ChatReadStatusInfo chatReadStatusInfo) {
-        return new Query(Criteria.where("_Id").is(chatReadStatusInfo.chatRoomId()).and("userId").is(chatReadStatusInfo.userEmail()));
+    private Query makeQuery(String chatRoomId, String userEmail) {
+        return new Query(Criteria.where("_id").is(ChatUtils.addString(chatRoomId,userEmail)).and("userEmail").is(userEmail));
     }
 
-    private Update makeUpdate(ChatReadStatusInfo chatReadStatusInfo) {
+
+    private Update makeUpdate() {
         return new Update()
-                .set("lastReadMessageId", chatReadStatusInfo.lastReadMessageData())
                 .set("lastReadTimestamp", LocalDateTime.now());
     }
 }

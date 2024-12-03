@@ -16,6 +16,6 @@ public class SendRepasswordResponseDto extends LogInResponseDto{
 
     public static ResponseEntity<LogInResponseDto> mailSendFail(){
         LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.MAIL_FAIL, ResponseMessage.MAIL_FAIL);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBody);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseBody);
     }
 }

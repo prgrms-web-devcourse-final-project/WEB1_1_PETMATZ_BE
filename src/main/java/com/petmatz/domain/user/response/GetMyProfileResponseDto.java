@@ -2,7 +2,6 @@ package com.petmatz.domain.user.response;
 
 import com.petmatz.domain.user.constant.Gender;
 import com.petmatz.domain.user.constant.PreferredSize;
-import com.petmatz.domain.user.constant.Role;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.user.common.LogInResponseDto;
 import com.petmatz.user.common.ResponseCode;
@@ -19,7 +18,6 @@ public class GetMyProfileResponseDto extends LogInResponseDto {
     private String accountId;
     private String nickname;
     private String profileImg;
-    private Role role;
     private List<PreferredSize> preferredSizes; // 변경: List로 수정
     private Gender gender;
     private String introduction;
@@ -36,7 +34,6 @@ public class GetMyProfileResponseDto extends LogInResponseDto {
         this.accountId = user.getAccountId();
         this.nickname = user.getNickname();
         this.profileImg = user.getProfileImg();
-        this.role = user.getRole();
         this.preferredSizes = user.getPreferredSizes(); // 수정: 리스트 그대로 할당
         this.gender = user.getGender();
         this.introduction=user.getIntroduction();
@@ -48,7 +45,7 @@ public class GetMyProfileResponseDto extends LogInResponseDto {
         this.region = user.getRegion();
     }
 
-    public static ResponseEntity<LogInResponseDto> userNotFound() {
+    public static ResponseEntity<LogInResponseDto> idNotFound() {
         LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.ID_NOT_FOUND, ResponseMessage.ID_NOT_FOUND);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseBody);
     }

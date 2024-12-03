@@ -27,22 +27,16 @@ public class ChatMessageService {
 
     private final ChatMessageReader chatMessageReader;
     private final ChatMessageUpdater chatMessageUpdater;
-    private final JwtExtractProvider jwtExtractProvider;
 
 
-    public Page<ChatMessageInfo> selectMessage(String receiver, String chatRoomsId, int pageNumber, int pageSize) {
-        String sender = jwtExtractProvider.findAccountIdFromJwt();
-
+    public Page<ChatMessageInfo> selectMessage(String receiver, String chatRoomsId, int pageNumber, int pageSize, LocalDateTime lastFetchTimestamp) {
         // 페이징된 메시지 가져오기
-        List<ChatMessageInfo> chatMessageInfos = chatMessageReader.selectChatMessagesHistory(chatRoomsId, pageNumber, pageSize);
+        List<ChatMessageInfo> chatMessageInfos = chatMessageReader.selectChatMessagesHistory(chatRoomsId, pageNumber, pageSize,lastFetchTimestamp);
 
         // 반환 데이터에 읽음 상태 업데이트
         ChatReadStatusDocs chatReadStatusDocs = chatMessageReader.selectChatMessageLastStatus(chatRoomsId, receiver);
         LocalDateTime lastReadTimestamp = chatReadStatusDocs.checkLastReadTimestamp();
         List<ChatMessageInfo> updatedMessages = messageStatusUpdate(chatMessageInfos, lastReadTimestamp);
-
-        //상대편 정보 조회
-        User byAccountId = userRepository.findByAccountId(receiver);
 
         // 전체 메시지 개수 가져오기
         long totalElements = chatMessageReader.countChatMessages(chatRoomsId);
@@ -62,5 +56,6 @@ public class ChatMessageService {
     public void updateMessage(ChatMessageInfo chatMessageInfo, String chatRoomId) {
         chatMessageUpdater.updateMessage(chatMessageInfo,chatRoomId);
     }
+
 
 }

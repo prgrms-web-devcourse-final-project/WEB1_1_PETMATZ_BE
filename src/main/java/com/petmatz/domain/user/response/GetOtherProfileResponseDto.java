@@ -2,7 +2,6 @@ package com.petmatz.domain.user.response;
 
 import com.petmatz.domain.user.constant.Gender;
 import com.petmatz.domain.user.constant.PreferredSize;
-import com.petmatz.domain.user.constant.Role;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.user.common.LogInResponseDto;
 import com.petmatz.user.common.ResponseCode;
@@ -19,7 +18,6 @@ public class GetOtherProfileResponseDto extends LogInResponseDto {
     private String accountId;
     private String nickname;
     private String profileImg;
-    private Role role;
     private List<PreferredSize> preferredSize;
     private Gender gender;
     private Boolean isRegistered;
@@ -28,14 +26,14 @@ public class GetOtherProfileResponseDto extends LogInResponseDto {
     private Boolean isCareAvailable;
     private String mbti;
     private String region;
+    private boolean isMyHeartUser;
 
-    public GetOtherProfileResponseDto(User user) {
+    public GetOtherProfileResponseDto(User user, boolean isMyHeartUser) {
         super();
         this.id = user.getId();
         this.accountId = user.getAccountId();
         this.nickname = user.getNickname();
         this.profileImg=user.getProfileImg();
-        this.role = user.getRole();
         this.preferredSize = user.getPreferredSizes();
         this.gender = user.getGender();
         this.isRegistered = user.getIsRegistered();
@@ -44,6 +42,7 @@ public class GetOtherProfileResponseDto extends LogInResponseDto {
         this.isCareAvailable = user.getIsCareAvailable();
         this.mbti=user.getMbti();
         this.region = user.getRegion();
+        this.isMyHeartUser=isMyHeartUser;
     }
 
     public static ResponseEntity<LogInResponseDto> userNotFound() {
@@ -51,8 +50,8 @@ public class GetOtherProfileResponseDto extends LogInResponseDto {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseBody);
     }
 
-    public static ResponseEntity<LogInResponseDto> success(User user) {
-        GetOtherProfileResponseDto responseBody = new GetOtherProfileResponseDto(user);
+    public static ResponseEntity<LogInResponseDto> success(User user,boolean isMyHeartUser) {
+        GetOtherProfileResponseDto responseBody = new GetOtherProfileResponseDto(user,isMyHeartUser);
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 

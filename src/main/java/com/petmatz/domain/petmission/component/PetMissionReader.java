@@ -2,6 +2,7 @@ package com.petmatz.domain.petmission.component;
 
 
 import com.petmatz.domain.petmission.entity.PetMissionEntity;
+import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import com.petmatz.domain.petmission.repository.PetMissionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,11 +16,10 @@ public class PetMissionReader {
 
     private final PetMissionRepository petMissionRepository;
 
-    public List<PetMissionEntity> selectPetMissionId(Long UUID) {
-//        Optional<List<PetMissionEntity>> petMissionEntity = petMissionRepository.selectPetMissionList(String.valueOf(UUID));
-//        List<PetMissionEntity> petMissionEntityList = petMissionEntity.get();
-//        return petMissionEntityList;
-        return null;
+    public List<UserToPetMissionEntity> selectPetMissionId(Long UUID) {
+        Optional<List<UserToPetMissionEntity>> petMissionEntity = petMissionRepository.selectPetMissionList(String.valueOf(UUID));
+        List<UserToPetMissionEntity> petMissionEntityList = petMissionEntity.get();
+        return petMissionEntityList;
     }
 
 }

@@ -30,4 +30,12 @@ public interface ResponseMessage {
     String WRONG_LOCATION= "Wrong location";
 
     String USER_NOT_FOUND = "User Not Found";
+
+    String LOCATION_FAIL = "Location Fail"; // LF
+
+    String INVALID_PASSWORD = "Invalid Password"; // IP
+
+    String MISSING_FIELDS = "Missing Fields"; // MF
+
+    String UNKNOWN_ERROR = "Unknown Error"; // UE
 }

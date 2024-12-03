@@ -2,47 +2,48 @@ package com.petmatz.common.security.handler;
 
 import com.petmatz.common.security.utils.JwtProvider;
 import com.petmatz.domain.user.entity.CustomOAuthUser;
+import com.petmatz.domain.user.entity.User;
+import com.petmatz.domain.user.repository.UserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-/**
- * OAuth2 인증 성공 시 호출되는 핸들러 클래스.
- * JWT 토큰을 생성하고 클라이언트로 응답을 처리하는 역할.
- */
 @Component
 @RequiredArgsConstructor
 public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    // JWT 토큰을 생성하는 프로바이더
     private final JwtProvider jwtProvider;
+    private final UserRepository userRepository;
 
-    /**
-     * OAuth2 인증이 성공했을 때 호출되는 메서드.
-     * 사용자 정보를 바탕으로 JWT 토큰을 생성하고 클라이언트로 전달.
-     *
-     * @param authentication 인증 객체 (OAuth2 사용자 정보 포함)
-     */
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
-
-        // 인증된 OAuth2 사용자 정보 가져오기
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         CustomOAuthUser oAuth2User = (CustomOAuthUser) authentication.getPrincipal();
 
-        // 사용자 ID와 accountId 가져오기
-        Long userId = oAuth2User.getUserId(); // Long 타입의 사용자 ID
-        String accountId = oAuth2User.getName(); // accountId
+        // 사용자 정보
+        Long userId = oAuth2User.getUserId();
+        String accountId = oAuth2User.getName();
 
         // JWT 생성
         String token = jwtProvider.create(userId, accountId);
 
-        // 인증 성공 후 클라이언트로 토큰을 전달할 수 있는 로직 추가 (리다이렉트)
-        response.sendRedirect("http://localhost:3000/auth/oauth-response/" + token + "/3600");
+        // JWT 쿠키 설정
+        ResponseCookie jwtCookie = ResponseCookie.from("jwt", token)
+                .httpOnly(true)
+                .secure(true) // HTTPS 환경에서만 사용
+                .path("/")
+                .maxAge(3600) // 1시간 유효
+                .sameSite("Lax")
+                .build();
+        response.addHeader("Set-Cookie", jwtCookie.toString());
+
+        // 클라이언트로 리다이렉트
+        response.sendRedirect("http://localhost:3000/auth/oauth-response/" + token);
     }
 }
