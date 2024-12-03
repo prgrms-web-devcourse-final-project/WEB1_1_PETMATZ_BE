@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -76,9 +75,6 @@ public class User extends BaseEntity {
 
     @Column(name = "longitude")
     private Double longitude;
-
-    @Column(name = "is_deleted")
-    private Boolean isDeleted = false;
 
     @Column(name = "mbti", nullable = false)
     private String mbti;

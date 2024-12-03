@@ -25,7 +25,6 @@ public class UserFactory {
                 .isRegistered(false)
                 .recommendationCount(0)
                 .careCompletionCount(0)
-                .isDeleted(false)
                 .mbti(info.getMbti())
                 .latitude(info.getLatitude())
                 .longitude(info.getLongitude())

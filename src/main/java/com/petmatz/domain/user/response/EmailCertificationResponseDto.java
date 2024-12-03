@@ -25,9 +25,4 @@ public class EmailCertificationResponseDto extends LogInResponseDto {
         LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.MAIL_FAIL, ResponseMessage.MAIL_FAIL);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBody);
     }
-
-    public static ResponseEntity<LogInResponseDto> alreadyDeletedUser() {
-        LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.DELETED_USER, ResponseMessage.DELETED_USER);
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(responseBody);
-    }
 }
