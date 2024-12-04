@@ -3,12 +3,12 @@ package com.petmatz.domain.aws;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class AwsClient {
 

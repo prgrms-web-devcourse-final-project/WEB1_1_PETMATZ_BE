@@ -143,7 +143,6 @@ public class UserServiceImpl implements UserService {
 
             //6-1 Img 정제
             URL uploadURL = awsClient.uploadImg(info.getAccountId(), info.getProfileImg(), "CUSTOM_USER_IMG");
-            System.out.println("imgURL :: " + uploadURL);
             String imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
 
             // 7. 새로운 User 생성 및 저장
@@ -315,10 +314,15 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<? super EditMyProfileResponseDto> editMyProfile(EditMyProfileInfo info) {
         try {
             Long userId = jwtExtractProvider.findIdFromJwt();
+            String userEmail = jwtExtractProvider.findAccountIdFromJwt();
             boolean exists = userRepository.existsById(userId);
             if (!exists) {
                 return EditMyProfileResponseDto.idNotFound();
             }
+
+            //6-1 Img 정제
+            URL uploadURL = awsClient.uploadImg(userEmail, info.getProfileImg(), "CUSTOM_USER_IMG");
+            String imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
 
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));

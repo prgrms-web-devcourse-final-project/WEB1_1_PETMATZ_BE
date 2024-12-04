@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class ImageErrorApi {
     private final UserService userService;
     private final PetService petService;
@@ -35,10 +35,10 @@ public class ImageErrorApi {
         if (type.name().equals("U")) {
             userService.deleteUser(UUID);
         } else if (type.name().equals("P")) {
-//            userService.
-//            petService.deletePet();
-        }
 
+        } else if (type.name().equals("H")) {
+
+        }
     }
 
 }

@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -64,10 +65,15 @@ public class PetServiceImpl implements PetService{
     }
 
     // 펫 저장
-    public Long savePet(User user, PetServiceDto dto) {
+    public Long savePet(User user, PetServiceDto dto) throws MalformedURLException {
         if (repository.existsByDogRegNo(dto.dogRegNo())) {
             throw new PetServiceException(PetErrorCode.DOG_REG_NO_DUPLICATE);
         }
+
+        //6-1 Img 정제
+        URL uploadURL = awsClient.uploadImg(user.getAccountId(), dto.profileImg(), "PET_IMG");
+        String imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
+
 
         // DTO에서 Pet 엔티티 생성
         Pet pet = Pet.builder()
@@ -81,7 +87,7 @@ public class PetServiceImpl implements PetService{
                 .age(dto.age())
                 .temperament(dto.temperament())
                 .preferredWalkingLocation(dto.preferredWalkingLocation())
-                .profileImg(dto.profileImg())
+                .profileImg(imgURL)
                 .comment(dto.comment())
                 .build();
         return repository.save(pet).getId();
@@ -91,13 +97,21 @@ public class PetServiceImpl implements PetService{
     public void updatePet(Long petId, User user, PetServiceDto updatedDto) {
         Pet existingPet = repository.findByIdAndUser(petId, user)
                 .orElseThrow(() -> new PetServiceException(PetErrorCode.PET_NOT_FOUND));
-
+        String imgURL;
         // 현재 사용자가 리소스 소유자인지 검증
         if (!existingPet.getUser().equals(user)) {
             throw new SecurityException("권한이 없습니다.");
         }
 
         try {
+            if (updatedDto.profileImg() != null) {
+                //6-1 Img 정제
+                URL uploadURL = awsClient.uploadImg(user.getAccountId(), updatedDto.profileImg(), "PET_IMG");
+                imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
+            } else {
+                imgURL = existingPet.getProfileImg();
+            }
+
             // 병합된 DTO를 기반으로 엔티티 생성
             Pet updatedPet = Pet.builder()
                     .id(existingPet.getId())
@@ -111,7 +125,7 @@ public class PetServiceImpl implements PetService{
                     .age(updatedDto.age() != null ? updatedDto.age() : existingPet.getAge())
                     .temperament(updatedDto.temperament() != null ? updatedDto.temperament() : existingPet.getTemperament())
                     .preferredWalkingLocation(updatedDto.preferredWalkingLocation() != null ? updatedDto.preferredWalkingLocation() : existingPet.getPreferredWalkingLocation())
-                    .profileImg(updatedDto.profileImg() != null ? updatedDto.profileImg() : existingPet.getProfileImg())
+                    .profileImg(imgURL)
                     .comment(updatedDto.comment() != null ? updatedDto.comment() : existingPet.getComment())
                     .createdAt(existingPet.getCreatedAt())
                     .build();
