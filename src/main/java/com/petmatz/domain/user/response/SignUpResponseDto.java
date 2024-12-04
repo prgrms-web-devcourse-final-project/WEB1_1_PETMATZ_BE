@@ -9,9 +9,11 @@ import org.springframework.http.ResponseEntity;
 
 @Getter
 public class SignUpResponseDto extends LogInResponseDto {
+    private Long id;
 
-    private SignUpResponseDto(String role) {
+    private SignUpResponseDto(Long id) {
         super();
+        this.id=id;
     }
 
     // 1. 중복된 ID 응답
@@ -33,9 +35,9 @@ public class SignUpResponseDto extends LogInResponseDto {
     }
 
     // 4. 회원가입 성공 응답
-    public static ResponseEntity<LogInResponseDto> success() {
-        LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
-        return ResponseEntity.ok(responseBody);
+    public static ResponseEntity<SignUpResponseDto> success(Long id) {
+        SignUpResponseDto responseBody = new SignUpResponseDto(id);
+        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
     // 5. 위치 정보 확인 실패 응답

@@ -3,6 +3,7 @@ package com.petmatz.domain.user.service;
 import com.petmatz.api.user.request.*;
 import com.petmatz.domain.user.info.*;
 import com.petmatz.domain.user.response.*;
+import com.petmatz.user.common.LogInResponseDto;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ public interface UserService {
     ResponseEntity<? super CheckCertificationResponseDto> checkCertification(CheckCertificationInfo info);
     ResponseEntity<? super SignUpResponseDto> signUp(SignUpInfo info);
     ResponseEntity<? super SignInResponseDto> signIn(SignInInfo info, HttpServletResponse response);
+    ResponseEntity<? super LogInResponseDto> logout(HttpServletResponse response);
     ResponseEntity<? super DeleteIdResponseDto> deleteId(DeleteIdRequestDto dto);
     ResponseEntity<? super GetMyProfileResponseDto> getMypage();
     ResponseEntity<? super GetOtherProfileResponseDto> getOtherMypage(Long userId);

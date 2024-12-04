@@ -101,22 +101,4 @@ public class JwtProvider {
         }
     }
 
-    public String validateAndGetAccountId(String token) {
-        try {
-            // 비밀 키 생성
-            Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
-
-            // JWT 토큰 파싱 및 검증
-            return Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token) // 토큰 파싱
-                    .getBody()
-                    .getSubject(); // accountId를 subject로 저장한 경우 반환
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null; // JWT가 유효하지 않거나 예외가 발생한 경우 null 반환
-        }
-    }
-
 }
