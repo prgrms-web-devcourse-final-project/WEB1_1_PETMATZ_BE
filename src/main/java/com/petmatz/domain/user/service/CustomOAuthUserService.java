@@ -35,35 +35,32 @@ public class CustomOAuthUserService extends DefaultOAuth2UserService {
         String kakaoAccountId = attributes.get("id").toString(); // 고유 ID
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
 
-        // Extract email
+        // Extract email (required for accountId)
         String email = (String) kakaoAccount.get("email");
-        if (email == null) {
-            throw new OAuth2AuthenticationException("Email is missing from Kakao response.");
+        if (email == null || email.isEmpty()) {
+            throw new OAuth2AuthenticationException("Email is required for Kakao login.");
         }
 
         // Extract nickname
         Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
-        String nickname = (String) profile.get("nickname");
-        if (nickname == null) {
-            throw new OAuth2AuthenticationException("Nickname is missing from Kakao response.");
-        }
+        String nickname = (String) profile.getOrDefault("nickname", "Unknown User");
 
         // Extract profile image (optional)
-        String profileImage = profile.get("profile_image_url") != null ? profile.get("profile_image_url").toString() : "";
+        String profileImage = (String) profile.getOrDefault("profile_image_url", "");
 
         // 3. Check if user exists or create new user
-        User user = userRepository.findByAccountId(kakaoAccountId);
+        User user = userRepository.findByAccountId(email);
         if (user == null) {
-            user = createNewKakaoUser(kakaoAccountId, email, nickname, profileImage); // 신규 사용자 생성
+            user = createNewKakaoUser(email, nickname, profileImage); // 신규 사용자 생성
         }
 
         // 4. Return CustomOAuthUser
         return new CustomOAuthUser(user.getId(), user.getAccountId(), attributes, oAuth2User.getAuthorities());
     }
 
-    private User createNewKakaoUser(String kakaoAccountId, String email, String nickname, String profileImage) {
+    private User createNewKakaoUser(String email, String nickname, String profileImage) {
         User newUser = User.builder()
-                .accountId(email)
+                .accountId(email) // 이메일을 accountId에 저장
                 .password("default_password") // 기본 비밀번호 설정 (필요시 변경)
                 .nickname(nickname)
                 .profileImg(profileImage) // 프로필 이미지 저장
