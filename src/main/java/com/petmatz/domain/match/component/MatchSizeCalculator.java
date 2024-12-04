@@ -1,10 +1,10 @@
-package com.petmatz.domain.match.service;
+package com.petmatz.domain.match.component;
 
 import com.petmatz.domain.match.exception.MatchException;
 import com.petmatz.domain.pet.Pet;
 import com.petmatz.domain.pet.PetRepository;
+import com.petmatz.domain.pet.PetServiceImpl;
 import com.petmatz.domain.pet.exception.PetServiceException;
-import com.petmatz.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,17 +17,11 @@ import static com.petmatz.domain.pet.exception.PetErrorCode.PET_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
-public class MatchSizeService {
+public class MatchSizeCalculator {
 
-    private final PetRepository petRepository;
-
-    // TODO 현재는 임시로 펫 직접 조회 추후에 펫 쪽에서 사이즈 구현 의뢰 예정
+    private final PetServiceImpl petService;
     public double calculateDogSizeScore(Long userId, List<String> targetPreferredSizes) {
-        List<Pet> userPets = petRepository.findByUserId(userId);
-
-        if (userPets.isEmpty()) {
-            throw new PetServiceException(PET_NOT_FOUND);
-        }
+        List<Pet> userPets = petService.getPetsByUserId(userId);
 
         if (targetPreferredSizes == null || targetPreferredSizes.isEmpty()) {
             throw new MatchException(NULL_PREFERRED_SIZES);
@@ -36,7 +30,7 @@ public class MatchSizeService {
         double totalScore = userPets.stream()
                 .mapToDouble(pet -> {
                     String myPetSize = pet.getSize().name();
-                    return calculateScoreForPet(targetPreferredSizes, myPetSize); // 점수 계산
+                    return calculateScoreForPet(targetPreferredSizes, myPetSize);
                 })
                 .sum();
 

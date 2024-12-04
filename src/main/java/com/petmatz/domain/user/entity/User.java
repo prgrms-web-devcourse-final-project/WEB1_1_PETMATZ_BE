@@ -2,6 +2,8 @@ package com.petmatz.domain.user.entity;
 
 import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import com.petmatz.domain.global.BaseEntity;
+import com.petmatz.domain.match.dto.response.UserResponse;
+import com.petmatz.domain.match.exception.MatchException;
 import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import com.petmatz.domain.user.constant.*;
 import com.petmatz.domain.user.info.EditMyProfileInfo;
@@ -13,6 +15,9 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.petmatz.domain.match.exception.MatchErrorCode.INSUFFICIENT_LATITUDE_DATA;
+import static com.petmatz.domain.match.exception.MatchErrorCode.INSUFFICIENT_LONGITUDE_DATA;
 
 @Getter
 @SuperBuilder
@@ -79,10 +84,10 @@ public class User extends BaseEntity {
     @Column(name = "mbti", nullable = false)
     private String mbti;
 
-    @Column(name="region")
+    @Column(name = "region")
     private String region;
 
-    @Column(name="region_code")
+    @Column(name = "region_code")
     private Integer regionCode;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -109,18 +114,18 @@ public class User extends BaseEntity {
     }
 
     public void updateProfile(EditMyProfileInfo info) {
-        this.profileImg=info.getProfileImg();
-        this.nickname=info.getNickname();
-        this.introduction=info.getIntroduction();
-        this.preferredSizes=info.getPreferredSizes();
-        this.isCareAvailable=info.isCareAvailable();
+        this.profileImg = info.getProfileImg();
+        this.nickname = info.getNickname();
+        this.introduction = info.getIntroduction();
+        this.preferredSizes = info.getPreferredSizes();
+        this.isCareAvailable = info.isCareAvailable();
     }
 
-    public void updateLocation(UpdateLocationInfo info, String region, Integer regionCode){
-        this.latitude=info.getLatitude();
-        this.longitude=info.getLongitude();
-        this.region=region;
-        this.regionCode=regionCode;
+    public void updateLocation(UpdateLocationInfo info, String region, Integer regionCode) {
+        this.latitude = info.getLatitude();
+        this.longitude = info.getLongitude();
+        this.region = region;
+        this.regionCode = regionCode;
     }
 
     public UserInfo of() {
@@ -130,5 +135,19 @@ public class User extends BaseEntity {
                 .email(accountId)
                 .profileImg(profileImg)
                 .build();
+    }
+
+    public void checkLatitudeLongitude() { // (희수 : 예외나 위도 경도 범위 추후에 변경 예정입니다!)
+        if (latitude <= 0) {
+            throw new MatchException(INSUFFICIENT_LATITUDE_DATA);
+        }
+        if (longitude <= 0) {
+            if (latitude == 0.0) {
+                throw new MatchException(INSUFFICIENT_LATITUDE_DATA);
+            }
+            if (longitude == 0.0) {
+                throw new MatchException(INSUFFICIENT_LONGITUDE_DATA);
+            }
+        }
     }
 }

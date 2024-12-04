@@ -9,4 +9,15 @@ public record MatchScoreResponse(
         double mbtiScore,
         double totalScore
 ) {
+    public MatchScoreResponse withUpdatedScore(double newScore) {
+        return new MatchScoreResponse(
+                this.id,
+                this.distance,
+                this.distanceScore,
+                this.careAvailabilityScore,
+                this.sizePreferenceScore,
+                this.mbtiScore,
+                newScore
+        );
+    }
 }

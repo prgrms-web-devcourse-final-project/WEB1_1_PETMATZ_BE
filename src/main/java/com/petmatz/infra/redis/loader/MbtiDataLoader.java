@@ -1,6 +1,6 @@
 package com.petmatz.infra.redis.loader;
 
-import com.petmatz.infra.redis.service.MbtiRedisService;
+import com.petmatz.infra.redis.component.RedisMbti;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ import static java.util.Map.entry;
 @RequiredArgsConstructor
 public class MbtiDataLoader implements CommandLineRunner {
 
-    private final MbtiRedisService mbtiRedisService;
+    private final RedisMbti redisMbti;
 
     public void loadData() {
         // MBTI 궁합 점수 데이터
@@ -146,7 +146,7 @@ public class MbtiDataLoader implements CommandLineRunner {
         ));
 
         // Redis에 저장
-        compatibilityMap.forEach((mbti, scores) -> mbtiRedisService.saveMbtiScores(mbti, scores));
+        compatibilityMap.forEach((mbti, scores) -> redisMbti.saveMbtiScores(mbti, scores));
     }
 
     @Override
