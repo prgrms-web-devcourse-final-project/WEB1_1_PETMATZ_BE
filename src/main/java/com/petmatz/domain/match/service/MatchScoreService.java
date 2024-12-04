@@ -27,7 +27,6 @@ public class MatchScoreService {
     private final UserRepository userRepository;
     private final MatchScoreCalculator matchScoreCalculator;
     private final RedisMatchComponent matchComponent;
-    private final MatchUtil matchUtil;
     private final UserMapper userMapper;
     private final BoundingBoxCalculator boundingBoxCalculator;
 
@@ -86,17 +85,7 @@ public class MatchScoreService {
 
 
     public void decreaseScore(Long userId, Long targetId) {
-        List<MatchScoreResponse> matchScores = matchComponent.getMatchScores(userId);
-
-        List<MatchScoreResponse> updatedResults = matchScores.stream()
-                .map(match -> {
-                    if (match.id().equals(targetId)) {
-                        double newScore = Math.max(0, match.totalScore() - 30.0);
-                        return match.withUpdatedScore(newScore);
-                    }
-                    return match;
-                })
-                .toList();
+        List<MatchScoreResponse> updatedResults = matchScoreCalculator.decreaseScore(userId, targetId);
         matchComponent.saveMatchScores(userId, updatedResults);
     }
 }

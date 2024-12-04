@@ -4,8 +4,11 @@ import com.petmatz.domain.match.dto.response.MatchScoreResponse;
 import com.petmatz.domain.match.dto.response.UserResponse;
 import com.petmatz.domain.pet.PetServiceImpl;
 import com.petmatz.domain.user.entity.User;
+import com.petmatz.infra.redis.component.RedisMatchComponent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -16,6 +19,7 @@ public class MatchScoreCalculator {
     private final MatchSizeCalculator matchSizeCalculator;
     private final MatchMbtiCalculator matchMbtiCalculator;
     private final PetServiceImpl petService;
+    private final RedisMatchComponent matchComponent;
 
     public MatchScoreResponse calculateScore(User user, UserResponse targetUser) {
         double distance = matchPlaceCalculator.calculateDistanceOnly(user, targetUser);
@@ -38,4 +42,18 @@ public class MatchScoreCalculator {
         );
     }
 
+    public List<MatchScoreResponse> decreaseScore(Long userId, Long targetId) {
+        double penaltyScore = 60.0;
+        List<MatchScoreResponse> matchScores = matchComponent.getMatchScores(userId);
+
+        return matchScores.stream()
+                .map(match -> {
+                    if (match.id().equals(targetId)) {
+                        double newScore = Math.max(0, match.totalScore() - penaltyScore);
+                        return match.withUpdatedScore(newScore);
+                    }
+                    return match;
+                })
+                .toList();
+    }
 }

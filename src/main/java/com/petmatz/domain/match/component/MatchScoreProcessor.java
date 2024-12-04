@@ -7,9 +7,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * 점수 정렬에 따라 가져오는 메소드
- */
 @Component
 public class MatchScoreProcessor {
 
