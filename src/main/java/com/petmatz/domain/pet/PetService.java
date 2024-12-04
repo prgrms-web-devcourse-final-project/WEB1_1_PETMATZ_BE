@@ -11,6 +11,5 @@ public interface PetService {
     void savePet(User user, PetServiceDto dto);  //새로운 펫 정보를 저장합니다.
     void updatePet(Long petId, User user, PetServiceDto updatedDto); //기존 펫 정보를 업데이트합니다.
     void deletePet(Long petId, User user); //특정 펫 정보를 삭제합니다.
-    Map<String, String> uploadImage(MultipartFile file); //이미지를 업로드하고 업로드된 파일의 정보를 반환합니다.
 }
 

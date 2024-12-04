@@ -64,15 +64,10 @@ public class PetServiceImpl implements PetService{
     }
 
     // 펫 저장
-    public void savePet(User user, PetServiceDto dto) {
+    public Long savePet1(User user, PetServiceDto dto) {
         if (repository.existsByDogRegNo(dto.dogRegNo())) {
             throw new PetServiceException(PetErrorCode.DOG_REG_NO_DUPLICATE);
         }
-
-
-        //사용자의 이미지가 기본 이미지면 default imgURL 반환, 새 이미지면 Upload 및 새 imgURL 반환
-        String imgURL = awsClient.uploadImg(dto.profileImg(), user.getNickname(), (user.getNickname()+"_profileImg"),"강아지_프로필_폴더");
-
 
         // DTO에서 Pet 엔티티 생성
         Pet pet = Pet.builder()
@@ -86,11 +81,10 @@ public class PetServiceImpl implements PetService{
                 .age(dto.age())
                 .temperament(dto.temperament())
                 .preferredWalkingLocation(dto.preferredWalkingLocation())
-                .profileImg(imgURL)
+                .profileImg(dto.profileImg())
                 .comment(dto.comment())
                 .build();
-
-        repository.save(pet);
+        return repository.save(pet).getId();
     }
 
     // 펫 업데이트
@@ -134,33 +128,6 @@ public class PetServiceImpl implements PetService{
         Pet pet = repository.findByIdAndUser(petId, user)
                 .orElseThrow(() -> new PetServiceException(PetErrorCode.PET_NOT_FOUND));
         repository.delete(pet);
-    }
-
-    // 이미지 업로드
-    public Map<String, String> uploadImage(MultipartFile file) {
-        if (file.isEmpty()) {
-            throw new ImageServiceException(ImageErrorCode.INVALID_FILE_FORMAT);
-        }
-
-        try {
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            String filePath = uploadDir + fileName;
-
-            File uploadDirFile = new File(uploadDir);
-            if (!uploadDirFile.exists() && !uploadDirFile.mkdirs()) {
-                throw new ImageServiceException(ImageErrorCode.FILE_UPLOAD_ERROR, "FILE_SYSTEM");
-            }
-
-            file.transferTo(new File(filePath));
-
-            Map<String, String> response = new HashMap<>();
-            response.put("fileName", fileName);
-            response.put("filePath", filePath);
-            return response;
-
-        } catch (IOException e) {
-            throw new ImageServiceException(ImageErrorCode.FILE_UPLOAD_ERROR, "IO_OPERATION");
-        }
     }
 
     // 외부 API 호출

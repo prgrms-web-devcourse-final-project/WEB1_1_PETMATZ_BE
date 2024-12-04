@@ -28,4 +28,6 @@ public interface UserService {
     ResponseEntity<? super UpdateRecommendationResponseDto> updateRecommend(UpdateRecommendationRequestDto dto);
 
     GetMyUserDto receiverEmail(String accountId);
+
+    void deleteUser(Long accountId);
 }

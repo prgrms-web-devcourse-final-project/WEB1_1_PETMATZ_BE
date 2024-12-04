@@ -139,11 +139,10 @@ public class UserServiceImpl implements UserService {
                 return SignUpResponseDto.locationFail();
             }
 
-            //사용자의 이미지가 기본 이미지면 default imgURL 반환, 새 이미지면 Upload 및 새 imgURL 반환
-            String imgURL = awsClient.uploadImg(info.getProfileImg(), info.getNickname(), (info.getNickname()+"_profileImg"), "유저_프로필_폴더");
+
 
             // 7. 새로운 User 생성 및 저장
-            User user = UserFactory.createNewUser(info, encodedPassword, regionName, regionCode, imgURL);
+            User user = UserFactory.createNewUser(info, encodedPassword, regionName, regionCode);
             userRepository.save(user);
 
             // 8. 인증 엔티티 삭제
@@ -493,8 +492,15 @@ public class UserServiceImpl implements UserService {
         return new GetMyUserDto();
     }
 
+    @Override
+    public void deleteUser(Long userUUID) {
+        userRepository.deleteUserById(userUUID);
+    }
+
     public UserInfo selectUserInfo(String receiverEmail) {
         User otherUser = userRepository.findByAccountId(receiverEmail);
         return otherUser.of();
     }
+
+
 }

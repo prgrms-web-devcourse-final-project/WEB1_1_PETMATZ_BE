@@ -9,13 +9,13 @@ import java.time.LocalDateTime;
 
 public class UserFactory {
 
-    public static User createNewUser(SignUpInfo info, String encodedPassword, String region,Integer regionCode,String imgURL) {
+    public static User createNewUser(SignUpInfo info, String encodedPassword, String region,Integer regionCode) {
 
         return User.builder()
                 .accountId(info.getAccountId())
                 .password(encodedPassword)
                 .nickname(info.getNickname())
-                .profileImg(imgURL)
+                .profileImg(info.getProfileImg())
                 .loginRole(LoginRole.ROLE_USER)
                 .loginType(LoginType.NORMAL)
                 .gender(info.getGender())

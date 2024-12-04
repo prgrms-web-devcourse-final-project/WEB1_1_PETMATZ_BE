@@ -39,11 +39,11 @@ public class PetController {
     // 댕댕이 정보 등록
     @PostMapping("/register")
     @Operation(summary = "반려동물 등록", description = "사용자의 반려동물 정보를 등록합니다.")
-    public ResponseEntity<Response<Void>> registerPet(@RequestBody PetRequest request) {
+    public ResponseEntity<Response<Long>> registerPet(@RequestBody PetRequest request) {
         User user = getAuthenticatedUser();
         PetServiceDto serviceDto = PetRequest.toServiceDto(request);
-        petServiceImpl.savePet(user, serviceDto);
-        return ResponseEntity.ok(Response.success("댕댕이가 성공적으로 등록되었습니다."));
+        Long aLong = petServiceImpl.savePet1(user, serviceDto);
+        return ResponseEntity.ok(Response.success(aLong));
     }
 
     // 댕댕이 정보 수정

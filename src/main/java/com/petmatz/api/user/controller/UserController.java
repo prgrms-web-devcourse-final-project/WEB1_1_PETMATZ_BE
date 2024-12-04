@@ -19,21 +19,21 @@ public class UserController {
 
     @PostMapping("/email-certification")
     public ResponseEntity<? super EmailCertificationResponseDto> emailCertification(@RequestBody @Valid EmailCertificationRequestDto requestBody) {
-        ResponseEntity<? super EmailCertificationResponseDto> response= userService.emailCertification(requestBody);
+        ResponseEntity<? super EmailCertificationResponseDto> response = userService.emailCertification(requestBody);
         log.info("[emailCertification]: { accountId: " + requestBody.getAccountId() + "}");
         return response;
     }
 
     @PostMapping("/check-certification")
     public ResponseEntity<? super CheckCertificationResponseDto> checkCertification(@RequestBody @Valid CheckCertificationRequestDto requestBody) {
-        ResponseEntity<? super CheckCertificationResponseDto> response= userService.checkCertification(CheckCertificationRequestDto.of(requestBody));
+        ResponseEntity<? super CheckCertificationResponseDto> response = userService.checkCertification(CheckCertificationRequestDto.of(requestBody));
         log.info("[checkCertification]: {accountId: " + requestBody.getAccountId() + ", certificationNumber: " + requestBody.getCertificationNumber() + "}");
         return response;
     }
 
     @PostMapping("/sign-up")
     public ResponseEntity<? super SignUpResponseDto> signUp(@RequestBody @Valid SignUpRequestDto requestBody) {
-        ResponseEntity<? super SignUpResponseDto> response= userService.signUp(SignUpRequestDto.of(requestBody));
+        ResponseEntity<? super SignUpResponseDto> response = userService.signUp(SignUpRequestDto.of(requestBody));
         log.info("[signUp]: { accountId: " + requestBody.getAccountId() + ", password: " + requestBody.getPassword());
         return response;
     }
@@ -50,7 +50,7 @@ public class UserController {
 
     @PostMapping("/delete-user")
     public ResponseEntity<? super DeleteIdResponseDto> deleteUser(@RequestBody @Valid DeleteIdRequestDto requestBody) {
-        ResponseEntity<? super DeleteIdResponseDto> response= userService.deleteId(requestBody);
+        ResponseEntity<? super DeleteIdResponseDto> response = userService.deleteId(requestBody);
         log.info("[deleteUser]:{password: " + requestBody.getPassword() + "}");
         return response;
     }
@@ -80,7 +80,7 @@ public class UserController {
     @PostMapping("/send-repassword")
     public ResponseEntity<? super SendRepasswordResponseDto> sendRepassword(@RequestBody @Valid SendRepasswordRequestDto requestBody) {
         ResponseEntity<? super SendRepasswordResponseDto> response = userService.sendRepassword(requestBody);
-        log.info("[sendRepassword]: {accountId: " + requestBody.getAccountId()+"}");
+        log.info("[sendRepassword]: {accountId: " + requestBody.getAccountId() + "}");
         return response;
     }
 
@@ -90,30 +90,31 @@ public class UserController {
         log.info("[repassword]: {currentPassword: " + requestBody.getCurrentPassword() + ", newPassword: " + requestBody.getNewPassword() + "}");
         return response;
     }
+
     //---------------------------------------------------------------------------------------------------------------------------------------------------------------
     @PostMapping("/hearting")
     public ResponseEntity<? super HeartingResponseDto> hearting(@RequestBody @Valid HeartingRequestDto requestBody) {
         ResponseEntity<? super HeartingResponseDto> response = userService.hearting(requestBody);
-        log.info("[hearting]: {heartedId: " + requestBody.getHeartedId() +"}");
+        log.info("[hearting]: {heartedId: " + requestBody.getHeartedId() + "}");
         return response;
     }
 
     @GetMapping("/get-heartlist")
-    public ResponseEntity<? super GetHeartingListResponseDto>getHeartedList() {
+    public ResponseEntity<? super GetHeartingListResponseDto> getHeartedList() {
         ResponseEntity<? super GetHeartingListResponseDto> response = userService.getHeartedList();
         log.info("[getHeartedList]");
         return response;
     }
 
     @PostMapping("/update-location")
-    public ResponseEntity<? super UpdateLocationResponseDto>updateLocation(@RequestBody @Valid UpdateLocationRequestDto requestBody) {
+    public ResponseEntity<? super UpdateLocationResponseDto> updateLocation(@RequestBody @Valid UpdateLocationRequestDto requestBody) {
         ResponseEntity<? super UpdateLocationResponseDto> response = userService.updateLocation(UpdateLocationRequestDto.of(requestBody));
         log.info("[updateLocation]");
         return response;
     }
 
     @PostMapping("/update-recommendation")
-    public ResponseEntity<? super UpdateRecommendationResponseDto>updateLocation(@RequestBody @Valid UpdateRecommendationRequestDto requestBody) {
+    public ResponseEntity<? super UpdateRecommendationResponseDto> updateLocation(@RequestBody @Valid UpdateRecommendationRequestDto requestBody) {
         ResponseEntity<? super UpdateRecommendationResponseDto> response = userService.updateRecommend(requestBody);
         log.info("[updateLocation]");
         return response;

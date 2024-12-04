@@ -1,5 +1,6 @@
 package com.petmatz.domain.aws;
 
+import com.petmatz.common.security.utils.JwtExtractProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -10,20 +11,18 @@ public class AwsClient{
 
     private final S3Client s3Client;
 
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucketName;
+    private final JwtExtractProvider jwtExtractProvider;
 
-    @Value("${cloud.aws.region.static}")
-    private String region;
+    
+    public String uploadImg(String defaultFolder, String standard) {
+        if(defaultFolder.startsWith("profile")) return "default";
 
-
-    public String uploadImg(String base64EncodedData, String folderName, String fileName, String defaultFolder) {
-        if (base64EncodedData.startsWith("profile")) {
-            String fileKey = defaultFolder + "/" + base64EncodedData;
-            return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + fileKey;
-        }
-
-        return s3Client.uploadFile(defaultFolder, base64EncodedData, folderName, fileName);
+        String folderName = Prefix.returnKoreaName(standard);
+        //userName의 경우 토큰에서 가져와서 사용해야함 UUID로
+//        Long userName = jwtExtractProvider.findIdFromJwt();
+        String userName = "tset";
+        return s3Client.getPresignedURL(folderName,userName);
     }
+
 
 }

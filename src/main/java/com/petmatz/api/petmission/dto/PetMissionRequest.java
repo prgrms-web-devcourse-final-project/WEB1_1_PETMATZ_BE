@@ -11,6 +11,8 @@ public record PetMissionRequest(
 //        //JWT 이용
 //        Long careId,
         Long receiverId,
+
+        //TODO 펫 아이디 List
         String petId,
         LocalDateTime missionStarted,
         LocalDateTime missionEnd,

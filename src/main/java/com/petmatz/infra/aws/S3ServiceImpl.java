@@ -1,16 +1,16 @@
 package com.petmatz.infra.aws;
 
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.Headers;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.petmatz.domain.aws.S3Client;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Base64;
+import java.net.URL;
+import java.util.Date;
 
 @RequiredArgsConstructor
 @Component
@@ -24,28 +24,39 @@ public class S3ServiceImpl implements S3Client {
     @Value("${cloud.aws.region.static}")
     private String region;
 
-    @Override
-    public String uploadFile(String base64EncodedData, String folderName, String fileName, String defaultFolder) {
-        byte[] decodedBytes = Base64.getDecoder().decode(base64EncodedData);
-        String fileKey;
-        try (InputStream inputStream = new ByteArrayInputStream(decodedBytes)) {
-            // 메타데이터 설정
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentLength(decodedBytes.length);
-            metadata.setContentType("image/jpeg");
-            fileKey = defaultFolder  + "/" + folderName + "/" + fileName;
-            // S3에 업로드
-            amazonS3Client.putObject(bucketName, fileKey, inputStream, metadata);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to upload file to S3", e);
-        }
 
-        return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + fileKey;
+    //URL 반환
+    //해당 URL은 회원가입, 이미지 수정때도 같이 사용이 가능 할듯
+    @Override
+    public String getPresignedURL(String folderName, String userName) {
+        String path = createPath(folderName, userName);
+        GeneratePresignedUrlRequest generatePresignedUrlRequest = makePresignedURL(bucketName, path);
+        URL url = amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
+        return url.toString();
     }
 
+    //URL 생성
+    private GeneratePresignedUrlRequest makePresignedURL(String bucket, String path) {
+        GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucket, path)
+                        .withMethod(HttpMethod.PUT)
+                        .withExpiration(getPreSignedUrlExpiration());
+        generatePresignedUrlRequest.addRequestParameter(
+                Headers.S3_CANNED_ACL,
+                CannedAccessControlList.PublicRead.toString());
+        return generatePresignedUrlRequest;
+    }
 
-    @Override
-    public void deleteFile(String key) {
+    //URL 유효기간 설정
+    private Date getPreSignedUrlExpiration() {
+        Date expiration = new Date();
+        long expTimeMillis = expiration.getTime();
+        expTimeMillis += 1000 * 60 * 2;
+        expiration.setTime(expTimeMillis);
+        return expiration;
+    }
+
+    private String createPath(String prefix, String userName) {
+        return String.format("%s/%s", prefix ,userName);
 
     }
 }
