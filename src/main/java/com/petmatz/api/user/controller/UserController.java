@@ -3,6 +3,7 @@ package com.petmatz.api.user.controller;
 import com.petmatz.api.user.request.*;
 import com.petmatz.domain.user.response.*;
 import com.petmatz.domain.user.service.UserService;
+import com.petmatz.user.common.LogInResponseDto;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -116,6 +117,13 @@ public class UserController {
     public ResponseEntity<? super UpdateRecommendationResponseDto>updateLocation(@RequestBody @Valid UpdateRecommendationRequestDto requestBody) {
         ResponseEntity<? super UpdateRecommendationResponseDto> response = userService.updateRecommend(requestBody);
         log.info("[updateLocation]");
+        return response;
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<? super LogInResponseDto> logout(HttpServletResponse res) {
+        ResponseEntity<? super LogInResponseDto> response = userService.logout(res);
+        log.info("[logout]");
         return response;
     }
 

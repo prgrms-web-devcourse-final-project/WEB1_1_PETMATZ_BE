@@ -17,8 +17,6 @@ public interface ResponseMessage {
 
     String ID_NOT_FOUND = "ID Not found";
 
-    String ID_NOT_MATCHING = "ID does not match";
-
     String WRONG_ROLE = "Wrong role.";
 
     String WRONG_PASSWORD="Wrong password.";

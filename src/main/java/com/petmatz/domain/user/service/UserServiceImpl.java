@@ -19,6 +19,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -144,7 +145,7 @@ public class UserServiceImpl implements UserService {
             certificationRepository.deleteAllByAccountId(accountId);
 
             // 9. 성공 응답 반환
-            return SignUpResponseDto.success();
+            return SignUpResponseDto.success(user.getId());
 
         } catch (RuntimeException e) {
             log.error("회원 가입 실패: {}", e.getMessage(), e);
@@ -196,6 +197,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public ResponseEntity<? super LogInResponseDto> logout(HttpServletResponse response) {
+        try {
+            // 만료된 쿠키 설정
+            ResponseCookie expiredCookie = ResponseCookie.from("jwt", "")
+                    .httpOnly(true)           // XSS 방지
+                    .secure(true)             // HTTPS만 허용
+                    .path("/")                // 모든 경로에서 접근 가능
+                    .sameSite("None")         // SameSite=None 설정
+                    .maxAge(0)                // 즉시 만료
+                    .build();
+
+            response.addHeader("Set-Cookie", expiredCookie.toString());
+
+            log.info("JWT 쿠키 제거 및 로그아웃 처리 완료");
+            return LogInResponseDto.success();
+        } catch (Exception e) {
+            log.error("로그아웃 처리 중 예외 발생", e);
+            return LogInResponseDto.validationFail();
+        }
+    }
+
+    @Override
     @Transactional
     public ResponseEntity<? super DeleteIdResponseDto> deleteId(DeleteIdRequestDto dto) {
         try {
@@ -213,7 +236,7 @@ public class UserServiceImpl implements UserService {
             String password = dto.getPassword();
             String encodedPassword = user.getPassword();
             boolean isMatched = passwordEncoder.matches(password, encodedPassword);
-            if (!isMatched) return DeleteIdResponseDto.idNotMatching();  // 비밀번호 불일치
+            if (!isMatched) return DeleteIdResponseDto.wrongPassword();  // 비밀번호 불일치
 
             certificationRepository.deleteById(userId);
 
@@ -367,7 +390,11 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<? super SendRepasswordResponseDto> sendRepassword(SendRepasswordRequestDto dto) {
         try {
             String accountId = dto.getAccountId();
+            if (!userRepository.existsByAccountId(accountId)) {
+                return GetMyProfileResponseDto.idNotFound();
+            }
             User user = userRepository.findByAccountId(accountId);
+
 
             String rePasswordNum = RePasswordProvider.generatePassword();
 

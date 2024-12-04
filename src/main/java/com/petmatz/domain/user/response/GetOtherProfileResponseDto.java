@@ -26,6 +26,7 @@ public class GetOtherProfileResponseDto extends LogInResponseDto {
     private Boolean isCareAvailable;
     private String mbti;
     private String region;
+    private Integer regionCode;
     private boolean isMyHeartUser;
 
     public GetOtherProfileResponseDto(User user, boolean isMyHeartUser) {
@@ -43,6 +44,7 @@ public class GetOtherProfileResponseDto extends LogInResponseDto {
         this.mbti=user.getMbti();
         this.region = user.getRegion();
         this.isMyHeartUser=isMyHeartUser;
+        this.regionCode=user.getRegionCode();
     }
 
     public static ResponseEntity<LogInResponseDto> userNotFound() {
