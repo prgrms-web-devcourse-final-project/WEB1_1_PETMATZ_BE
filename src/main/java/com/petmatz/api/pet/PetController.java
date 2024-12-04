@@ -42,7 +42,7 @@ public class PetController {
     public ResponseEntity<Response<Long>> registerPet(@RequestBody PetRequest request) {
         User user = getAuthenticatedUser();
         PetServiceDto serviceDto = PetRequest.toServiceDto(request);
-        Long aLong = petServiceImpl.savePet1(user, serviceDto);
+        Long aLong = petServiceImpl.savePet(user, serviceDto);
         return ResponseEntity.ok(Response.success(aLong));
     }
 

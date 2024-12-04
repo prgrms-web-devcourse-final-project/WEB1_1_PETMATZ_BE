@@ -28,11 +28,10 @@ public class S3ServiceImpl implements S3Client {
     //URL 반환
     //해당 URL은 회원가입, 이미지 수정때도 같이 사용이 가능 할듯
     @Override
-    public String getPresignedURL(String folderName, String userName) {
+    public URL getPresignedURL(String folderName, String userName) {
         String path = createPath(folderName, userName);
         GeneratePresignedUrlRequest generatePresignedUrlRequest = makePresignedURL(bucketName, path);
-        URL url = amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
-        return url.toString();
+        return amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
     }
 
     //URL 생성

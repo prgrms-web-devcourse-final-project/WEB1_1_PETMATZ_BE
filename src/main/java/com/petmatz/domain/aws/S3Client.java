@@ -1,10 +1,11 @@
 package com.petmatz.domain.aws;
 
 import java.io.InputStream;
+import java.net.URL;
 
 public interface S3Client {
 
-    String getPresignedURL(String folderName, String userName);
+    URL getPresignedURL(String folderName, String userName);
 
 
 }

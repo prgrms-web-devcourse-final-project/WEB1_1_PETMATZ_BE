@@ -28,6 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -140,17 +141,20 @@ public class UserServiceImpl implements UserService {
                 return SignUpResponseDto.locationFail();
             }
 
-
+            //6-1 Img 정제
+            URL uploadURL = awsClient.uploadImg(info.getAccountId(), info.getProfileImg(), "CUSTOM_USER_IMG");
+            System.out.println("imgURL :: " + uploadURL);
+            String imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
 
             // 7. 새로운 User 생성 및 저장
-            User user = UserFactory.createNewUser(info, encodedPassword, regionName, regionCode);
+            User user = UserFactory.createNewUser(info, encodedPassword, regionName, regionCode, imgURL);
             userRepository.save(user);
 
             // 8. 인증 엔티티 삭제
             certificationRepository.deleteAllByAccountId(accountId);
 
             // 9. 성공 응답 반환
-            return SignUpResponseDto.success(user.getId());
+            return SignUpResponseDto.success(user.getId(), uploadURL.toString());
 
         } catch (RuntimeException e) {
             log.error("회원 가입 실패: {}", e.getMessage(), e);

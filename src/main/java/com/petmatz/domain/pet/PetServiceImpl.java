@@ -64,7 +64,7 @@ public class PetServiceImpl implements PetService{
     }
 
     // 펫 저장
-    public Long savePet1(User user, PetServiceDto dto) {
+    public Long savePet(User user, PetServiceDto dto) {
         if (repository.existsByDogRegNo(dto.dogRegNo())) {
             throw new PetServiceException(PetErrorCode.DOG_REG_NO_DUPLICATE);
         }
