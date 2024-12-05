@@ -33,6 +33,7 @@ public record SosBoardCreateRequestDto(
         return new SosBoardServiceDto(
                 this.id(),
                 user.getId(),
+                user.getAccountId(),
                 this.title(),
                 PaymentType.fromString(this.paymentType()),
                 this.price(),
