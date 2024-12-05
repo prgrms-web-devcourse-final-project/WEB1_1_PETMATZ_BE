@@ -93,7 +93,6 @@ public class PetMissionService {
         List<UserToPetMissionEntity> userToPetMissionEntities = userToPetMissionReader.selectUserToPetMissionList(petMissionId);
 
         PetMissionEntity petMissionEntity = petMissionReader.selectUserToPetMission(petMissionId);
-        System.out.println(petMissionEntity.toString());
 
         return PetMissionDetails.of(petMissionEntity, userToPetMissionEntities);
     }
