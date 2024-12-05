@@ -143,8 +143,13 @@ public class UserServiceImpl implements UserService {
             }
 
             //6-1 Img 정제
+            String imgURL;
             URL uploadURL = awsClient.uploadImg(info.getAccountId(), info.getProfileImg(), "CUSTOM_USER_IMG");
-            String imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
+            imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
+            String resultImgURL = String.valueOf(uploadURL);
+            if (info.getProfileImg().startsWith("profile")) {
+                resultImgURL = "";
+            }
 
             // 7. 새로운 User 생성 및 저장
             User user = UserFactory.createNewUser(info, encodedPassword, kakaoRegion.getRegionName(), kakaoRegion.getCodeAsInteger(), imgURL);
@@ -154,7 +159,7 @@ public class UserServiceImpl implements UserService {
             certificationRepository.deleteAllByAccountId(accountId);
 
             // 9. 성공 응답 반환
-            return SignUpResponseDto.success(user.getId(), uploadURL.toString());
+            return SignUpResponseDto.success(user.getId(), resultImgURL);
 
         } catch (RuntimeException e) {
             log.error("회원 가입 실패: {}", e.getMessage(), e);
