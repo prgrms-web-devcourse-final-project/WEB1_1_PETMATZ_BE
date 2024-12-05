@@ -32,4 +32,6 @@ public interface ResponseMessage {
     String MISSING_FIELDS = "Missing Fields"; // MF
 
     String UNKNOWN_ERROR = "Unknown Error"; // UE
+
+    String CERTIFICATION_EXPIRED = "Certificate Expired";
 }
