@@ -3,6 +3,8 @@ package com.petmatz.domain.pet;
 
 import com.petmatz.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 
 import java.util.List;
@@ -14,5 +16,9 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
     Optional<Pet> findByIdAndUser(Long id, User user);
 
     List<Pet> findByUserId(Long userId); // userId로 Pet 조회
+
+    @Query("select p from Pet p where p.id IN :petList")
+    Optional<List<Pet>> findPetListByPetId(@Param("petList") List<String> petList);
+
 
 }

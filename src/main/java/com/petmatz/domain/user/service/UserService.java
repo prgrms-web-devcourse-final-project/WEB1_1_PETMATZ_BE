@@ -29,5 +29,7 @@ public interface UserService {
 
     ResponseEntity<? super UpdateRecommendationResponseDto> updateRecommend(UpdateRecommendationRequestDto dto);
 
+    String findByUserEmail(Long userId);
+
     GetMyUserDto receiverEmail(String accountId);
 }

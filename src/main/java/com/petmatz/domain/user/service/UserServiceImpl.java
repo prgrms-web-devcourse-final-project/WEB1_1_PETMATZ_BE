@@ -502,6 +502,11 @@ public class UserServiceImpl implements UserService {
         return UpdateRecommendationResponseDto.success();
     }
 
+    @Override
+    public String findByUserEmail(Long userId) {
+        return userRepository.findById(userId).get().getAccountId();
+    }
+
 
     @Override
     public GetMyUserDto receiverEmail(String accountId) {

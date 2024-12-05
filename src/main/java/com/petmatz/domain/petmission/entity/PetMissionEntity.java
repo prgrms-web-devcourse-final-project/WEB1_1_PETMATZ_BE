@@ -29,13 +29,12 @@ public class PetMissionEntity {
     @Enumerated(EnumType.STRING)
     private PetMissionStatusZip status;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pet_id", nullable = false)
     private Pet pet;
 
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "pet_mission_id")
+    @OneToMany(mappedBy = "petMission", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<PetMissionAskEntity> petMissionAsks = new ArrayList<>();
 
     @Builder
@@ -44,7 +43,6 @@ public class PetMissionEntity {
         this.petMissionEnd = petMissionEnd;
         this.status = status;
         this.pet = pet;
-        this.petMissionAsks = petMissionAsks;
     }
 
 
@@ -54,11 +52,17 @@ public class PetMissionEntity {
                 .petMissionEnd(petMissionInfo.missionEnd())
                 .status(PetMissionStatusZip.fromDescription("시작"))
                 .pet(pet)
-                .petMissionAsks(petMissionInfo.petMissionAskInfo().stream().map(
-                        PetMissionAskEntity::of
-                ).toList())
                 .build();
     }
+
+    public void addPetMissionAsk(List<PetMissionAskEntity> ask) {
+        petMissionAsks.addAll(ask);
+        for (PetMissionAskEntity petMissionAsk : petMissionAsks) {
+            System.out.println("petMissionAsk.getComment() :: " + petMissionAsk.getComment());
+        }
+        ask.forEach(petMissionAskEntity -> petMissionAskEntity.addPetMission(this));
+    }
+
 
     public void updatePetMissionStatusZip(PetMissionStatusZip updateStatus) {
         status = updateStatus;

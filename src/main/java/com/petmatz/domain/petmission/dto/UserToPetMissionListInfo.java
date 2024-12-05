@@ -6,10 +6,13 @@ import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 public record UserToPetMissionListInfo(
         Long missionId,
+
+        String comment,
 
         LocalDateTime petMissionStarted,
 
@@ -17,7 +20,7 @@ public record UserToPetMissionListInfo(
 
         PetMissionStatusZip status,
 
-        PetInfo petInfo
+        List<PetInfo> petInfo
 
 ) {
 
@@ -29,7 +32,7 @@ public record UserToPetMissionListInfo(
                 .petMissionStarted(petMission.getPetMissionStarted())
                 .petMissionEnd(petMission.getPetMissionEnd())
                 .status(petMission.getStatus())
-                .petInfo(PetInfo.of(petMission.getPet()))
+                .petInfo(petMission.getPet().stream().map(PetInfo::of).toList())
                 .build();
     }
 }
