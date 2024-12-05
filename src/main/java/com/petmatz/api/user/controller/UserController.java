@@ -127,5 +127,12 @@ public class UserController {
         return response;
     }
 
+    @PostMapping("/edit-kakaoprofile")
+    public ResponseEntity<? super EditKakaoProfileResponseDto> editKakaoProfile(@RequestBody @Valid EditKakaoProfileRequestDto requestBody) {
+        ResponseEntity<? super EditKakaoProfileResponseDto> response = userService.editKakaoProfile(EditKakaoProfileRequestDto.of(requestBody));
+        log.info("[editKakaoProfile]");
+        return response;
+    }
+
 }
 

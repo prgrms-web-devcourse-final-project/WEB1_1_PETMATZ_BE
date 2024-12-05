@@ -4,6 +4,7 @@ import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import com.petmatz.domain.global.BaseEntity;
 import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import com.petmatz.domain.user.constant.*;
+import com.petmatz.domain.user.info.EditKakaoProfileInfo;
 import com.petmatz.domain.user.info.EditMyProfileInfo;
 import com.petmatz.domain.user.info.UpdateLocationInfo;
 import com.petmatz.domain.user.info.UserInfo;
@@ -27,13 +28,13 @@ public class User extends BaseEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "account_id", nullable = false, unique = true)
+    @Column(name = "account_id",unique = true)
     private String accountId;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password")
     private String password;
 
-    @Column(name = "nickname", nullable = false)
+    @Column(name = "nickname")
     private String nickname;
 
     @Column(name = "profile_img")
@@ -58,7 +59,7 @@ public class User extends BaseEntity {
     @Column(name = "introduction")
     private String introduction;
 
-    @Column(name = "is_care_available", nullable = false)
+    @Column(name = "is_care_available")
     private Boolean isCareAvailable;
 
     @Column(name = "is_registered")
@@ -76,7 +77,7 @@ public class User extends BaseEntity {
     @Column(name = "longitude")
     private Double longitude;
 
-    @Column(name = "mbti", nullable = false)
+    @Column(name = "mbti")
     private String mbti;
 
     @Column(name="region")
@@ -114,6 +115,16 @@ public class User extends BaseEntity {
         this.introduction=info.getIntroduction();
         this.preferredSizes=info.getPreferredSizes();
         this.isCareAvailable=info.isCareAvailable();
+    }
+
+    public void updateKakaoProfile(EditKakaoProfileInfo info) {
+        this.profileImg=info.getProfileImg();
+        this.nickname=info.getNickname();
+        this.introduction=info.getIntroduction();
+        this.preferredSizes=info.getPreferredSizes();
+        this.isCareAvailable=info.isCareAvailable();
+        this.mbti=info.getMbti();
+        this.gender=info.getGender();
     }
 
     public void updateLocation(UpdateLocationInfo info, String region, Integer regionCode){
