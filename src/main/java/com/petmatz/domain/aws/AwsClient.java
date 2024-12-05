@@ -25,7 +25,7 @@ public class AwsClient {
             //에러발생
 
         }
-        if (defaultFolder.startsWith("profile")) return null;
+        if (defaultFolder.startsWith("profile")) return new URL(DEFAULT_IMG_URL + standard + "/" + defaultFolder);
         String folderName = Prefix.returnKoreaName(standard);
         return s3Client.getPresignedURL(folderName, userEmail);
     }

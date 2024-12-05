@@ -7,6 +7,7 @@ import com.petmatz.api.pet.dto.PetInfoDto;
 import com.petmatz.api.pet.dto.PetRequest;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.pet.PetServiceImpl;
+import com.petmatz.domain.pet.dto.PetSaveResponse;
 import com.petmatz.domain.pet.dto.PetServiceDto;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.domain.user.repository.UserRepository;
@@ -41,11 +42,11 @@ public class PetController {
     // 댕댕이 정보 등록
     @PostMapping("/register")
     @Operation(summary = "반려동물 등록", description = "사용자의 반려동물 정보를 등록합니다.")
-    public ResponseEntity<Response<Long>> registerPet(@RequestBody PetRequest request) throws MalformedURLException {
+    public ResponseEntity<Response<PetSaveResponse>> registerPet(@RequestBody PetRequest request) throws MalformedURLException {
         User user = getAuthenticatedUser();
         PetServiceDto serviceDto = PetRequest.toServiceDto(request);
-        Long aLong = petServiceImpl.savePet(user, serviceDto);
-        return ResponseEntity.ok(Response.success(aLong));
+        PetSaveResponse petSaveResponse = petServiceImpl.savePet(user, serviceDto);
+        return ResponseEntity.ok(Response.success(petSaveResponse));
     }
 
     // 댕댕이 정보 수정
