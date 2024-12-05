@@ -4,10 +4,7 @@ import com.petmatz.domain.pet.Pet;
 import com.petmatz.domain.petmission.dto.PetMissionInfo;
 import com.petmatz.common.constants.PetMissionStatusZip;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,41 +26,44 @@ public class PetMissionEntity {
     @Enumerated(EnumType.STRING)
     private PetMissionStatusZip status;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pet_id", nullable = false)
-    private Pet pet;
+    @OneToMany(mappedBy = "petMission", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PetToPetMissionEntity> petToPetMissions = new ArrayList<>();
 
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "pet_mission_id")
+    @OneToMany(mappedBy = "petMission", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<PetMissionAskEntity> petMissionAsks = new ArrayList<>();
 
+
     @Builder
-    public PetMissionEntity(LocalDateTime petMissionStarted, LocalDateTime petMissionEnd, PetMissionStatusZip status, Pet pet, List<UserToPetMissionEntity> userPetMissions, List<PetMissionAskEntity> petMissionAsks) {
+    public PetMissionEntity(LocalDateTime petMissionStarted, LocalDateTime petMissionEnd, PetMissionStatusZip status, List<PetToPetMissionEntity> petToPetMissions, List<PetMissionAskEntity> petMissionAsks) {
         this.petMissionStarted = petMissionStarted;
         this.petMissionEnd = petMissionEnd;
         this.status = status;
-        this.pet = pet;
-        this.petMissionAsks = petMissionAsks;
+        this.petToPetMissions = new ArrayList<>();
+        this.petMissionAsks =  new ArrayList<>();
     }
 
 
-    public static PetMissionEntity of(PetMissionInfo petMissionInfo, Pet pet) {
+    public static PetMissionEntity of(PetMissionInfo petMissionInfo) {
         return PetMissionEntity.builder()
                 .petMissionStarted(petMissionInfo.missionStarted())
                 .petMissionEnd(petMissionInfo.missionEnd())
                 .status(PetMissionStatusZip.fromDescription("시작"))
-                .pet(pet)
-                .petMissionAsks(petMissionInfo.petMissionAskInfo().stream().map(
-                        PetMissionAskEntity::of
-                ).toList())
                 .build();
     }
+
+    public void addPetMissionAsk(List<PetMissionAskEntity> ask) {
+        petMissionAsks.addAll(ask);
+        ask.forEach(petMissionAskEntity -> petMissionAskEntity.addPetMission(this));
+    }
+
 
     public void updatePetMissionStatusZip(PetMissionStatusZip updateStatus) {
         status = updateStatus;
     }
 
-
+    public void addPetToPetMission(PetToPetMissionEntity pet) {
+        this.petToPetMissions.add(pet);
+    }
 
 }

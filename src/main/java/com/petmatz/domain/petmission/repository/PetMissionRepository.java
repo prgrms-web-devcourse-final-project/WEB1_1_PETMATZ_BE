@@ -9,9 +9,10 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface PetMissionRepository extends JpaRepository<UserToPetMissionEntity, Long> {
+public interface PetMissionRepository extends JpaRepository<PetMissionEntity, Long> {
 
-    @Query("select pm from UserToPetMissionEntity pm where pm.user.id = :userId")
-    Optional<List<UserToPetMissionEntity>> selectPetMissionList(@Param("userId") String userId);
+    @Query("select utr from PetMissionEntity  utr where utr.id = :petMissionId")
+    Optional<PetMissionEntity> selectUserToPetMission(@Param("petMissionId") String petMissionId);
 
 }
+

@@ -1,5 +1,6 @@
 package com.petmatz.api.petmission.dto;
 
+import com.petmatz.domain.chatting.dto.ChatMessagePetMissionInfo;
 import com.petmatz.domain.petmission.dto.PetMissionInfo;
 import org.springframework.cglib.core.Local;
 
@@ -11,9 +12,7 @@ public record PetMissionRequest(
 //        //JWT 이용
 //        Long careId,
         Long receiverId,
-
-        //TODO 펫 아이디 List
-        String petId,
+        List<String> petId,
         LocalDateTime missionStarted,
         LocalDateTime missionEnd,
         List<String> petMissionAsk
@@ -22,6 +21,18 @@ public record PetMissionRequest(
 
     public PetMissionInfo of() {
         return PetMissionInfo.builder()
+//                .careId(careId)
+                .receiverId(receiverId)
+                .petId(petId)
+                .missionStarted(missionStarted)
+                .missionEnd(missionEnd)
+                .petMissionAskInfo(petMissionAsk)
+                .build();
+    }
+
+
+    public ChatMessagePetMissionInfo ofto() {
+        return ChatMessagePetMissionInfo.builder()
 //                .careId(careId)
                 .receiverId(receiverId)
                 .petId(petId)

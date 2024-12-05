@@ -22,4 +22,11 @@ public class PetMissionAnswerEntity {
     private String imgURL;
 
 
+    public String checkCommentNull() {
+        return comment != null ? comment : "없음";
+    }
+
+    public String checkURLNull() {
+        return imgURL != null ? imgURL : "없음";
+    }
 }

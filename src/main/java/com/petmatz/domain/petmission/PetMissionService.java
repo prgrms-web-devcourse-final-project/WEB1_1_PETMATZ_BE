@@ -4,13 +4,17 @@ import com.petmatz.api.petmission.dto.PetMissionUpdateRequest;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.pet.Pet;
 import com.petmatz.domain.pet.PetRepository;
+import com.petmatz.domain.petmission.component.PetMissionReader;
 import com.petmatz.domain.petmission.component.UserToChatRoomReader;
 import com.petmatz.domain.petmission.component.UserToPetMissionInserter;
 import com.petmatz.domain.petmission.component.UserToPetMissionReader;
 import com.petmatz.domain.petmission.dto.PetMissionData;
+import com.petmatz.domain.petmission.dto.PetMissionDetails;
 import com.petmatz.domain.petmission.dto.PetMissionInfo;
 import com.petmatz.domain.petmission.dto.UserToPetMissionListInfo;
+import com.petmatz.domain.petmission.entity.PetMissionAskEntity;
 import com.petmatz.domain.petmission.entity.PetMissionEntity;
+import com.petmatz.domain.petmission.entity.PetToPetMissionEntity;
 import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.domain.user.repository.UserRepository;
@@ -32,42 +36,47 @@ public class PetMissionService {
     private final UserToChatRoomReader userToChatRoomReader;
     private final UserToPetMissionInserter userToPetMissionInserter;
     private final UserToPetMissionReader userToPetMissionReader;
+    private final PetMissionReader petMissionReader;
 
     private final JwtExtractProvider jwtExtractProvider;
 
     public PetMissionData insertPetMission(PetMissionInfo petMissionInfo) {
-
+        System.out.println("petMissionInfo.petMissionAskInfo :: " + petMissionInfo.petMissionAskInfo());
         Long careId = jwtExtractProvider.findIdFromJwt();
 
         List<User> users = makeUserEntityList(careId, petMissionInfo.receiverId());
+
         String chatRoomId = userToChatRoomReader.selectChatRoomId(users.get(0).getAccountId(), users.get(1).getAccountId());
 
-        //TODO 예외처리 해야 함
-        Optional<Pet> byId = petRepository.findById(Long.valueOf(petMissionInfo.petId()));
-        Pet pet = byId.get();
+        List<Pet> pets = petRepository.findPetListByPetId(petMissionInfo.petId())
+                .orElseThrow(() -> new IllegalArgumentException("No Pets Found"));
 
-        PetMissionEntity petMissionEntity = PetMissionEntity.of(petMissionInfo, pet);
+        List<PetMissionAskEntity> petMissionAskEntityList = petMissionInfo.petMissionAskInfo()
+                .stream()
+                .map(PetMissionAskEntity::of)
+                .toList();
 
-        List<UserToPetMissionEntity> list = users.stream().map(
-                user -> UserToPetMissionEntity.of(user, petMissionEntity)
-        ).toList();
+        PetMissionEntity petMissionEntity = PetMissionEntity.of(petMissionInfo);
+        petMissionEntity.addPetMissionAsk(petMissionAskEntityList);
 
-        List<UserToPetMissionEntity> userToPetMissionEntities = userToPetMissionInserter.insertUserToPetMission(list);
+        List<PetToPetMissionEntity> petToPetMissionEntities = pets.stream()
+                .map(pet -> PetToPetMissionEntity.of(pet, petMissionEntity))
+                .toList();
 
-        //TODO 반환 DTO 만들기
+        petToPetMissionEntities.forEach(petMissionEntity::addPetToPetMission);
 
-        return PetMissionData.of(chatRoomId,userToPetMissionEntities);
+        List<UserToPetMissionEntity> userToPetMissionEntities = users.stream()
+                .map(user -> UserToPetMissionEntity.of(user, petMissionEntity))
+                .toList();
 
+        userToPetMissionInserter.insertUserToPetMission(userToPetMissionEntities);
+
+        return PetMissionData.of(chatRoomId, petMissionEntity);
     }
 
-    public List<UserToPetMissionListInfo> selectPetMissionList() {
-
+    public List<UserToPetMissionEntity> selectPetMissionList() {
         Long userId = jwtExtractProvider.findIdFromJwt();
-        List<UserToPetMissionEntity> userToPetMissionEntities = userToPetMissionReader.selectUserToPetMissionList(userId);
-        return userToPetMissionEntities.stream().map(
-                UserToPetMissionListInfo::of
-        ).toList();
-
+        return userToPetMissionReader.selectUserToPetMissionList(userId);
     }
 
     @Transactional
@@ -80,17 +89,19 @@ public class PetMissionService {
         }
     }
 
-    public void selectPetMissionInfo(String petMissionId) {
-        Long userId = jwtExtractProvider.findIdFromJwt();
+    public PetMissionDetails selectPetMissionInfo(String petMissionId) {
+        List<UserToPetMissionEntity> userToPetMissionEntities = userToPetMissionReader.selectUserToPetMissionList(petMissionId);
 
-        UserToPetMissionEntity userToPetMissionEntity = userToPetMissionReader.selectUserToPetMission(petMissionId, userId);
+        PetMissionEntity petMissionEntity = petMissionReader.selectUserToPetMission(petMissionId);
+        System.out.println(petMissionEntity.toString());
 
+        return PetMissionDetails.of(petMissionEntity, userToPetMissionEntities);
     }
 
     private List<User> makeUserEntityList(Long careId, Long receiverId) {
         ArrayList<User> userList = new ArrayList<>();
-         userList.add(userRepository.findById(careId).get());
-         userList.add(userRepository.findById(receiverId).get());
+        userList.add(userRepository.findById(careId).get());
+        userList.add(userRepository.findById(receiverId).get());
         return userList;
     }
 

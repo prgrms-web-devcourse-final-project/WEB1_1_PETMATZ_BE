@@ -93,7 +93,7 @@ public class UserServiceImpl implements UserService {
 
         } catch (Exception e) {
             log.info("인증 번호 확인 실패: {}", e);
-            return LogInResponseDto.databaseError();
+            return CheckCertificationResponseDto.databaseError();
         }
 
         return CheckCertificationResponseDto.success();  // 인증 성공 응답
@@ -515,6 +515,11 @@ public class UserServiceImpl implements UserService {
         return UpdateRecommendationResponseDto.success();
     }
 
+    @Override
+    public String findByUserEmail(Long userId) {
+        return userRepository.findById(userId).get().getAccountId();
+    }
+
 
     @Override
     public GetMyUserDto receiverEmail(String accountId) {
@@ -530,6 +535,25 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long userUUID) {
         userRepository.deleteUserById(userUUID);
+    }
+    @Transactional
+    public ResponseEntity<? super EditKakaoProfileResponseDto> editKakaoProfile(EditKakaoProfileInfo info) {
+        try {
+            Long userId = jwtExtractProvider.findIdFromJwt();
+            boolean exists = userRepository.existsById(userId);
+            if (!exists) {
+                return EditKakaoProfileResponseDto.idNotFound();
+            }
+
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
+
+            user.updateKakaoProfile(info);
+        } catch (Exception e) {
+            log.info("프로필 수정 실패: {}", e);
+            return EditKakaoProfileResponseDto.editFailed();
+        }
+        return EditKakaoProfileResponseDto.success();
     }
 
     public UserInfo selectUserInfo(String receiverEmail) {

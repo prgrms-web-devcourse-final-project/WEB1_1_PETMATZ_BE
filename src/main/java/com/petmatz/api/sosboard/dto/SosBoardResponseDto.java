@@ -1,16 +1,19 @@
 package com.petmatz.api.sosboard.dto;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.petmatz.api.pet.dto.PetResponse;
 import com.petmatz.domain.sosboard.PaymentType;
 import com.petmatz.domain.sosboard.PetSosBoard;
 import com.petmatz.domain.sosboard.SosBoard;
 import com.petmatz.domain.sosboard.dto.SosBoardServiceDto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public record SosBoardResponseDto(
         Long id,
         Long userId,
+        String accountId,
         String title,
         PaymentType paymentType,
         int price,
@@ -20,12 +23,17 @@ public record SosBoardResponseDto(
         String authorNickname,
         String authorProfileImg,
         String authorGender,
-        String authorRegion
+        String authorRegion,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+        LocalDateTime createdAt, // 생성일시
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+        LocalDateTime updatedAt
 ) {
     public static SosBoardResponseDto of(SosBoard sosBoard) {
         return new SosBoardResponseDto(
                 sosBoard.getId(),
                 sosBoard.getUser().getId(),
+                sosBoard.getUser().getAccountId(),
                 sosBoard.getTitle(),
                 sosBoard.getPaymentType(),
                 sosBoard.getPrice(),
@@ -38,7 +46,9 @@ public record SosBoardResponseDto(
                 sosBoard.getUser().getNickname(),
                 sosBoard.getUser().getProfileImg(),
                 sosBoard.getUser().getGender().toString(),
-                sosBoard.getUser().getRegion()
+                sosBoard.getUser().getRegion(),
+                sosBoard.getCreatedAt(),
+                sosBoard.getUpdatedAt()
         );
     }
 
@@ -49,6 +59,7 @@ public record SosBoardResponseDto(
         return new SosBoardResponseDto(
                 serviceDto.id(),
                 serviceDto.userId(),
+                serviceDto.accountId(),
                 serviceDto.title(),
                 serviceDto.paymentType(),
                 serviceDto.price(),
@@ -58,7 +69,9 @@ public record SosBoardResponseDto(
                 serviceDto.userNickname(),
                 serviceDto.userProfileImg(),
                 serviceDto.userGender(),
-                serviceDto.userRegion()
+                serviceDto.userRegion(),
+                serviceDto.createdAt(),
+                serviceDto.updatedAt()
         );
     }
 }
