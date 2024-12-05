@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 public record SosBoardServiceDto(
         Long id, //게시글 id
         Long userId, //유저 id
+        String accountId,
         String title,
         PaymentType paymentType,
         Integer price,
@@ -37,6 +38,7 @@ public record SosBoardServiceDto(
         return new SosBoardServiceDto(
                 sosBoard.getId(),
                 sosBoard.getUser().getId(),
+                sosBoard.getUser().getAccountId(),
                 sosBoard.getTitle(),
                 sosBoard.getPaymentType(),
                 sosBoard.getPrice(),
