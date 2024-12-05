@@ -21,7 +21,6 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtProvider jwtProvider;
     private final UserRepository userRepository;
-
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         CustomOAuthUser oAuth2User = (CustomOAuthUser) authentication.getPrincipal();
@@ -43,7 +42,12 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
                 .build();
         response.addHeader("Set-Cookie", jwtCookie.toString());
 
+        User user= userRepository.findByAccountId(accountId);
+        String redirectUrl =(user==null)
+                ? "http://localhost:3000/register"
+                : "http://localhost:3000/home";
+
         // 클라이언트로 리다이렉트
-        response.sendRedirect("http://localhost:3000/auth/oauth-response/" + token);
+        response.sendRedirect(redirectUrl);
     }
 }

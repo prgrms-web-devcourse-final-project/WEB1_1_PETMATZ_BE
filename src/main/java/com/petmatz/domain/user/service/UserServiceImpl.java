@@ -3,6 +3,7 @@ package com.petmatz.domain.user.service;
 import com.petmatz.api.user.request.*;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.common.security.utils.JwtProvider;
+import com.petmatz.domain.aws.AwsClient;
 import com.petmatz.domain.user.entity.Certification;
 import com.petmatz.domain.user.entity.Heart;
 import com.petmatz.domain.user.entity.User;
@@ -19,6 +20,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,6 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +48,8 @@ public class UserServiceImpl implements UserService {
     private final JwtExtractProvider jwtExtractProvider;
 
     private final GeocodingService geocodingService;
+
+    private final AwsClient awsClient;
 
 
     @Override
@@ -88,7 +93,7 @@ public class UserServiceImpl implements UserService {
 
         } catch (Exception e) {
             log.info("인증 번호 확인 실패: {}", e);
-            return LogInResponseDto.databaseError();
+            return CheckCertificationResponseDto.databaseError();
         }
 
         return CheckCertificationResponseDto.success();  // 인증 성공 응답
@@ -136,15 +141,24 @@ public class UserServiceImpl implements UserService {
                 return SignUpResponseDto.locationFail();
             }
 
+            //6-1 Img 정제
+            String imgURL;
+            URL uploadURL = awsClient.uploadImg(info.getAccountId(), info.getProfileImg(), "CUSTOM_USER_IMG");
+            imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
+            String resultImgURL = String.valueOf(uploadURL);
+            if (info.getProfileImg().startsWith("profile")) {
+                resultImgURL = "";
+            }
+
             // 7. 새로운 User 생성 및 저장
-            User user = UserFactory.createNewUser(info, encodedPassword, regionName, regionCode);
+            User user = UserFactory.createNewUser(info, encodedPassword, regionName, regionCode, imgURL);
             userRepository.save(user);
 
             // 8. 인증 엔티티 삭제
             certificationRepository.deleteAllByAccountId(accountId);
 
             // 9. 성공 응답 반환
-            return SignUpResponseDto.success();
+            return SignUpResponseDto.success(user.getId(), resultImgURL);
 
         } catch (RuntimeException e) {
             log.error("회원 가입 실패: {}", e.getMessage(), e);
@@ -196,6 +210,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public ResponseEntity<? super LogInResponseDto> logout(HttpServletResponse response) {
+        try {
+            // 만료된 쿠키 설정
+            ResponseCookie expiredCookie = ResponseCookie.from("jwt", "")
+                    .httpOnly(true)           // XSS 방지
+                    .secure(true)             // HTTPS만 허용
+                    .path("/")                // 모든 경로에서 접근 가능
+                    .sameSite("None")         // SameSite=None 설정
+                    .maxAge(0)                // 즉시 만료
+                    .build();
+
+            response.addHeader("Set-Cookie", expiredCookie.toString());
+
+            log.info("JWT 쿠키 제거 및 로그아웃 처리 완료");
+            return LogInResponseDto.success();
+        } catch (Exception e) {
+            log.error("로그아웃 처리 중 예외 발생", e);
+            return LogInResponseDto.validationFail();
+        }
+    }
+
+    @Override
     @Transactional
     public ResponseEntity<? super DeleteIdResponseDto> deleteId(DeleteIdRequestDto dto) {
         try {
@@ -213,7 +249,7 @@ public class UserServiceImpl implements UserService {
             String password = dto.getPassword();
             String encodedPassword = user.getPassword();
             boolean isMatched = passwordEncoder.matches(password, encodedPassword);
-            if (!isMatched) return DeleteIdResponseDto.idNotMatching();  // 비밀번호 불일치
+            if (!isMatched) return DeleteIdResponseDto.wrongPassword();  // 비밀번호 불일치
 
             certificationRepository.deleteById(userId);
 
@@ -283,10 +319,15 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<? super EditMyProfileResponseDto> editMyProfile(EditMyProfileInfo info) {
         try {
             Long userId = jwtExtractProvider.findIdFromJwt();
+            String userEmail = jwtExtractProvider.findAccountIdFromJwt();
             boolean exists = userRepository.existsById(userId);
             if (!exists) {
                 return EditMyProfileResponseDto.idNotFound();
             }
+
+            //6-1 Img 정제
+            URL uploadURL = awsClient.uploadImg(userEmail, info.getProfileImg(), "CUSTOM_USER_IMG");
+            String imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
 
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
@@ -367,7 +408,11 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<? super SendRepasswordResponseDto> sendRepassword(SendRepasswordRequestDto dto) {
         try {
             String accountId = dto.getAccountId();
+            if (!userRepository.existsByAccountId(accountId)) {
+                return GetMyProfileResponseDto.idNotFound();
+            }
             User user = userRepository.findByAccountId(accountId);
+
 
             String rePasswordNum = RePasswordProvider.generatePassword();
 
@@ -475,6 +520,11 @@ public class UserServiceImpl implements UserService {
         return UpdateRecommendationResponseDto.success();
     }
 
+    @Override
+    public String findByUserEmail(Long userId) {
+        return userRepository.findById(userId).get().getAccountId();
+    }
+
 
     @Override
     public GetMyUserDto receiverEmail(String accountId) {
@@ -487,8 +537,34 @@ public class UserServiceImpl implements UserService {
         return new GetMyUserDto();
     }
 
+    @Override
+    public void deleteUser(Long userUUID) {
+        userRepository.deleteUserById(userUUID);
+    }
+    @Transactional
+    public ResponseEntity<? super EditKakaoProfileResponseDto> editKakaoProfile(EditKakaoProfileInfo info) {
+        try {
+            Long userId = jwtExtractProvider.findIdFromJwt();
+            boolean exists = userRepository.existsById(userId);
+            if (!exists) {
+                return EditKakaoProfileResponseDto.idNotFound();
+            }
+
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
+
+            user.updateKakaoProfile(info);
+        } catch (Exception e) {
+            log.info("프로필 수정 실패: {}", e);
+            return EditKakaoProfileResponseDto.editFailed();
+        }
+        return EditKakaoProfileResponseDto.success();
+    }
+
     public UserInfo selectUserInfo(String receiverEmail) {
         User otherUser = userRepository.findByAccountId(receiverEmail);
         return otherUser.of();
     }
+
+
 }

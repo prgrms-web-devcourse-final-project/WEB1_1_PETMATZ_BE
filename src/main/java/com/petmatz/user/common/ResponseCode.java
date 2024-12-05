@@ -17,10 +17,6 @@ public interface ResponseCode {
 
     String ID_NOT_FOUND = "IDNF";
 
-    String ID_NOT_MATCHING = "IDNM";
-
-    String WRONG_ROLE = "WR";
-
     String WRONG_PASSWORD = "WP";
 
     String EDIT_FAIL = "EF";
@@ -31,11 +27,7 @@ public interface ResponseCode {
 
     String USER_NOT_FOUND = "UNF";
 
-    String DELETED_USER = "DU";
-
     String LOCATION_FAIL = "LF";
-
-    String INVALID_PASSWORD = "IP";
 
     String MISSING_FIELDS = "MF";
 

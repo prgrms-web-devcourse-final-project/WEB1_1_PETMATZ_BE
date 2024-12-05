@@ -1,5 +1,6 @@
 package com.petmatz.domain.petmission.entity;
 
+import com.petmatz.domain.petmission.dto.RoleType;
 import com.petmatz.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -23,12 +24,16 @@ public class UserToPetMissionEntity {
     @JoinColumn(name = "pet_mission_id", nullable = false)
     private PetMissionEntity petMission;
 
+    @Enumerated(EnumType.STRING)
+    private RoleType roleType;
 
     @Builder
-    public UserToPetMissionEntity(User user, PetMissionEntity petMission) {
+    public UserToPetMissionEntity(User user, PetMissionEntity petMission, RoleType roleType) {
         this.user = user;
         this.petMission = petMission;
+        this.roleType = roleType;
     }
+
 
     public static UserToPetMissionEntity of(User user, PetMissionEntity petMission) {
         return UserToPetMissionEntity.builder()

@@ -1,10 +1,14 @@
 package com.petmatz.domain.pet;
 
 import com.petmatz.domain.global.BaseEntity;
+import com.petmatz.domain.petmission.entity.PetToPetMissionEntity;
 import com.petmatz.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @SuperBuilder
@@ -12,7 +16,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @Entity(name = "Pet")
 @Table(name = "Pet")
-public class Pet extends BaseEntity {
+public class
+Pet extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +40,6 @@ public class Pet extends BaseEntity {
     @Column(name = "gender", nullable = false)
     private Gender gender; // 성별
 
-    @Getter
     @Column(name = "is_neutered", columnDefinition = "VARCHAR(10)", nullable = false)
     private String neuterYn; // 중성화 여부
 
@@ -57,5 +61,9 @@ public class Pet extends BaseEntity {
 
     @Column(name = "comment")
     private String comment; // 코멘트
+
+    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PetToPetMissionEntity> petToPetMissions = new ArrayList<>();
+
 }
 

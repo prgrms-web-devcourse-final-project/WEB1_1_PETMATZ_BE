@@ -1,11 +1,11 @@
 package com.petmatz.domain.chatting;
 
-import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.chatting.component.ChatMessageReader;
 import com.petmatz.domain.chatting.component.ChatMessageUpdater;
-import com.petmatz.domain.chatting.dto.ChatMessageInfo;
 
-import com.petmatz.domain.user.entity.User;
+import com.petmatz.domain.chatting.dto.ChatMessageInfo;
+import com.petmatz.domain.chatting.dto.ChatMessagePetMissionInfo;
+
 import com.petmatz.domain.user.repository.UserRepository;
 import com.petmatz.domain.chatting.docs.ChatReadStatusDocs;
 
@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 public class ChatMessageService {
 
     private final UserRepository userRepository;
-
     private final ChatMessageReader chatMessageReader;
     private final ChatMessageUpdater chatMessageUpdater;
 
@@ -55,6 +54,10 @@ public class ChatMessageService {
 
     public void updateMessage(ChatMessageInfo chatMessageInfo, String chatRoomId) {
         chatMessageUpdater.updateMessage(chatMessageInfo,chatRoomId);
+    }
+
+    public void updateMessage(ChatMessagePetMissionInfo chatMessageInfo, String chatRoomId, String receiverEmail) {
+        chatMessageUpdater.updateMessage(chatMessageInfo.of(receiverEmail),chatRoomId);
     }
 
 

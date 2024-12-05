@@ -26,8 +26,13 @@ public class UserToPetMissionReader {
         return userToPetMissionEntities.get();
     }
 
-    public UserToPetMissionEntity selectUserToPetMission(String petMissionId, Long userId) {
-        Optional<UserToPetMissionEntity> userToPetMissionEntity = userToPetMissionRepository.selectUserToPetMission(userId, petMissionId);
-        return userToPetMissionEntity.get();
+    public List<UserToPetMissionEntity> selectUserToPetMissionList(String petMissionId) {
+        Optional<List<UserToPetMissionEntity>> petMissionEntity = userToPetMissionRepository.selectUserToPetMissionList(petMissionId);
+        return petMissionEntity.get();
     }
+
+
+
+
+
 }

@@ -27,6 +27,7 @@ public class GetMyProfileResponseDto extends LogInResponseDto {
     private Boolean isCareAvailable;
     private String mbti;
     private String region;
+    private Integer regionCode;
 
     public GetMyProfileResponseDto(User user) {
         super();
@@ -43,6 +44,7 @@ public class GetMyProfileResponseDto extends LogInResponseDto {
         this.isCareAvailable = user.getIsCareAvailable();
         this.mbti = user.getMbti();
         this.region = user.getRegion();
+        this.regionCode=user.getRegionCode();   
     }
 
     public static ResponseEntity<LogInResponseDto> idNotFound() {

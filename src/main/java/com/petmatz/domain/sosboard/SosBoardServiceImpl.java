@@ -56,7 +56,7 @@ public class SosBoardServiceImpl implements SosBoardService{
                 serviceDtos,
                 sosBoardPage.getTotalElements(),
                 sosBoardPage.getTotalPages(),
-                pageNum
+                pageNum + 1
         );
     }
 
@@ -200,7 +200,7 @@ public class SosBoardServiceImpl implements SosBoardService{
                 serviceDtos,
                 sosBoardPage.getTotalElements(),
                 sosBoardPage.getTotalPages(),
-                page
+                page + 1
         );
     }
 

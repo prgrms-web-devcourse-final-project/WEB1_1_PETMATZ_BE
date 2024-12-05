@@ -42,4 +42,10 @@ public class ChatMessageInfo {
         this.readStatus = msgTimestamp.isBefore(lastReadTimestamp) || msgTimestamp.isEqual(lastReadTimestamp);
     }
 
+    public void addSenderEmail(String addSenderEmail) {
+        if (this.senderEmail == null || this.senderEmail.isEmpty()) {
+            this.senderEmail = addSenderEmail;
+        }
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.petmatz.domain.petmission.dto;
 
+import com.petmatz.domain.petmission.entity.PetMissionEntity;
 import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import com.petmatz.domain.user.entity.User;
 import lombok.Builder;
@@ -12,15 +13,13 @@ public record PetMissionData(
         String chatRoomId,
 
 
-        List<Long> petMissionId
+        Long petMissionId
 ) {
 
-    public static PetMissionData of(String chatRoomId, List<UserToPetMissionEntity> userToPetMissionEntities) {
+    public static PetMissionData of(String chatRoomId, PetMissionEntity petMissionEntity) {
         return PetMissionData.builder()
                 .chatRoomId(chatRoomId)
-                .petMissionId(userToPetMissionEntities.stream().map(
-                        UserToPetMissionEntity::getId
-                ).toList())
+                .petMissionId(petMissionEntity.getId())
                 .build();
     }
 }

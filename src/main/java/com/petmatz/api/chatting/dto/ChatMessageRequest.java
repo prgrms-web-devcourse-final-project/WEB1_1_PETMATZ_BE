@@ -26,7 +26,6 @@ public record ChatMessageRequest(
                 .senderEmail(senderEmail)
                 .receiverEmail(receiverEmail)
                 .msg(msg)
-                .msg_type(msg_type)
                 .msgTimestamp(LocalDateTime.now())
                 .msg_type(ChatMessageMsgType.MSG)
                 .build();

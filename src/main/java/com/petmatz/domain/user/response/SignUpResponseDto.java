@@ -9,9 +9,14 @@ import org.springframework.http.ResponseEntity;
 
 @Getter
 public class SignUpResponseDto extends LogInResponseDto {
+    private Long id;
 
-    private SignUpResponseDto(String role) {
+    private String imgURL;
+
+    private SignUpResponseDto(Long id, String imgURL) {
         super();
+        this.id=id;
+        this.imgURL = imgURL;
     }
 
     // 1. 중복된 ID 응답
@@ -26,27 +31,15 @@ public class SignUpResponseDto extends LogInResponseDto {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseBody);
     }
 
-    // 3. 역할이 잘못된 경우
-    public static ResponseEntity<LogInResponseDto> wrongRole() {
-        LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.WRONG_ROLE, ResponseMessage.WRONG_ROLE);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
-    }
-
     // 4. 회원가입 성공 응답
-    public static ResponseEntity<LogInResponseDto> success() {
-        LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.SUCCESS, ResponseMessage.SUCCESS);
-        return ResponseEntity.ok(responseBody);
+    public static ResponseEntity<SignUpResponseDto> success(Long id, String imgURL) {
+        SignUpResponseDto responseBody = new SignUpResponseDto(id,imgURL);
+        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
     // 5. 위치 정보 확인 실패 응답
     public static ResponseEntity<LogInResponseDto> locationFail() {
         LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.LOCATION_FAIL, ResponseMessage.LOCATION_FAIL);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
-    }
-
-    // 6. 비밀번호 정책 위반 응답
-    public static ResponseEntity<LogInResponseDto> invalidPassword() {
-        LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.INVALID_PASSWORD, ResponseMessage.INVALID_PASSWORD);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }
 

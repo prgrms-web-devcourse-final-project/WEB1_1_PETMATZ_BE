@@ -3,14 +3,11 @@ package com.petmatz.domain.user.response;
 import com.petmatz.user.common.LogInResponseDto;
 import com.petmatz.user.common.ResponseCode;
 import com.petmatz.user.common.ResponseMessage;
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-@Getter
-public class DeleteIdResponseDto extends LogInResponseDto {
-
-    private DeleteIdResponseDto(){
+public class EditKakaoProfileResponseDto extends LogInResponseDto {
+    private EditKakaoProfileResponseDto(){
         super();
     }
 
@@ -19,8 +16,8 @@ public class DeleteIdResponseDto extends LogInResponseDto {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseBody);
     }
 
-    public static ResponseEntity<LogInResponseDto> wrongPassword(){
-        LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.WRONG_PASSWORD, ResponseMessage.WRONG_PASSWORD);
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(responseBody);
+    public static ResponseEntity<LogInResponseDto> editFailed(){
+        LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.EDIT_FAIL, ResponseMessage.EDIT_FAIL);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }
 }

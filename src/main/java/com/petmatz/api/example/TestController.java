@@ -1,8 +1,5 @@
 package com.petmatz.api.example;
 
-import com.petmatz.domain.example.TestService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,8 +7,15 @@ import org.springframework.web.bind.annotation.*;
 public class TestController {
 
 
+
+
     @GetMapping("/chat1")
     public String chatPage() {
         return "chat";
     }
+
+//    @PutMapping("/tset2")
+//    public String chatPage1(@RequestBody) {
+//        return "chat";
+//    }
 }
