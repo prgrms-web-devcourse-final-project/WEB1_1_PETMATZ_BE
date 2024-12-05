@@ -28,12 +28,6 @@ public class SignUpResponseDto extends LogInResponseDto {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseBody);
     }
 
-    // 3. 역할이 잘못된 경우
-    public static ResponseEntity<LogInResponseDto> wrongRole() {
-        LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.WRONG_ROLE, ResponseMessage.WRONG_ROLE);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
-    }
-
     // 4. 회원가입 성공 응답
     public static ResponseEntity<SignUpResponseDto> success(Long id) {
         SignUpResponseDto responseBody = new SignUpResponseDto(id);
@@ -43,12 +37,6 @@ public class SignUpResponseDto extends LogInResponseDto {
     // 5. 위치 정보 확인 실패 응답
     public static ResponseEntity<LogInResponseDto> locationFail() {
         LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.LOCATION_FAIL, ResponseMessage.LOCATION_FAIL);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
-    }
-
-    // 6. 비밀번호 정책 위반 응답
-    public static ResponseEntity<LogInResponseDto> invalidPassword() {
-        LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.INVALID_PASSWORD, ResponseMessage.INVALID_PASSWORD);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }
 

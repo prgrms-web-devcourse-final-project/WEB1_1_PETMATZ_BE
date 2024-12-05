@@ -17,8 +17,6 @@ public interface ResponseMessage {
 
     String ID_NOT_FOUND = "ID Not found";
 
-    String WRONG_ROLE = "Wrong role.";
-
     String WRONG_PASSWORD="Wrong password.";
 
     String EDIT_FAIL = "Edit profile failed";
@@ -30,8 +28,6 @@ public interface ResponseMessage {
     String USER_NOT_FOUND = "User Not Found";
 
     String LOCATION_FAIL = "Location Fail"; // LF
-
-    String INVALID_PASSWORD = "Invalid Password"; // IP
 
     String MISSING_FIELDS = "Missing Fields"; // MF
 

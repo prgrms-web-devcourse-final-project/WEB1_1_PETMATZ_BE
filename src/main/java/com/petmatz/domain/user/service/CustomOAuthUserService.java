@@ -18,7 +18,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomOAuthUserService extends DefaultOAuth2UserService {
 
-    private final UserRepository userRepository; // 사용자 저장소
+    private final UserRepository userRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -61,11 +61,9 @@ public class CustomOAuthUserService extends DefaultOAuth2UserService {
     private User createNewKakaoUser(String email, String nickname, String profileImage) {
         User newUser = User.builder()
                 .accountId(email) // 이메일을 accountId에 저장
-                .password("default_password") // 기본 비밀번호 설정 (필요시 변경)
+                .password("password") // 기본 비밀번호 설정 (필요시 변경)
                 .nickname(nickname)
                 .profileImg(profileImage) // 프로필 이미지 저장
-                .isCareAvailable(true)
-                .mbti("ISTJ")
                 .loginRole(LoginRole.ROLE_USER) // 기본 역할 설정
                 .loginType(LoginType.KAKAO) // 로그인 타입
                 .build();
