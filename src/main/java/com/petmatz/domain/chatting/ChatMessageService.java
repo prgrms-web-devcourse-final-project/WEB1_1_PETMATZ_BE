@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 public class ChatMessageService {
 
     private final UserRepository userRepository;
-
     private final ChatMessageReader chatMessageReader;
     private final ChatMessageUpdater chatMessageUpdater;
 

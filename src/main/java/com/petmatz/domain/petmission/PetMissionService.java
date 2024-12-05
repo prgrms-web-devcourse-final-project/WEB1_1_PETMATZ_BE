@@ -34,10 +34,11 @@ public class PetMissionService {
     private final PetRepository petRepository;
 
     private final UserToChatRoomReader userToChatRoomReader;
-    private final JwtExtractProvider jwtExtractProvider;
     private final UserToPetMissionInserter userToPetMissionInserter;
     private final UserToPetMissionReader userToPetMissionReader;
     private final PetMissionReader petMissionReader;
+
+    private final JwtExtractProvider jwtExtractProvider;
 
     public PetMissionData insertPetMission(PetMissionInfo petMissionInfo) {
         System.out.println("petMissionInfo.petMissionAskInfo :: " + petMissionInfo.petMissionAskInfo());

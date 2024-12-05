@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class TestDTO {
 
-    private String namee;
-    private String ageee;
+    private String profileImage;
+    private String standard;
 
 }

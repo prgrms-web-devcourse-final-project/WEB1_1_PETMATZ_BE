@@ -3,6 +3,7 @@ package com.petmatz.domain.user.service;
 import com.petmatz.api.user.request.*;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.common.security.utils.JwtProvider;
+import com.petmatz.domain.aws.AwsClient;
 import com.petmatz.domain.user.entity.Certification;
 import com.petmatz.domain.user.entity.Heart;
 import com.petmatz.domain.user.entity.User;
@@ -27,6 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -46,6 +48,8 @@ public class UserServiceImpl implements UserService {
     private final JwtExtractProvider jwtExtractProvider;
 
     private final GeocodingService geocodingService;
+
+    private final AwsClient awsClient;
 
 
     @Override
@@ -137,15 +141,19 @@ public class UserServiceImpl implements UserService {
                 return SignUpResponseDto.locationFail();
             }
 
+            //6-1 Img 정제
+            URL uploadURL = awsClient.uploadImg(info.getAccountId(), info.getProfileImg(), "CUSTOM_USER_IMG");
+            String imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
+
             // 7. 새로운 User 생성 및 저장
-            User user = UserFactory.createNewUser(info, encodedPassword, regionName, regionCode);
+            User user = UserFactory.createNewUser(info, encodedPassword, regionName, regionCode, imgURL);
             userRepository.save(user);
 
             // 8. 인증 엔티티 삭제
             certificationRepository.deleteAllByAccountId(accountId);
 
             // 9. 성공 응답 반환
-            return SignUpResponseDto.success(user.getId());
+            return SignUpResponseDto.success(user.getId(), uploadURL.toString());
 
         } catch (RuntimeException e) {
             log.error("회원 가입 실패: {}", e.getMessage(), e);
@@ -306,10 +314,15 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<? super EditMyProfileResponseDto> editMyProfile(EditMyProfileInfo info) {
         try {
             Long userId = jwtExtractProvider.findIdFromJwt();
+            String userEmail = jwtExtractProvider.findAccountIdFromJwt();
             boolean exists = userRepository.existsById(userId);
             if (!exists) {
                 return EditMyProfileResponseDto.idNotFound();
             }
+
+            //6-1 Img 정제
+            URL uploadURL = awsClient.uploadImg(userEmail, info.getProfileImg(), "CUSTOM_USER_IMG");
+            String imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
 
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
@@ -520,6 +533,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void deleteUser(Long userUUID) {
+        userRepository.deleteUserById(userUUID);
+    }
     @Transactional
     public ResponseEntity<? super EditKakaoProfileResponseDto> editKakaoProfile(EditKakaoProfileInfo info) {
         try {
@@ -544,4 +560,6 @@ public class UserServiceImpl implements UserService {
         User otherUser = userRepository.findByAccountId(receiverEmail);
         return otherUser.of();
     }
+
+
 }

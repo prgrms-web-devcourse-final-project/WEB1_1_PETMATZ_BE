@@ -28,12 +28,10 @@ public interface UserService {
     ResponseEntity<? super UpdateLocationResponseDto> updateLocation(UpdateLocationInfo info);
 
     ResponseEntity<? super UpdateRecommendationResponseDto> updateRecommend(UpdateRecommendationRequestDto dto);
-<<<<<<< HEAD
-
     String findByUserEmail(Long userId);
 
-=======
->>>>>>> 277c886bc6aec52fd29c8ff93a6ffa40558f2765
     GetMyUserDto receiverEmail(String accountId);
+
+    void deleteUser(Long accountId);
     ResponseEntity<? super EditKakaoProfileResponseDto> editKakaoProfile(EditKakaoProfileInfo of);
 }
