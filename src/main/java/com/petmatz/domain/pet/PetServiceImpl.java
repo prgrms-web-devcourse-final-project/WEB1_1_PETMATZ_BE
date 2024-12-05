@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.petmatz.api.pet.dto.PetInfoDto;
 import com.petmatz.domain.aws.AwsClient;
+import com.petmatz.domain.pet.dto.PetSaveResponse;
 import com.petmatz.domain.pet.dto.PetServiceDto;
 import com.petmatz.domain.pet.dto.PetServiceDtoFactory;
 import com.petmatz.domain.pet.exception.ImageErrorCode;
@@ -66,16 +67,19 @@ public class PetServiceImpl implements PetService{
     }
 
     // 펫 저장
-    public Long savePet(User user, PetServiceDto dto) throws MalformedURLException {
+    public PetSaveResponse savePet(User user, PetServiceDto dto) throws MalformedURLException {
         if (repository.existsByDogRegNo(dto.dogRegNo())) {
             throw new PetServiceException(PetErrorCode.DOG_REG_NO_DUPLICATE);
         }
 
         //6-1 Img 정제
+        String imgURL;
         URL uploadURL = awsClient.uploadImg(user.getAccountId(), dto.profileImg(), "PET_IMG");
-        String imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
-
-
+        imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
+        String resultImgURL = String.valueOf(uploadURL);
+        if (dto.profileImg().startsWith("profile")) {
+            resultImgURL = "";
+        }
         // DTO에서 Pet 엔티티 생성
         Pet pet = Pet.builder()
                 .user(user)
@@ -91,7 +95,10 @@ public class PetServiceImpl implements PetService{
                 .profileImg(imgURL)
                 .comment(dto.comment())
                 .build();
-        return repository.save(pet).getId();
+
+        Long id = repository.save(pet).getId();
+        return PetSaveResponse.of(id, resultImgURL);
+//        return ;
     }
 
     // 펫 업데이트
@@ -106,9 +113,16 @@ public class PetServiceImpl implements PetService{
 
         try {
             if (updatedDto.profileImg() != null) {
+
                 //6-1 Img 정제
                 URL uploadURL = awsClient.uploadImg(user.getAccountId(), updatedDto.profileImg(), "PET_IMG");
                 imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
+                String resultImgURL = imgURL;
+                if (updatedDto.profileImg().startsWith("profile")) {
+                    resultImgURL = "";
+                }
+
+
             } else {
                 imgURL = existingPet.getProfileImg();
             }
