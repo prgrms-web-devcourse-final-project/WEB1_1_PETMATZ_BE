@@ -43,7 +43,7 @@ public class MatchScoreCalculator {
     }
 
     public List<MatchScoreResponse> decreaseScore(Long userId, Long targetId) {
-        double penaltyScore = 60.0;
+        double penaltyScore = 200.0;
         List<MatchScoreResponse> matchScores = matchComponent.getMatchScores(userId);
 
         return matchScores.stream()

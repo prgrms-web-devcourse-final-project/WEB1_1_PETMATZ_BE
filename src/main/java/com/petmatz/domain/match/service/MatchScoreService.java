@@ -2,16 +2,18 @@ package com.petmatz.domain.match.service;
 
 import com.petmatz.domain.match.component.BoundingBoxCalculator;
 import com.petmatz.domain.match.component.MatchScoreCalculator;
+import com.petmatz.domain.match.component.MatchScoreProcessor;
 import com.petmatz.domain.match.component.UserMapper;
 import com.petmatz.domain.match.dto.response.BoundingBoxResponse;
 import com.petmatz.domain.match.dto.response.MatchScoreResponse;
 import com.petmatz.domain.match.dto.response.UserResponse;
+import com.petmatz.domain.match.exception.MatchException;
 import com.petmatz.domain.match.repo.MatchUserRepository;
-import com.petmatz.domain.match.utils.MatchUtil;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.domain.user.repository.UserRepository;
 import com.petmatz.infra.redis.component.RedisMatchComponent;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MatchScoreService {
 
     private final MatchUserRepository matchUserRepository;
@@ -29,6 +32,8 @@ public class MatchScoreService {
     private final RedisMatchComponent matchComponent;
     private final UserMapper userMapper;
     private final BoundingBoxCalculator boundingBoxCalculator;
+    private final RedisMatchComponent redisMatchComponent;
+    private final MatchScoreProcessor matchScoreProcessor;
 
 
     // sql에서 필터링 후 1000명 가져오기
@@ -40,14 +45,13 @@ public class MatchScoreService {
         double userLng = user.getLongitude();
 
         // Bounding Box 계산
-        BoundingBoxResponse boundingBox = boundingBoxCalculator.calculateBoundingBox(userLat, userLng, 100.0);
+        BoundingBoxResponse boundingBox = boundingBoxCalculator.calculateBoundingBox(userLat, userLng, 100.0); // 대략 60km 정도
 
         List<Object[]> rawUsers = matchUserRepository.findUsersWithinBoundingBox(
                 userLng, userLat, boundingBox.minLat(), boundingBox.maxLat(),
                 boundingBox.minLng(), boundingBox.maxLng()
         );
 
-        // 사용자 데이터를 UserResponse로 매핑
         return rawUsers.stream()
                 .map(userMapper::mapToUserResponse) // UserMapper로 매핑
                 .sorted(Comparator.comparingDouble(UserResponse::distance)) // 거리로 정렬
@@ -58,6 +62,18 @@ public class MatchScoreService {
     // TODO 현재는 임시로 유저, pet(mbti) 직접 조회  | 추후에 user, pet  패키지 구현 의뢰 예정
 
     public List<MatchScoreResponse> calculateTotalScore(Long userId) {
+        String redisKey = "matchResult:" + userId;
+
+        try {
+            List<MatchScoreResponse> cachedResults = redisMatchComponent.getMatchScoresFromRedis(redisKey);
+            if (cachedResults != null && !cachedResults.isEmpty()) {
+                return matchScoreProcessor.filterAndSortScores(cachedResults);
+            }
+        } catch (MatchException e) {
+            log.info("Redis에 데이터가 없습니다! 새로운 사용자로 간주되어 새로 측정합니다.");
+        }
+
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
@@ -69,8 +85,7 @@ public class MatchScoreService {
 
         List<MatchScoreResponse> matchResults = filteredTargetUsers.stream()
                 .map(targetUser -> matchScoreCalculator.calculateScore(user, targetUser))
-                .collect(Collectors.toCollection(ArrayList::new)); // 가변 리스트 생성
-
+                .collect(Collectors.toCollection(ArrayList::new)); // 가변 리스트 생성!!!
 
         matchResults.sort(Comparator
                 .comparingDouble(MatchScoreResponse::totalScore)

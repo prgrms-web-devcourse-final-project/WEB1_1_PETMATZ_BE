@@ -31,4 +31,15 @@ public class MatchScoreProcessor {
     public int calculateTotalPages(long totalElements, int size) {
         return (int) Math.ceil((double) totalElements / size);
     }
+
+    public List<MatchScoreResponse> filterAndSortScores(List<MatchScoreResponse> scores) {
+        return scores.stream()
+                .filter(score -> score.totalScore() > 0.0)
+                .sorted(Comparator
+                        .comparingDouble(MatchScoreResponse::totalScore)
+                        .thenComparingDouble(MatchScoreResponse::distance)
+                        .reversed()
+                )
+                .toList();
+    }
 }

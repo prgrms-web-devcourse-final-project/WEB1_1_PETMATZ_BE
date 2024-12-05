@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.List;
 
 import static com.petmatz.domain.match.exception.MatchErrorCode.INVALID_REDIS_DATA;
@@ -71,7 +72,7 @@ public class RedisMatchComponent {
         String redisKey = "matchResult:" + userId;
         try {
             String data = objectMapper.writeValueAsString(matchScores);
-            redisTemplate.opsForValue().set(redisKey, data);
+            redisTemplate.opsForValue().set(redisKey, data, Duration.ofDays(30));
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Redis 저장 중 JSON 직렬화 오류 발생", e);
         }
