@@ -11,6 +11,7 @@ import com.petmatz.domain.pet.Pet;
 import com.petmatz.domain.pet.PetService;
 import com.petmatz.domain.petmission.PetMissionService;
 import com.petmatz.domain.petmission.dto.PetMissionData;
+import com.petmatz.domain.petmission.dto.PetMissionDetails;
 import com.petmatz.domain.petmission.dto.UserToPetMissionListInfo;
 import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import com.petmatz.domain.user.service.UserService;
@@ -60,11 +61,9 @@ public class PetMissionController {
     @GetMapping
     public Response<List<UserToPetMissionListInfo>> selectPetMissionList() {
         List<UserToPetMissionEntity> userToPetMissionEntities = petMissionService.selectPetMissionList();
-
-        List<UserToPetMissionListInfo> list = userToPetMissionEntities.stream().map(userToPetMissionEntity ->
-                UserToPetMissionListInfo.of(userToPetMissionEntity, )
+        List<UserToPetMissionListInfo> list = userToPetMissionEntities.stream().map(UserToPetMissionListInfo::of
         ).toList();
-        return Response.success();
+        return Response.success(list);
     }
 
     @Operation(summary = "멍멍이의 부탁 상태 업데이트", description = "멍멍이의 부탁 상태를 업데이트 하는 API")
@@ -81,8 +80,9 @@ public class PetMissionController {
     //------------------------아래는 잠시 보류 ---------------//
 
     @GetMapping("/Info")
-    public void selectPetMissionInfo(@RequestParam("petMissionId") String petMissionId) {
-        petMissionService.selectPetMissionInfo(petMissionId);
+    public Response<PetMissionDetails> selectPetMissionInfo(@RequestParam("petMissionId") String petMissionId) {
+        PetMissionDetails petMissionDetails = petMissionService.selectPetMissionInfo(petMissionId);
+        return Response.success(petMissionDetails);
     }
     //TODO comment에 ask달때 사진 s3로 전송해야 함.
 

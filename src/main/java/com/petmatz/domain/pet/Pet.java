@@ -1,10 +1,14 @@
 package com.petmatz.domain.pet;
 
 import com.petmatz.domain.global.BaseEntity;
+import com.petmatz.domain.petmission.entity.PetToPetMissionEntity;
 import com.petmatz.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @SuperBuilder
@@ -57,5 +61,9 @@ Pet extends BaseEntity {
 
     @Column(name = "comment")
     private String comment; // 코멘트
+
+    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PetToPetMissionEntity> petToPetMissions = new ArrayList<>();
+
 }
 

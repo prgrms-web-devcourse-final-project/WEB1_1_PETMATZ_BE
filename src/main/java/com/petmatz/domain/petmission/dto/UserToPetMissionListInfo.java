@@ -1,7 +1,9 @@
 package com.petmatz.domain.petmission.dto;
 
 import com.petmatz.common.constants.PetMissionStatusZip;
+import com.petmatz.domain.petmission.entity.PetMissionAskEntity;
 import com.petmatz.domain.petmission.entity.PetMissionEntity;
+import com.petmatz.domain.petmission.entity.PetToPetMissionEntity;
 import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import lombok.Builder;
 
@@ -12,7 +14,7 @@ import java.util.List;
 public record UserToPetMissionListInfo(
         Long missionId,
 
-        String comment,
+        List<String> comment,
 
         LocalDateTime petMissionStarted,
 
@@ -27,12 +29,14 @@ public record UserToPetMissionListInfo(
 
     public static UserToPetMissionListInfo of(UserToPetMissionEntity userToPetMissionEntity) {
         PetMissionEntity petMission = userToPetMissionEntity.getPetMission();
+        List<PetToPetMissionEntity> petToPetMissions = petMission.getPetToPetMissions();
         return UserToPetMissionListInfo.builder()
-                .missionId(userToPetMissionEntity.getId())
+                .missionId(userToPetMissionEntity.getPetMission().getId())
+                .comment(petMission.getPetMissionAsks().stream().map(PetMissionAskEntity::getComment).toList())
                 .petMissionStarted(petMission.getPetMissionStarted())
                 .petMissionEnd(petMission.getPetMissionEnd())
                 .status(petMission.getStatus())
-                .petInfo(petMission.getPet().stream().map(PetInfo::of).toList())
+                .petInfo(petToPetMissions.stream().map(pet -> PetInfo.of(pet.getPet())).toList())
                 .build();
     }
 }

@@ -1,6 +1,5 @@
 package com.petmatz.domain.petmission.entity;
 
-import com.petmatz.domain.petmission.dto.PetMissionAskInfo;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,9 +28,8 @@ public class PetMissionAskEntity {
     public PetMissionAskEntity(String comment, PetMissionEntity petMission, PetMissionAnswerEntity missionAnswer) {
         this.comment = comment;
         this.petMission = petMission;
+        this.missionAnswer = missionAnswer;
     }
-
-
     public static PetMissionAskEntity of(String comment) {
         return PetMissionAskEntity.builder()
                 .comment(comment)
@@ -41,6 +39,5 @@ public class PetMissionAskEntity {
     public void addPetMission(PetMissionEntity petMission) {
         this.petMission = petMission;
     }
-
 
 }
