@@ -1,10 +1,12 @@
 package com.petmatz.domain.sosboard.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.petmatz.api.pet.dto.PetResponse;
 import com.petmatz.domain.sosboard.PaymentType;
 import com.petmatz.domain.sosboard.SosBoard;
 import com.petmatz.domain.user.entity.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +24,12 @@ public record SosBoardServiceDto(
         String userNickname,
         String userProfileImg,
         String userGender,
-        String userRegion
+        String userRegion,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+        LocalDateTime createdAt, // 생성일시
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+        LocalDateTime updatedAt
+
 ) {
 
     // SosBoard → SosBoardServiceDto 변환
@@ -43,7 +50,9 @@ public record SosBoardServiceDto(
                 sosBoard.getUser().getNickname(),
                 sosBoard.getUser().getProfileImg(),
                 sosBoard.getUser().getGender().toString(),
-                sosBoard.getUser().getRegion()
+                sosBoard.getUser().getRegion(),
+                sosBoard.getCreatedAt(),
+                sosBoard.getUpdatedAt()
                         );
     }
 
