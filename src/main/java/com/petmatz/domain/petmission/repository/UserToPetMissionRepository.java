@@ -17,7 +17,9 @@ public interface UserToPetMissionRepository extends JpaRepository<UserToPetMissi
     @Query("select utr from UserToPetMissionEntity utr where utr.petMission.id = :petMissionId")
     Optional<List<UserToPetMissionEntity>> selectUserToPetMissionList(@Param("petMissionId") String petMissionId);
 
-    @Query("select utr from UserToChatRoomEntity  utr where utr.id = :petMissionId and utr.user.id = :userId")
-    Optional<UserToPetMissionEntity> selectUserToPetMission(@Param("userId") Long userId,
-                                @Param("petMissionId") String petMissionId);
+
+//    @Query("select pm from UserToPetMissionEntity pm where pm.user.id = :userId")
+//    Optional<List<UserToPetMissionEntity>> selectPetMissionList(@Param("userId") String userId);
+
+
 }

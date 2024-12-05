@@ -5,10 +5,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class PetMissionAnswerEntity {
 
     @Id
@@ -20,4 +22,11 @@ public class PetMissionAnswerEntity {
     private String imgURL;
 
 
+    public String checkCommentNull() {
+        return comment != null ? comment : "없음";
+    }
+
+    public String checkURLNull() {
+        return imgURL != null ? imgURL : "없음";
+    }
 }
