@@ -149,6 +149,7 @@ public class UserServiceImpl implements UserService {
             imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
             String resultImgURL = String.valueOf(uploadURL);
             if (info.getProfileImg().startsWith("profile")) {
+                imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + info.getProfileImg() + ".svg";
                 resultImgURL = "";
             }
 
@@ -342,6 +343,7 @@ public class UserServiceImpl implements UserService {
                 imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
                 resultImgURL = String.valueOf(uploadURL);
                 if (info.getProfileImg().startsWith("profile")) {
+                    imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + info.getProfileImg() + ".svg";
                     resultImgURL = "";
                 }
             }

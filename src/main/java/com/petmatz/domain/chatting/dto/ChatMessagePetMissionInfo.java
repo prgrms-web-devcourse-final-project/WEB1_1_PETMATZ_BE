@@ -17,10 +17,10 @@ public record ChatMessagePetMissionInfo(
 
 ) {
 
-    public ChatMessageInfo of(String receiverEmail) {
+    public ChatMessageInfo of(String receiverEmail, Long petMissionId) {
         return ChatMessageInfo.builder()
                 .receiverEmail(receiverEmail)
-                .msg("멍멍이 부탁 등록")
+                .msg(String.valueOf(petMissionId))
                 .msg_type(ChatMessageMsgType.PLG)
                 .msgTimestamp(LocalDateTime.now())
                 .build();

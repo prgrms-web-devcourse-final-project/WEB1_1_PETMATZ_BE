@@ -83,6 +83,7 @@ public class PetServiceImpl implements PetService{
         String imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
         String resultImgURL = String.valueOf(uploadURL);
         if (dto.profileImg().startsWith("profile")) {
+            imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + dto.profileImg() + ".svg";
             resultImgURL = "";
         }
         // DTO에서 Pet 엔티티 생성
@@ -127,7 +128,8 @@ public class PetServiceImpl implements PetService{
                 imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
                 resultImgURL = String.valueOf(uploadURL);
                 if (updatedDto.profileImg().startsWith("profile")) {
-                    resultImgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + updatedDto.profileImg();
+                    imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + updatedDto.profileImg() + ".svg";
+                    resultImgURL = "";
                 }
 
 

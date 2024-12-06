@@ -55,7 +55,7 @@ public class PetMissionController {
         String receiverEmail = userService.findByUserEmail(petMissionRequest.receiverId());
         PetMissionData petMissionData = petMissionService.insertPetMission(petMissionRequest.of(), careId);
 
-        chatService.updateMessage(petMissionRequest.ofto(), petMissionData.chatRoomId(), receiverEmail);
+        chatService.updateMessage(petMissionRequest.ofto(), petMissionData, receiverEmail);
 
         String destination = "/topic/chat/" + petMissionData.chatRoomId();
         //채팅 메세지에 UUID 담아서 보내기
