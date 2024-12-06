@@ -9,6 +9,5 @@ import java.util.Optional;
 public interface HeartRepository extends JpaRepository<Heart, Long> {
     boolean existsByMyIdAndHeartedId(Long myId, Long heartedId);
     List<Heart> findAllByMyId(Long myId);
-
     Optional<Heart> findByMyIdAndHeartedId(Long id, Long heartedId);
 }

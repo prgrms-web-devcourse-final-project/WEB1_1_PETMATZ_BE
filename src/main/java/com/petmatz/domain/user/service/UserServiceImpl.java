@@ -174,6 +174,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+
     @Override
     public ResponseEntity<? super SignInResponseDto> signIn(SignInInfo info, HttpServletResponse response) {
         try {
@@ -269,7 +270,6 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    //    -------------------------------------------------------------------------------------------------------------
     @Override
     public ResponseEntity<? super GetMyProfileResponseDto> getMypage() {
         try {
@@ -288,6 +288,7 @@ public class UserServiceImpl implements UserService {
             return GetMyProfileResponseDto.databaseError();
         }
     }
+
 
     @Override
     public ResponseEntity<? super GetOtherProfileResponseDto> getOtherMypage(Long userId) {
@@ -350,7 +351,6 @@ public class UserServiceImpl implements UserService {
                 }
             }
 
-
             user.updateProfile(info, imgURL);
 
             //반환해야 함 아래꺼
@@ -401,6 +401,8 @@ public class UserServiceImpl implements UserService {
             return HeartingResponseDto.databaseError(); // 데이터베이스 오류 응답
         }
     }
+
+
     @Override
     public ResponseEntity<? super GetHeartingListResponseDto> getHeartedList() {
         try {
@@ -434,6 +436,7 @@ public class UserServiceImpl implements UserService {
             return HeartingResponseDto.databaseError();
         }
     }
+
 
     @Override
     @Transactional
@@ -549,6 +552,40 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
+    @Transactional
+    public ResponseEntity<? super EditKakaoProfileResponseDto> editKakaoProfile(EditKakaoProfileInfo info) {
+        try {
+            Long userId = jwtExtractProvider.findIdFromJwt();
+
+            // userId가 null인 경우 예외 처리
+            if (userId == null) {
+                log.warn("JWT에서 추출된 userId가 null입니다.");
+                return EditKakaoProfileResponseDto.idNotFound();
+            }
+
+            boolean exists = userRepository.existsById(userId);
+            if (!exists) {
+                log.warn("존재하지 않는 사용자 ID: {}", userId);
+                return EditKakaoProfileResponseDto.idNotFound();
+            }
+
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
+
+            GeocodingService.KakaoRegion kakaoRegion = geocodingService.getRegionFromCoordinates(info.getLatitude(), info.getLongitude());
+            if (kakaoRegion == null || kakaoRegion.getCodeAsInteger() == null) {
+                return UpdateLocationResponseDto.wrongLocation(); // Kakao API 호출 실패 처리
+            }
+
+            user.updateKakaoProfile(info, kakaoRegion.getRegionName(), kakaoRegion.getCodeAsInteger());
+        } catch (Exception e) {
+            log.error("프로필 수정 실패", e);
+            return EditKakaoProfileResponseDto.editFailed();
+        }
+        return EditKakaoProfileResponseDto.success();
+    }
+
+    @Override
     public GetMyUserDto receiverEmail(String accountId) {
         try {
             User user = userRepository.findByAccountId(accountId);
@@ -563,31 +600,6 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long userUUID) {
         userRepository.deleteUserById(userUUID);
     }
-    @Transactional
-    public ResponseEntity<? super EditKakaoProfileResponseDto> editKakaoProfile(EditKakaoProfileInfo info) {
-        try {
-            Long userId = jwtExtractProvider.findIdFromJwt();
-            boolean exists = userRepository.existsById(userId);
-            if (!exists) {
-                return EditKakaoProfileResponseDto.idNotFound();
-            }
-
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
-
-            GeocodingService.KakaoRegion kakaoRegion = geocodingService.getRegionFromCoordinates(info.getLatitude(), info.getLongitude());
-            if (kakaoRegion == null || kakaoRegion.getCodeAsInteger() == null) {
-                return UpdateLocationResponseDto.wrongLocation(); // Kakao API 호출 실패 처리
-            }
-
-            user.updateKakaoProfile(info, kakaoRegion.getRegionName(), kakaoRegion.getCodeAsInteger());
-        } catch (Exception e) {
-            log.info("프로필 수정 실패: {}", e);
-            return EditKakaoProfileResponseDto.editFailed();
-        }
-        return EditKakaoProfileResponseDto.success();
-    }
-
 
     public UserInfo selectUserInfo(String receiverEmail) {
         User otherUser = userRepository.findByAccountId(receiverEmail);
@@ -598,6 +610,5 @@ public class UserServiceImpl implements UserService {
     public String findByUserEmail(Long userId) {
         return userRepository.findById(userId).get().getAccountId();
     }
-
 
 }
