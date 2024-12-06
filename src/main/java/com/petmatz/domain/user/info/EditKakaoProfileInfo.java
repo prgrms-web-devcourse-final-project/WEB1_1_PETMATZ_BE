@@ -23,4 +23,8 @@ public class EditKakaoProfileInfo {
     private Gender gender;
 
     private String mbti;
+
+    private Double latitude;
+
+    private Double longitude;
 }

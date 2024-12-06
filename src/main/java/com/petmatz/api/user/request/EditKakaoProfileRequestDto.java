@@ -28,6 +28,10 @@ public class EditKakaoProfileRequestDto {
 
     private String mbti;
 
+    private Double latitude;
+
+    private Double longitude;
+
 
     public static EditKakaoProfileInfo of(EditKakaoProfileRequestDto reqDto) {
         return EditKakaoProfileInfo.builder()
@@ -38,6 +42,8 @@ public class EditKakaoProfileRequestDto {
                 .profileImg(reqDto.getProfileImg())
                 .gender(reqDto.gender)
                 .mbti(reqDto.getMbti())
+                .latitude(reqDto.getLatitude())
+                .longitude(reqDto.getLongitude())
                 .build();
     }
 }

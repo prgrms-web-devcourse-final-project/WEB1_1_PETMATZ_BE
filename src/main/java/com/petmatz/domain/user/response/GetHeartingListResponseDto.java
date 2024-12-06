@@ -1,24 +1,25 @@
 package com.petmatz.domain.user.response;
 
+import com.petmatz.api.user.request.HeartedUserDto;
 import com.petmatz.user.common.LogInResponseDto;
-import com.petmatz.domain.user.entity.Heart;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 public class GetHeartingListResponseDto extends LogInResponseDto {
-    private List<Heart> heartList;
+    private List<HeartedUserDto> heartedUsers;
 
-    public GetHeartingListResponseDto(List<Heart> heartList) {
+    public GetHeartingListResponseDto(List<HeartedUserDto> heartedUsers) {
         super();
-        this.heartList = heartList;
+        this.heartedUsers = heartedUsers;
     }
 
-    public static ResponseEntity<GetHeartingListResponseDto> success(List<Heart> heartList) {
-        GetHeartingListResponseDto responseBody = new GetHeartingListResponseDto(heartList);
+    public static ResponseEntity<GetHeartingListResponseDto> success(List<HeartedUserDto> heartedUsers) {
+        GetHeartingListResponseDto responseBody = new GetHeartingListResponseDto(heartedUsers);
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 }
