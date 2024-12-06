@@ -27,7 +27,6 @@ public interface UserService {
     ResponseEntity<? super EditKakaoProfileResponseDto> editKakaoProfile(EditKakaoProfileInfo of);
 
 
-
     String findByUserEmail(Long userId);
 
     GetMyUserDto receiverEmail(String accountId);
