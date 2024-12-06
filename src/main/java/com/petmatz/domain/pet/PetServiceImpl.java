@@ -132,7 +132,6 @@ public class PetServiceImpl implements PetService{
                     resultImgURL = "";
                 }
             }
-
             // 병합된 DTO를 기반으로 엔티티 생성
             Pet updatedPet = Pet.builder()
                     .id(existingPet.getId())
@@ -149,11 +148,15 @@ public class PetServiceImpl implements PetService{
                     .profileImg(imgURL)
                     .comment(updatedDto.comment() != null ? updatedDto.comment() : existingPet.getComment())
                     .createdAt(existingPet.getCreatedAt())
+                    .petToPetMissions(existingPet.getPetToPetMissions())
                     .build();
 
+            System.out.println("dddddd1");
             repository.save(updatedPet);
+            System.out.println("dddddd2");
             return PetUpdateResponse.of(UUID, resultImgURL);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new PetServiceException(PetErrorCode.UPDATE_FAILED, "GENERAL_EXCEPTION");
         }
     }

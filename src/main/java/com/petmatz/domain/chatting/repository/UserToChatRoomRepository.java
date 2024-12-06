@@ -18,8 +18,9 @@ public interface UserToChatRoomRepository extends JpaRepository<UserToChatRoomEn
     Optional<List<String>> selectChatRoomForUserList(@Param("chatRoomId") Long chatRoomId);
 
     @Query(value = "SELECT chat_room_id FROM user_to_chat_room_entity " +
-            "WHERE (account_id = :careEmail AND account_id = :careEmail) " +
-            "   OR (account_id = :receiverEmail AND account_id = :receiverEmail)",
+            "WHERE account_id IN (:careEmail, :receiverEmail) " +
+            "GROUP BY chat_room_id " +
+            "HAVING COUNT(DISTINCT account_id) = 2",
             nativeQuery = true)
     Optional<String> selectChatRoomIdForUser1ToUser2(@Param("careEmail") String careEmail,
                                                      @Param("receiverEmail") String receiverEmail);
