@@ -49,7 +49,7 @@ public class PetMissionEntity {
         return PetMissionEntity.builder()
                 .petMissionStarted(petMissionInfo.missionStarted())
                 .petMissionEnd(petMissionInfo.missionEnd())
-                .status(PetMissionStatusZip.fromDescription("시작"))
+                .status(PetMissionStatusZip.BEF)
                 .build();
     }
 
