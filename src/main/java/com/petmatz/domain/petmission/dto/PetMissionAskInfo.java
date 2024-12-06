@@ -7,6 +7,7 @@ import lombok.Builder;
 @Builder
 public record PetMissionAskInfo(
 
+        Long id,
         String comment,
         String ask,
         String imgURL
@@ -18,6 +19,7 @@ public record PetMissionAskInfo(
             return PetMissionAskInfo.builder().ask(petMissionAskEntity.getComment()).build();
         }
         return PetMissionAskInfo.builder()
+                .id(petMissionAskEntity.getId())
                 .ask(petMissionAskEntity.getComment())
                 .comment(missionAnswer.checkCommentNull())
                 .imgURL(missionAnswer.checkURLNull())

@@ -5,7 +5,8 @@ import lombok.Builder;
 @Builder
 public record PetMissionCommentInfo(
 
-        String missionId,
+        String askId,
+        String missionAskId,
         String comment,
         String imgURL
 

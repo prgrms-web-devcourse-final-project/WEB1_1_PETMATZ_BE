@@ -4,15 +4,10 @@ import com.petmatz.api.petmission.dto.PetMissionUpdateRequest;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.pet.Pet;
 import com.petmatz.domain.pet.PetRepository;
-import com.petmatz.domain.petmission.component.PetMissionReader;
-import com.petmatz.domain.petmission.component.UserToChatRoomReader;
-import com.petmatz.domain.petmission.component.UserToPetMissionInserter;
-import com.petmatz.domain.petmission.component.UserToPetMissionReader;
+import com.petmatz.domain.petmission.component.*;
 import com.petmatz.domain.petmission.dto.*;
-import com.petmatz.domain.petmission.entity.PetMissionAskEntity;
-import com.petmatz.domain.petmission.entity.PetMissionEntity;
-import com.petmatz.domain.petmission.entity.PetToPetMissionEntity;
-import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
+import com.petmatz.domain.petmission.entity.*;
+import com.petmatz.domain.petmission.exception.ExistPetMissionAnswerException;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +29,7 @@ public class PetMissionService {
     private final UserToPetMissionInserter userToPetMissionInserter;
     private final UserToPetMissionReader userToPetMissionReader;
     private final PetMissionReader petMissionReader;
+    private final PetMissionInserter petMissionInserter;
 
     public PetMissionData insertPetMission(PetMissionInfo petMissionInfo, Long careId) {
 
@@ -99,8 +94,18 @@ public class PetMissionService {
     }
 
 
-//    public PetMissionCommentInfo insertPetMissionComment() {
-//
-//    }
+    @Transactional
+    public void updatePetMissionComment(PetMissionCommentInfo petMissionCommentInfo) {
+        PetMissionAskEntity petMissionAskEntity = petMissionReader.selectById(Long.valueOf(petMissionCommentInfo.askId()));
+        if (petMissionAskEntity.getMissionAnswer() != null) {
+            throw ExistPetMissionAnswerException.EXCEPTION;
+        }
+        String imgURL = "";
+
+        System.out.println("빈값");
+        PetMissionAnswerEntity petMissionAnswerEntity = petMissionInserter.insertPetMissionAnswer(PetMissionAnswerEntity.of(petMissionCommentInfo, imgURL));
+        System.out.println("petMissionAnswerEntity.getId() : " + petMissionAnswerEntity.getId());
+        petMissionAskEntity.addPetMissionAnswer(petMissionAnswerEntity);
+    }
 }
 

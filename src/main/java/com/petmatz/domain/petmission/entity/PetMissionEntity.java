@@ -1,6 +1,7 @@
 package com.petmatz.domain.petmission.entity;
 
 import com.petmatz.domain.pet.Pet;
+import com.petmatz.domain.petmission.dto.PetMissionCommentInfo;
 import com.petmatz.domain.petmission.dto.PetMissionInfo;
 import com.petmatz.common.constants.PetMissionStatusZip;
 import jakarta.persistence.*;

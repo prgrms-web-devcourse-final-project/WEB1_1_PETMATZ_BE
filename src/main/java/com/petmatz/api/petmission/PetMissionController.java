@@ -97,8 +97,7 @@ public class PetMissionController {
 
     @PostMapping("/comment")
     public void saveComment(@RequestBody PetMissionCommentRequest petMissionCommentRequest) {
-        petMissionService.insertPetMissionComment(petMissionCommentRequest.of());
-
+        petMissionService.updatePetMissionComment(petMissionCommentRequest.of());
     }
 
 /*

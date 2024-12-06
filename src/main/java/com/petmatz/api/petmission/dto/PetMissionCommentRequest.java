@@ -6,14 +6,14 @@ import lombok.Builder;
 @Builder
 public record PetMissionCommentRequest(
 
-        String missionId,
+        String askId,
         String comment,
         String imgURL
 
 ) {
     public PetMissionCommentInfo of() {
         return PetMissionCommentInfo.builder()
-                .missionId(missionId)
+                .askId(askId)
                 .comment(comment)
                 .imgURL(imgURL)
                 .build();
