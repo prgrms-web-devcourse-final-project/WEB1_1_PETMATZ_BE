@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 public record SosBoardCreateResponseDto(
         Long id,
         String title,
+        String comment,
         PaymentType paymentType,
         int price,
         String startDate,
@@ -27,6 +28,7 @@ public record SosBoardCreateResponseDto(
         return new SosBoardCreateResponseDto(
                 sosBoard.getId(),
                 sosBoard.getTitle(),
+                sosBoard.getComment(),
                 sosBoard.getPaymentType(),
                 sosBoard.getPrice(),
                 sosBoard.getStartDate(),

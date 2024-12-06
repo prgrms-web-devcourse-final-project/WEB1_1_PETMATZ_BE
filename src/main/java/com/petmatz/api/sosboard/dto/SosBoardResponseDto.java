@@ -15,6 +15,7 @@ public record SosBoardResponseDto(
         Long userId,
         String accountId,
         String title,
+        String comment,
         PaymentType paymentType,
         int price,
         String startDate, // "yyyy-MM-dd HH:mm" 형식
@@ -35,6 +36,7 @@ public record SosBoardResponseDto(
                 sosBoard.getUser().getId(),
                 sosBoard.getUser().getAccountId(),
                 sosBoard.getTitle(),
+                sosBoard.getComment(),
                 sosBoard.getPaymentType(),
                 sosBoard.getPrice(),
                 sosBoard.getStartDate(), // String 그대로 반환
@@ -61,6 +63,7 @@ public record SosBoardResponseDto(
                 serviceDto.userId(),
                 serviceDto.accountId(),
                 serviceDto.title(),
+                serviceDto.comment(),
                 serviceDto.paymentType(),
                 serviceDto.price(),
                 serviceDto.startDate(),
