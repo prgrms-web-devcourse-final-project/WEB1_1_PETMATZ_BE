@@ -53,7 +53,9 @@ public class PetMissionController {
         Long careId = jwtExtractProvider.findIdFromJwt();
 
         String receiverEmail = userService.findByUserEmail(petMissionRequest.receiverId());
+        System.out.println("1");
         PetMissionData petMissionData = petMissionService.insertPetMission(petMissionRequest.of(), careId);
+        System.out.println("2");
 
         chatService.updateMessage(petMissionRequest.ofto(), petMissionData, receiverEmail);
 

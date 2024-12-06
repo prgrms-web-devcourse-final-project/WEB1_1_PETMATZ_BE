@@ -18,7 +18,7 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
     List<Pet> findByUserId(Long userId); // userId로 Pet 조회
 
     @Query("select p from Pet p where p.id IN :petList")
-    Optional<List<Pet>> findPetListByPetId(@Param("petList") List<String> petList);
+    List<Pet> findPetListByPetId(@Param("petList") List<String> petList);
 
 
 }

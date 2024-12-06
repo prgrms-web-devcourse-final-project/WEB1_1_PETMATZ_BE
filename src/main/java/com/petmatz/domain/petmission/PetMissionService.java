@@ -11,6 +11,7 @@ import com.petmatz.domain.petmission.entity.*;
 import com.petmatz.domain.petmission.exception.ExistPetMissionAnswerException;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.domain.user.repository.UserRepository;
+import io.lettuce.core.ScriptOutputType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -36,13 +39,17 @@ public class PetMissionService {
 
     public PetMissionData insertPetMission(PetMissionInfo petMissionInfo, Long careId) {
 
-
         List<User> users = makeUserEntityList(careId, petMissionInfo.receiverId());
 
         String chatRoomId = userToChatRoomReader.selectChatRoomId(users.get(0).getAccountId(), users.get(1).getAccountId());
 
-        List<Pet> pets = petRepository.findPetListByPetId(petMissionInfo.petId())
-                .orElseThrow(() -> new IllegalArgumentException("No Pets Found"));
+
+        List<Pet> pets = petRepository.findPetListByPetId(petMissionInfo.petId());
+        if (pets.isEmpty()) {
+            System.out.println("값이 없음");
+            throw new IllegalArgumentException("값없음");
+        }
+
 
         List<PetMissionAskEntity> petMissionAskEntityList = petMissionInfo.petMissionAskInfo()
                 .stream()
@@ -62,8 +69,9 @@ public class PetMissionService {
                 .map(user -> UserToPetMissionEntity.of(user, petMissionEntity, careId))
                 .toList();
 
+        System.out.println("1111");
         userToPetMissionInserter.insertUserToPetMission(userToPetMissionEntities);
-
+        System.out.println("2222");
         return PetMissionData.of(chatRoomId, petMissionEntity);
     }
 
