@@ -64,5 +64,8 @@ public class Pet extends BaseEntity {
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PetToPetMissionEntity> petToPetMissions = new ArrayList<>();
 
+    public boolean checkImgURL(String Img) {
+        return profileImg.equals(Img);
+    }
 }
 

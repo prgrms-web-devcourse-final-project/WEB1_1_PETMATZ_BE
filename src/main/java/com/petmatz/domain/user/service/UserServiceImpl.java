@@ -163,7 +163,7 @@ public class UserServiceImpl implements UserService {
             certificationRepository.deleteAllByAccountId(accountId);
 
             // 9. 성공 응답 반환
-            return SignUpResponseDto.success(user.getId(), "resultImgURL");
+            return SignUpResponseDto.success(user.getId(), resultImgURL);
 
         } catch (RuntimeException e) {
             log.error("회원 가입 실패: {}", e.getMessage(), e);
@@ -342,7 +342,10 @@ public class UserServiceImpl implements UserService {
             String resultImgURL = "";
             if (!user.checkImgURL(info.getProfileImg())) {
                 //6-1 Img 정제
-                URL uploadURL = awsClient.uploadImg(userEmail, info.getProfileImg(), "CUSTOM_USER_IMG", null);
+                String url = "https://petmatz-s3.s3.ap-northeast-2.amazonaws.com/기본이미지_폴더/profile2.svg";
+                // '/'를 기준으로 문자열을 나누고 마지막 부분 추출
+                String fileName = url.substring(url.lastIndexOf("/") + 1);
+                URL uploadURL = awsClient.uploadImg(userEmail, fileName, "CUSTOM_USER_IMG", null);
                 imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
                 resultImgURL = String.valueOf(uploadURL);
                 if (info.getProfileImg().startsWith("profile")) {

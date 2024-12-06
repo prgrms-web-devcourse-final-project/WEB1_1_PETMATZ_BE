@@ -111,8 +111,6 @@ public class PetServiceImpl implements PetService{
         Pet existingPet = repository.findByIdAndUser(petId, user)
                 .orElseThrow(() -> new PetServiceException(PetErrorCode.PET_NOT_FOUND));
 
-        String imgURL;
-        String resultImgURL = null;
         String UUID = updatedDto.dogRegNo();
 
         // 현재 사용자가 리소스 소유자인지 검증
@@ -121,8 +119,10 @@ public class PetServiceImpl implements PetService{
         }
 
         try {
-            if (updatedDto.profileImg() != null) {
 
+            String imgURL = updatedDto.profileImg();
+            String resultImgURL = "";
+            if (!existingPet.checkImgURL(updatedDto.profileImg())) {
                 //6-1 Img 정제
                 URL uploadURL = awsClient.uploadImg(user.getAccountId(), updatedDto.profileImg(), "PET_IMG", updatedDto.dogRegNo());
                 imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
@@ -131,10 +131,6 @@ public class PetServiceImpl implements PetService{
                     imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + updatedDto.profileImg() + ".svg";
                     resultImgURL = "";
                 }
-
-
-            } else {
-                imgURL = existingPet.getProfileImg();
             }
 
             // 병합된 DTO를 기반으로 엔티티 생성
