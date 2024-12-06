@@ -1,10 +1,12 @@
 package com.petmatz.api.petmission;
 
 import com.petmatz.api.global.dto.Response;
+import com.petmatz.api.petmission.dto.PetMissionCommentRequest;
 import com.petmatz.api.petmission.dto.PetMissionRequest;
 import com.petmatz.api.petmission.dto.PetMissionResponse;
 import com.petmatz.api.petmission.dto.PetMissionUpdateRequest;
 import com.petmatz.common.constants.PetMissionStatusZip;
+import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.chatting.ChatMessageService;
 import com.petmatz.domain.chatting.dto.ChatMessageInfo;
 import com.petmatz.domain.pet.Pet;
@@ -35,6 +37,8 @@ public class PetMissionController {
     private final UserService userService;
     private final PetService petService;
 
+    private final JwtExtractProvider jwtExtractProvider;
+
     @Operation(summary = "멍멍이의 부탁 등록", description = "멍멍이의 부탁을 등록하는 API")
     @Parameters({
             @Parameter(name = "receiverId", description = "돌봄이 ID", example = "2"), //-> 레포에서 조회 해서 가져와햐 함.
@@ -45,8 +49,10 @@ public class PetMissionController {
     })
     @PostMapping
     public Response<PetMissionResponse> savePetMissionList(@RequestBody PetMissionRequest petMissionRequest) {
+        Long careId = jwtExtractProvider.findIdFromJwt();
+
         String receiverEmail = userService.findByUserEmail(petMissionRequest.receiverId());
-        PetMissionData petMissionData = petMissionService.insertPetMission(petMissionRequest.of());
+        PetMissionData petMissionData = petMissionService.insertPetMission(petMissionRequest.of(), careId);
 
         chatService.updateMessage(petMissionRequest.ofto(), petMissionData.chatRoomId(), receiverEmail);
 
@@ -60,7 +66,9 @@ public class PetMissionController {
     @Operation(summary = "멍멍이의 부탁 리스트 조회", description = "멍멍이 리스트 조회 API")
     @GetMapping
     public Response<List<UserToPetMissionListInfo>> selectPetMissionList() {
-        List<UserToPetMissionEntity> userToPetMissionEntities = petMissionService.selectPetMissionList();
+        Long userId = jwtExtractProvider.findIdFromJwt();
+
+        List<UserToPetMissionEntity> userToPetMissionEntities = petMissionService.selectPetMissionList(userId);
         List<UserToPetMissionListInfo> list = userToPetMissionEntities.stream().map(UserToPetMissionListInfo::of
         ).toList();
         return Response.success(list);
@@ -85,6 +93,13 @@ public class PetMissionController {
         return Response.success(petMissionDetails);
     }
     //TODO comment에 ask달때 사진 s3로 전송해야 함.
+
+
+    @PostMapping("/comment")
+    public void saveComment(@RequestBody PetMissionCommentRequest petMissionCommentRequest) {
+        petMissionService.insertPetMissionComment(petMissionCommentRequest.of());
+
+    }
 
 /*
     @DeleteMapping

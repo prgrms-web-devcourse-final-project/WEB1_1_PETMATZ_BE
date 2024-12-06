@@ -35,11 +35,16 @@ public class UserToPetMissionEntity {
     }
 
 
-    public static UserToPetMissionEntity of(User user, PetMissionEntity petMission) {
+    public static UserToPetMissionEntity of(User user, PetMissionEntity petMission, Long careId) {
         return UserToPetMissionEntity.builder()
                 .user(user)
                 .petMission(petMission)
+                .roleType(checkRoleType(user.getId(), careId))
                 .build();
+    }
+
+    public static RoleType checkRoleType(Long userId, Long careId) {
+        return userId.equals(careId) ? RoleType.DOL : RoleType.MAL;
     }
 
 }
