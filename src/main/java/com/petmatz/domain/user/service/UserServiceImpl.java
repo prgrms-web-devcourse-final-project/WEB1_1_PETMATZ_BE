@@ -289,6 +289,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+
     @Override
     public ResponseEntity<? super GetOtherProfileResponseDto> getOtherMypage(Long userId) {
         try {
@@ -350,7 +351,6 @@ public class UserServiceImpl implements UserService {
                 }
             }
 
-
             user.updateProfile(info, imgURL);
 
             //반환해야 함 아래꺼
@@ -401,6 +401,8 @@ public class UserServiceImpl implements UserService {
             return HeartingResponseDto.databaseError(); // 데이터베이스 오류 응답
         }
     }
+
+
     @Override
     public ResponseEntity<? super GetHeartingListResponseDto> getHeartedList() {
         try {
@@ -434,6 +436,7 @@ public class UserServiceImpl implements UserService {
             return HeartingResponseDto.databaseError();
         }
     }
+
 
     @Override
     @Transactional
@@ -602,10 +605,10 @@ public class UserServiceImpl implements UserService {
         User otherUser = userRepository.findByAccountId(receiverEmail);
         return otherUser.of();
     }
+
     @Override
     public String findByUserEmail(Long userId) {
         return userRepository.findById(userId).get().getAccountId();
     }
-
 
 }
