@@ -6,6 +6,7 @@ import com.petmatz.domain.chatting.component.ChatMessageUpdater;
 import com.petmatz.domain.chatting.dto.ChatMessageInfo;
 import com.petmatz.domain.chatting.dto.ChatMessagePetMissionInfo;
 
+import com.petmatz.domain.petmission.dto.PetMissionData;
 import com.petmatz.domain.user.repository.UserRepository;
 import com.petmatz.domain.chatting.docs.ChatReadStatusDocs;
 
@@ -56,8 +57,8 @@ public class ChatMessageService {
         chatMessageUpdater.updateMessage(chatMessageInfo,chatRoomId);
     }
 
-    public void updateMessage(ChatMessagePetMissionInfo chatMessageInfo, String chatRoomId, String receiverEmail) {
-        chatMessageUpdater.updateMessage(chatMessageInfo.of(receiverEmail),chatRoomId);
+    public void updateMessage(ChatMessagePetMissionInfo chatMessageInfo, PetMissionData petMissionData, String receiverEmail) {
+        chatMessageUpdater.updateMessage(chatMessageInfo.of(receiverEmail, petMissionData.petMissionId()),petMissionData.chatRoomId());
     }
 
 

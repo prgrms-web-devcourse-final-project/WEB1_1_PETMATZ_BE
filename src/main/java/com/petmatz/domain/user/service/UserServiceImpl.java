@@ -146,13 +146,14 @@ public class UserServiceImpl implements UserService {
             }
 
             //6-1 Img 정제
-            String imgURL="";
-//            URL uploadURL = awsClient.uploadImg(info.getAccountId(), info.getProfileImg(), "CUSTOM_USER_IMG",null);
-//            imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
-//            String resultImgURL = String.valueOf(uploadURL);
-//            if (info.getProfileImg().startsWith("profile")) {
-//                resultImgURL = "";
-//            }
+            String imgURL;
+            URL uploadURL = awsClient.uploadImg(info.getAccountId(), info.getProfileImg(), "CUSTOM_USER_IMG", null);
+            imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
+            String resultImgURL = String.valueOf(uploadURL);
+            if (info.getProfileImg().startsWith("profile")) {
+                imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + info.getProfileImg() + ".svg";
+                resultImgURL = "";
+            }
 
             // 7. 새로운 User 생성 및 저장
             User user = UserFactory.createNewUser(info, encodedPassword, kakaoRegion.getRegionName(), kakaoRegion.getCodeAsInteger(), imgURL);
@@ -344,6 +345,7 @@ public class UserServiceImpl implements UserService {
                 imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
                 resultImgURL = String.valueOf(uploadURL);
                 if (info.getProfileImg().startsWith("profile")) {
+                    imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + info.getProfileImg() + ".svg";
                     resultImgURL = "";
                 }
             }
