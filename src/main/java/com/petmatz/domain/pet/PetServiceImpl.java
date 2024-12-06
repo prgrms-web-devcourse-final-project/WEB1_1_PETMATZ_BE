@@ -151,9 +151,7 @@ public class PetServiceImpl implements PetService{
                     .petToPetMissions(existingPet.getPetToPetMissions())
                     .build();
 
-            System.out.println("dddddd1");
             repository.save(updatedPet);
-            System.out.println("dddddd2");
             return PetUpdateResponse.of(UUID, resultImgURL);
         } catch (Exception e) {
             e.printStackTrace();
