@@ -22,7 +22,7 @@ public class AwsClient {
 
 
     //이미지 업로드 URL 발급
-    public URL uploadImg(String userEmail, String defaultFolder, String standard, String dogRegNo) throws MalformedURLException {
+    public URL uploadImg(String userEmail, String defaultFolder, String standard, String subpath1) throws MalformedURLException {
         if (defaultFolder.isEmpty()) {
             //에러발생
 
@@ -30,7 +30,7 @@ public class AwsClient {
         if (defaultFolder.startsWith("profile"))
             return new URL(DEFAULT_IMG_URL + standard + "/" + Prefix.returnKoreaName(standard));
         String folderName = Prefix.returnKoreaName(standard);
-        return s3Client.getPresignedURL(folderName, userEmail, standard, dogRegNo);
+        return s3Client.getPresignedURL(folderName, userEmail, standard, subpath1);
     }
 
     //이미지 연쇄 삭제

@@ -36,8 +36,8 @@ public class S3ServiceImpl implements S3Client {
     //URL 반환
     //해당 URL은 회원가입, 이미지 수정때도 같이 사용이 가능 할듯
     @Override
-    public URL getPresignedURL(String folderName, String userName, String standard,String dogRegNo) {
-        String path = createPath(folderName, userName, standard, dogRegNo);
+    public URL getPresignedURL(String folderName, String userName, String standard,String subpath1) {
+        String path = createPath(folderName, userName, standard, subpath1);
         GeneratePresignedUrlRequest generatePresignedUrlRequest = makePresignedURL(bucketName, path);
         return amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
     }
@@ -75,12 +75,12 @@ public class S3ServiceImpl implements S3Client {
     }
 
     //이미지 사진 경로 제작
-    private String createPath(String prefix, String userName, String standard, String dogRegNo) {
+    private String createPath(String prefix, String userName, String standard, String subpath1) {
         if (standard.equals("PET_IMG")) {
-            return String.format("%s/%s/%s", prefix, userName, (userName + "_" + dogRegNo));
+            return String.format("%s/%s/%s", prefix, userName, (userName + "_" + subpath1));
         }
         if (standard.equals("CARE_HISTORY_IMG")) {
-//            return String.format("%s/%s/%s", prefix, userName, (userName + "_" + dogRegNo));
+            return String.format("%s/%s/%s/%s", prefix, userName,subpath1,(userName + "_" + subpath1));
         }
         return String.format("%s/%s", prefix ,userName);
 

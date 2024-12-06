@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.MalformedURLException;
 import java.util.List;
 
 @RestController
@@ -101,8 +102,9 @@ public class PetMissionController {
 
 
     @PostMapping("/comment")
-    public void saveComment(@RequestBody PetMissionCommentRequest petMissionCommentRequest) {
-        petMissionService.updatePetMissionComment(petMissionCommentRequest.of());
+    public String saveComment(@RequestBody PetMissionCommentRequest petMissionCommentRequest) throws MalformedURLException {
+        String userEmail = jwtExtractProvider.findAccountIdFromJwt();
+        return petMissionService.updatePetMissionComment(petMissionCommentRequest.of(), userEmail);
     }
 
 /*
