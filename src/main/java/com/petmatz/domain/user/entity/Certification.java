@@ -28,4 +28,11 @@ public class Certification extends BaseEntity {
 
     @Column(name = "certification_number", nullable = false, length = 6)
     private String certificationNumber;
+
+    @Column(name = "is_verified")
+    private Boolean isVerified = false; // 인증 완료 상태
+
+    public void markAsVerified() {
+        this.isVerified = true;
+    }
 }

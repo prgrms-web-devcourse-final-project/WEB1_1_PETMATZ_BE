@@ -2,7 +2,6 @@ package com.petmatz.domain.user.entity;
 
 import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import com.petmatz.domain.global.BaseEntity;
-import com.petmatz.domain.match.dto.response.UserResponse;
 import com.petmatz.domain.match.exception.MatchException;
 import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import com.petmatz.domain.user.constant.*;
@@ -128,6 +127,7 @@ public class User extends BaseEntity {
         this.longitude = info.getLongitude();
         this.region = region;
         this.regionCode = regionCode;
+    }
 
     public void updateKakaoProfile(EditKakaoProfileInfo info) {
         this.profileImg=info.getProfileImg();
@@ -139,13 +139,6 @@ public class User extends BaseEntity {
         this.gender=info.getGender();
     }
 
-    public void updateLocation(UpdateLocationInfo info, String region, Integer regionCode){
-        this.latitude=info.getLatitude();
-        this.longitude=info.getLongitude();
-        this.region=region;
-        this.regionCode=regionCode;
-
-    }
 
     public UserInfo of() {
         return UserInfo.builder()
