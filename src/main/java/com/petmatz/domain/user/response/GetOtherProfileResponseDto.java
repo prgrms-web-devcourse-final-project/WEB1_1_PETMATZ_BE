@@ -24,6 +24,7 @@ public class GetOtherProfileResponseDto extends LogInResponseDto {
     private Integer recommendationCount;
     private Integer careCompletionCount;
     private Boolean isCareAvailable;
+    private String introduction;
     private String mbti;
     private String region;
     private Integer regionCode;
@@ -40,6 +41,7 @@ public class GetOtherProfileResponseDto extends LogInResponseDto {
         this.isRegistered = user.getIsRegistered();
         this.recommendationCount = user.getRecommendationCount();
         this.careCompletionCount = user.getCareCompletionCount();
+        this.introduction=user.getIntroduction();
         this.isCareAvailable = user.getCareAvailable();
         this.mbti=user.getMbti();
         this.region = user.getRegion();

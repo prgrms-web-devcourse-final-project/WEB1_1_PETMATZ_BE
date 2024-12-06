@@ -29,7 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -161,7 +163,7 @@ public class UserServiceImpl implements UserService {
             certificationRepository.deleteAllByAccountId(accountId);
 
             // 9. 성공 응답 반환
-            return SignUpResponseDto.success(user.getId(), resultImgURL);
+            return SignUpResponseDto.success(user.getId(), "resultImgURL");
 
         } catch (RuntimeException e) {
             log.error("회원 가입 실패: {}", e.getMessage(), e);
@@ -406,9 +408,26 @@ public class UserServiceImpl implements UserService {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
+            // Heart 리스트 조회
             List<Heart> heartList = heartRepository.findAllByMyId(user.getId());
 
-            return GetHeartingListResponseDto.success(heartList);
+            // Heart 정보와 관련된 User 데이터 매핑
+            List<HeartedUserDto> heartedUsers = heartList.stream()
+                    .map(heart -> {
+                        User heartedUser = userRepository.findById(heart.getHeartedId())
+                                .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + heart.getHeartedId()));
+
+                        return new HeartedUserDto(
+                                heart.getMyId(),
+                                heart.getHeartedId(),
+                                heartedUser.getNickname(),
+                                heartedUser.getProfileImg()
+                        );
+                    })
+                    .toList();
+
+            // 성공 응답 반환
+            return GetHeartingListResponseDto.success(heartedUsers);
 
         } catch (Exception e) {
             log.info("찜리스트 받아오기 실패: {}", e);
@@ -426,8 +445,8 @@ public class UserServiceImpl implements UserService {
             }
             User user = userRepository.findByAccountId(accountId);
 
-
             String rePasswordNum = RePasswordProvider.generatePassword();
+            log.info("Generated Repassword: {}", rePasswordNum);
 
             boolean isSendSuccess = rePasswordEmailProvider.sendVerificationEmail(accountId, rePasswordNum);
             if (!isSendSuccess) return SendRepasswordResponseDto.mailSendFail();
@@ -556,7 +575,12 @@ public class UserServiceImpl implements UserService {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
-            user.updateKakaoProfile(info);
+            GeocodingService.KakaoRegion kakaoRegion = geocodingService.getRegionFromCoordinates(info.getLatitude(), info.getLongitude());
+            if (kakaoRegion == null || kakaoRegion.getCodeAsInteger() == null) {
+                return UpdateLocationResponseDto.wrongLocation(); // Kakao API 호출 실패 처리
+            }
+
+            user.updateKakaoProfile(info, kakaoRegion.getRegionName(), kakaoRegion.getCodeAsInteger());
         } catch (Exception e) {
             log.info("프로필 수정 실패: {}", e);
             return EditKakaoProfileResponseDto.editFailed();

@@ -129,7 +129,7 @@ public class User extends BaseEntity {
         this.regionCode = regionCode;
     }
 
-    public void updateKakaoProfile(EditKakaoProfileInfo info) {
+    public void updateKakaoProfile(EditKakaoProfileInfo info, String region, Integer regionCode) {
         this.profileImg=info.getProfileImg();
         this.nickname=info.getNickname();
         this.introduction=info.getIntroduction();
@@ -137,6 +137,10 @@ public class User extends BaseEntity {
         this.careAvailable=info.isCareAvailable();
         this.mbti=info.getMbti();
         this.gender=info.getGender();
+        this.latitude=info.getLatitude();
+        this.longitude=info.getLongitude();
+        this.region=region;
+        this.regionCode=regionCode;
     }
 
 
