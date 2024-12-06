@@ -38,14 +38,14 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
                 .secure(true) // HTTPS 환경에서만 사용
                 .path("/")
                 .maxAge(3600) // 1시간 유효
-                .sameSite("Lax")
+                .sameSite("None")
                 .build();
         response.addHeader("Set-Cookie", jwtCookie.toString());
 
         User user= userRepository.findByAccountId(accountId);
-        String redirectUrl =(user==null)
-                ? "http://localhost:3000/register"
-                : "http://localhost:3000/home";
+        String redirectUrl =(user.getGender()==null)
+                ? "https://localhost:5173/kakao-signup"
+                : "https://localhost:5173/kakao-login";
 
         // 클라이언트로 리다이렉트
         response.sendRedirect(redirectUrl);

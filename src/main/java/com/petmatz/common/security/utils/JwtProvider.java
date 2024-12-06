@@ -21,7 +21,7 @@ import java.util.Map;
  * 주어진 사용자 ID로 JWT 토큰을 생성 -> 토큰의 유효성을 검증하여 사용자 ID를 반환
  */
 @Component
-//@Slf4j
+@Slf4j
 public class JwtProvider {
 
     // JWT 토큰의 서명에 사용할 비밀 키
@@ -48,7 +48,7 @@ public class JwtProvider {
                 .setIssuedAt(new Date())                  // 토큰 발행 시간
                 .setExpiration(expireDate)                // 토큰 만료 시간
                 .compact();
-
+        log.info("Generated JWT: {}", jwt);
         return jwt;
     }
 
