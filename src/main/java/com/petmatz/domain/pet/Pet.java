@@ -16,8 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity(name = "Pet")
 @Table(name = "Pet")
-public class
-Pet extends BaseEntity {
+public class Pet extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

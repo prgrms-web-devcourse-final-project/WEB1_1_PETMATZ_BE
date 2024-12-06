@@ -64,7 +64,7 @@ public class User extends BaseEntity {
     private String introduction;
 
     @Column(name = "is_care_available")
-    private Boolean isCareAvailable;
+    private Boolean careAvailable;
 
     @Column(name = "is_registered")
     private Boolean isRegistered;
@@ -113,14 +113,14 @@ public class User extends BaseEntity {
         this.recommendationCount = recommendationCount;
     }
 
-    public void updateProfile(EditMyProfileInfo info) {
-        this.profileImg = info.getProfileImg();
+    public void updateProfile(EditMyProfileInfo info, String resultImgURL) {
+        this.profileImg = resultImgURL;
         this.nickname = info.getNickname();
         this.introduction = info.getIntroduction();
         this.preferredSizes = info.getPreferredSizes();
-        this.isCareAvailable = info.isCareAvailable();
-    }
+        this.careAvailable = info.isCareAvailable();
 
+    }
 
     public void updateLocation(UpdateLocationInfo info, String region, Integer regionCode) {
         this.latitude = info.getLatitude();
@@ -134,11 +134,15 @@ public class User extends BaseEntity {
         this.nickname=info.getNickname();
         this.introduction=info.getIntroduction();
         this.preferredSizes=info.getPreferredSizes();
-        this.isCareAvailable=info.isCareAvailable();
+        this.careAvailable=info.isCareAvailable();
         this.mbti=info.getMbti();
         this.gender=info.getGender();
     }
 
+
+    public boolean checkImgURL(String Img) {
+        return profileImg.equals(Img);
+    }
 
     public UserInfo of() {
         return UserInfo.builder()

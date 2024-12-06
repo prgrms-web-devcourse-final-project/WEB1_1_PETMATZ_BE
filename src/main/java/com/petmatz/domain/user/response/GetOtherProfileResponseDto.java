@@ -40,7 +40,7 @@ public class GetOtherProfileResponseDto extends LogInResponseDto {
         this.isRegistered = user.getIsRegistered();
         this.recommendationCount = user.getRecommendationCount();
         this.careCompletionCount = user.getCareCompletionCount();
-        this.isCareAvailable = user.getIsCareAvailable();
+        this.isCareAvailable = user.getCareAvailable();
         this.mbti=user.getMbti();
         this.region = user.getRegion();
         this.isMyHeartUser=isMyHeartUser;

@@ -39,7 +39,7 @@ public class GetMyUserDto {
         this.isRegistered = user.getIsRegistered();
         this.recommendationCount = user.getRecommendationCount();
         this.careCompletionCount = user.getCareCompletionCount();
-        this.isCareAvailable = user.getIsCareAvailable();
+        this.isCareAvailable = user.getCareAvailable();
         this.latitude = user.getLatitude();
         this.longitude = user.getLongitude();
         this.mbti = user.getMbti();

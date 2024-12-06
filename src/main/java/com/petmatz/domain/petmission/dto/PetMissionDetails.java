@@ -1,5 +1,6 @@
 package com.petmatz.domain.petmission.dto;
 
+import com.petmatz.common.constants.PetMissionStatusZip;
 import com.petmatz.domain.petmission.entity.PetMissionEntity;
 import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import lombok.Builder;
@@ -10,13 +11,14 @@ import java.util.List;
 @Builder
 public record PetMissionDetails(
 
-    Long id,
-    String careName,
-    String receiverName,
-    LocalDateTime receiverStart,
-    LocalDateTime receiverEnd,
-    List<PetMissionPetInfo> petMissionPetInfos,
-    List<PetMissionAskInfo> petMissionAskInfos
+        Long id,
+        String careName,
+        String receiverName,
+        LocalDateTime receiverStart,
+        LocalDateTime receiverEnd,
+        PetMissionStatusZip status,
+        List<PetMissionPetInfo> petMissionPetInfos,
+        List<PetMissionAskInfo> petMissionAskInfos
 
 ) {
 
@@ -30,6 +32,7 @@ public record PetMissionDetails(
                 .petMissionPetInfos(petMissionEntity.getPetToPetMissions().stream().map(pet ->
                         PetMissionPetInfo.of(pet.getPet())).toList()
                 )
+                .status(petMissionEntity.getStatus())
                 .petMissionAskInfos(petMissionEntity.getPetMissionAsks().stream().map(PetMissionAskInfo::of).toList())
                 .build();
     }

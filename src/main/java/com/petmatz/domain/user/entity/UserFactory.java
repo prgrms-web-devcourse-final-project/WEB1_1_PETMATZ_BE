@@ -21,7 +21,7 @@ public class UserFactory {
                 .gender(info.getGender())
                 .preferredSizes(info.getPreferredSizes())
                 .introduction(info.getIntroduction())
-                .isCareAvailable(info.getIsCareAvailable())
+                .careAvailable(info.getIsCareAvailable())
                 .isRegistered(false)
                 .recommendationCount(0)
                 .careCompletionCount(0)

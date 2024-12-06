@@ -4,6 +4,7 @@ import com.petmatz.api.user.request.*;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.common.security.utils.JwtProvider;
 import com.petmatz.domain.aws.AwsClient;
+import com.petmatz.domain.aws.Prefix;
 import com.petmatz.domain.user.entity.Certification;
 import com.petmatz.domain.user.entity.Heart;
 import com.petmatz.domain.user.entity.User;
@@ -144,11 +145,11 @@ public class UserServiceImpl implements UserService {
 
             //6-1 Img 정제
             String imgURL;
-            URL uploadURL = awsClient.uploadImg(info.getAccountId(), info.getProfileImg(), "CUSTOM_USER_IMG");
+            URL uploadURL = awsClient.uploadImg(info.getAccountId(), info.getProfileImg(), "CUSTOM_USER_IMG", null);
             imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
             String resultImgURL = String.valueOf(uploadURL);
             if (info.getProfileImg().startsWith("profile")) {
-                resultImgURL = "";
+                resultImgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + info.getProfileImg() + ".svg";
             }
 
             // 7. 새로운 User 생성 및 저장
@@ -285,7 +286,6 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-
     @Override
     public ResponseEntity<? super GetOtherProfileResponseDto> getOtherMypage(Long userId) {
         try {
@@ -318,10 +318,12 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    //TODO 고쳐야함.
     @Override
     @Transactional
     public ResponseEntity<? super EditMyProfileResponseDto> editMyProfile(EditMyProfileInfo info) {
         try {
+            System.out.println("info ::" + info.isCareAvailable());
             Long userId = jwtExtractProvider.findIdFromJwt();
             String userEmail = jwtExtractProvider.findAccountIdFromJwt();
             boolean exists = userRepository.existsById(userId);
@@ -329,15 +331,26 @@ public class UserServiceImpl implements UserService {
                 return EditMyProfileResponseDto.idNotFound();
             }
 
-            //6-1 Img 정제
-            URL uploadURL = awsClient.uploadImg(userEmail, info.getProfileImg(), "CUSTOM_USER_IMG");
-            String imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
-
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
-            user.updateProfile(info);
+            String imgURL = info.getProfileImg();
+            String resultImgURL = "";
+            if (user.checkImgURL(info.getProfileImg())) {
+                //6-1 Img 정제
+                URL uploadURL = awsClient.uploadImg(userEmail, info.getProfileImg(), "CUSTOM_USER_IMG", null);
+                imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
+                resultImgURL = String.valueOf(uploadURL);
+                if (info.getProfileImg().startsWith("profile")) {
+                    resultImgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + info.getProfileImg() + ".svg";
+                }
+            }
 
+
+            user.updateProfile(info, imgURL);
+
+            //반환해야 함 아래꺼
+//            resultImgURL
 
         } catch (Exception e) {
             log.info("프로필 수정 실패: {}", e);
@@ -384,8 +397,6 @@ public class UserServiceImpl implements UserService {
             return HeartingResponseDto.databaseError(); // 데이터베이스 오류 응답
         }
     }
-
-
     @Override
     public ResponseEntity<? super GetHeartingListResponseDto> getHeartedList() {
         try {
@@ -517,6 +528,20 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
+    public GetMyUserDto receiverEmail(String accountId) {
+        try {
+            User user = userRepository.findByAccountId(accountId);
+            return new GetMyUserDto(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new GetMyUserDto();
+    }
+
+    @Override
+    public void deleteUser(Long userUUID) {
+        userRepository.deleteUserById(userUUID);
+    }
     @Transactional
     public ResponseEntity<? super EditKakaoProfileResponseDto> editKakaoProfile(EditKakaoProfileInfo info) {
         try {
@@ -546,22 +571,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public String findByUserEmail(Long userId) {
         return userRepository.findById(userId).get().getAccountId();
-    }
-
-    @Override
-    public GetMyUserDto receiverEmail(String accountId) {
-        try {
-            User user = userRepository.findByAccountId(accountId);
-            return new GetMyUserDto(user);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new GetMyUserDto();
-    }
-
-    @Override
-    public void deleteUser(Long userUUID) {
-        userRepository.deleteUserById(userUUID);
     }
 
 
