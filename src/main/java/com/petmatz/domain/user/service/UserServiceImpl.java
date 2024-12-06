@@ -149,7 +149,7 @@ public class UserServiceImpl implements UserService {
             imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
             String resultImgURL = String.valueOf(uploadURL);
             if (info.getProfileImg().startsWith("profile")) {
-                resultImgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + info.getProfileImg() + ".svg";
+                resultImgURL = "";
             }
 
             // 7. 새로운 User 생성 및 저장
@@ -342,7 +342,7 @@ public class UserServiceImpl implements UserService {
                 imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
                 resultImgURL = String.valueOf(uploadURL);
                 if (info.getProfileImg().startsWith("profile")) {
-                    resultImgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + info.getProfileImg() + ".svg";
+                    resultImgURL = "";
                 }
             }
 

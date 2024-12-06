@@ -83,7 +83,7 @@ public class PetServiceImpl implements PetService{
         String imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
         String resultImgURL = String.valueOf(uploadURL);
         if (dto.profileImg().startsWith("profile")) {
-            resultImgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + dto.profileImg();
+            resultImgURL = "";
         }
         // DTO에서 Pet 엔티티 생성
         Pet pet = Pet.builder()

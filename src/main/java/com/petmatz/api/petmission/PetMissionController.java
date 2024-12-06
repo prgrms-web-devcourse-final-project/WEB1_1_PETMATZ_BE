@@ -99,8 +99,6 @@ public class PetMissionController {
     }
 
     //TODO comment에 ask달때 사진 s3로 전송해야 함.
-
-
     @PostMapping("/comment")
     public String saveComment(@RequestBody PetMissionCommentRequest petMissionCommentRequest) throws MalformedURLException {
         String userEmail = jwtExtractProvider.findAccountIdFromJwt();
