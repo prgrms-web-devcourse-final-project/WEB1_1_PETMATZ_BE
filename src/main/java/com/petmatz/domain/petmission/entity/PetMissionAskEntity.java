@@ -1,9 +1,11 @@
 package com.petmatz.domain.petmission.entity;
 
+import com.petmatz.domain.petmission.dto.PetMissionCommentInfo;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -40,4 +42,7 @@ public class PetMissionAskEntity {
         this.petMission = petMission;
     }
 
+    public void addPetMissionAnswer(PetMissionAnswerEntity petMissionAnswerEntity) {
+        missionAnswer = petMissionAnswerEntity;
+    }
 }
