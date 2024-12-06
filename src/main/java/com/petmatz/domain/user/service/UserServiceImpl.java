@@ -340,7 +340,7 @@ public class UserServiceImpl implements UserService {
 
             String imgURL = info.getProfileImg();
             String resultImgURL = "";
-            if (user.checkImgURL(info.getProfileImg())) {
+            if (!user.checkImgURL(info.getProfileImg())) {
                 //6-1 Img 정제
                 URL uploadURL = awsClient.uploadImg(userEmail, info.getProfileImg(), "CUSTOM_USER_IMG", null);
                 imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
@@ -353,14 +353,13 @@ public class UserServiceImpl implements UserService {
 
             user.updateProfile(info, imgURL);
 
-            //반환해야 함 아래꺼
-//            resultImgURL
+//            반환해야 함 아래꺼
+            return EditMyProfileResponseDto.success(resultImgURL);
 
         } catch (Exception e) {
             log.info("프로필 수정 실패: {}", e);
             return EditMyProfileResponseDto.editFailed();
         }
-        return EditMyProfileResponseDto.success();
     }
 
 
