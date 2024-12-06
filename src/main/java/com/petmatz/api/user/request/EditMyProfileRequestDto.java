@@ -18,7 +18,7 @@ public class EditMyProfileRequestDto {
 
     private String introduction;
 
-    private boolean isCareAvailable;
+    private boolean careAvailable;
 
     private String profileImg;
 
@@ -27,7 +27,8 @@ public class EditMyProfileRequestDto {
                 .nickname(reqDto.getNickname())
                 .preferredSizes(reqDto.getPreferredSizes())
                 .introduction(reqDto.getIntroduction())
-                .isCareAvailable(reqDto.isCareAvailable())
+                .careAvailable(reqDto.isCareAvailable()
+                )
                 .profileImg(reqDto.getProfileImg())
                 .build();
     }

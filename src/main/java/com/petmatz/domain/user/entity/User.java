@@ -109,12 +109,13 @@ public class User extends BaseEntity {
         this.recommendationCount = recommendationCount;
     }
 
-    public void updateProfile(EditMyProfileInfo info) {
-        this.profileImg=info.getProfileImg();
+    public void updateProfile(EditMyProfileInfo info, String resultImgURL) {
+        this.profileImg=resultImgURL;
         this.nickname=info.getNickname();
         this.introduction=info.getIntroduction();
         this.preferredSizes=info.getPreferredSizes();
         this.isCareAvailable=info.isCareAvailable();
+
     }
 
     public void updateKakaoProfile(EditKakaoProfileInfo info) {
@@ -132,6 +133,10 @@ public class User extends BaseEntity {
         this.longitude=info.getLongitude();
         this.region=region;
         this.regionCode=regionCode;
+    }
+
+    public boolean checkImgURL(String Img) {
+        return profileImg.equals(Img);
     }
 
     public UserInfo of() {

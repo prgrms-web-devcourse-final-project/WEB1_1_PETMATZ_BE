@@ -17,5 +17,5 @@ public class EditMyProfileInfo {
 
     private String introduction;
 
-    private boolean isCareAvailable;
+    private boolean careAvailable;
 }

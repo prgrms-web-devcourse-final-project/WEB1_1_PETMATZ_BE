@@ -7,6 +7,7 @@ import com.petmatz.domain.aws.AwsClient;
 import com.petmatz.domain.pet.dto.PetSaveResponse;
 import com.petmatz.domain.pet.dto.PetServiceDto;
 import com.petmatz.domain.pet.dto.PetServiceDtoFactory;
+import com.petmatz.domain.pet.dto.PetUpdateResponse;
 import com.petmatz.domain.pet.exception.ImageErrorCode;
 import com.petmatz.domain.pet.exception.ImageServiceException;
 import com.petmatz.domain.pet.exception.PetErrorCode;
@@ -73,12 +74,12 @@ public class PetServiceImpl implements PetService{
         }
 
         //6-1 Img 정제
-        String imgURL;
-        URL uploadURL = awsClient.uploadImg(user.getAccountId(), dto.profileImg(), "PET_IMG");
-        imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
+        //TODO 펫 구분하는거 ID로 못함. 딴걸로 해야 함.
+        URL uploadURL = awsClient.uploadImg(user.getAccountId(), dto.profileImg(), "PET_IMG", dto.dogRegNo());
+        String imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
         String resultImgURL = String.valueOf(uploadURL);
         if (dto.profileImg().startsWith("profile")) {
-            resultImgURL = "";
+            resultImgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + dto.profileImg();
         }
         // DTO에서 Pet 엔티티 생성
         Pet pet = Pet.builder()
@@ -98,14 +99,17 @@ public class PetServiceImpl implements PetService{
 
         Long id = repository.save(pet).getId();
         return PetSaveResponse.of(id, resultImgURL);
-//        return ;
     }
 
     // 펫 업데이트
-    public void updatePet(Long petId, User user, PetServiceDto updatedDto) {
+    public PetUpdateResponse updatePet(Long petId, User user, PetServiceDto updatedDto) {
         Pet existingPet = repository.findByIdAndUser(petId, user)
                 .orElseThrow(() -> new PetServiceException(PetErrorCode.PET_NOT_FOUND));
+
         String imgURL;
+        String resultImgURL = null;
+        String UUID = user.getAccountId() + "_" + updatedDto.dogRegNo();
+
         // 현재 사용자가 리소스 소유자인지 검증
         if (!existingPet.getUser().equals(user)) {
             throw new SecurityException("권한이 없습니다.");
@@ -115,11 +119,11 @@ public class PetServiceImpl implements PetService{
             if (updatedDto.profileImg() != null) {
 
                 //6-1 Img 정제
-                URL uploadURL = awsClient.uploadImg(user.getAccountId(), updatedDto.profileImg(), "PET_IMG");
+                URL uploadURL = awsClient.uploadImg(user.getAccountId(), updatedDto.profileImg(), "PET_IMG", updatedDto.dogRegNo());
                 imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
-                String resultImgURL = imgURL;
+                resultImgURL = String.valueOf(uploadURL);
                 if (updatedDto.profileImg().startsWith("profile")) {
-                    resultImgURL = "";
+                    resultImgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + updatedDto.profileImg();
                 }
 
 
@@ -146,6 +150,7 @@ public class PetServiceImpl implements PetService{
                     .build();
 
             repository.save(updatedPet);
+            return PetUpdateResponse.of(UUID, resultImgURL);
         } catch (Exception e) {
             throw new PetServiceException(PetErrorCode.UPDATE_FAILED, "GENERAL_EXCEPTION");
         }

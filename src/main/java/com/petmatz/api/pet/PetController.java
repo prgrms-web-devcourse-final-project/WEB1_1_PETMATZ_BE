@@ -9,6 +9,7 @@ import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.pet.PetServiceImpl;
 import com.petmatz.domain.pet.dto.PetSaveResponse;
 import com.petmatz.domain.pet.dto.PetServiceDto;
+import com.petmatz.domain.pet.dto.PetUpdateResponse;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -53,11 +54,11 @@ public class PetController {
     @PutMapping("/{id}")
     @Operation(summary = "반려동물 정보 수정", description = "기존 반려동물 정보를 수정합니다.")
     @Parameter(name = "id", description = "반려동물 ID", example = "1")
-    public ResponseEntity<Response<Void>> updatePet(@PathVariable Long id, @RequestBody PetRequest updatedRequest) {
+    public ResponseEntity<Response<PetUpdateResponse>> updatePet(@PathVariable Long id, @RequestBody PetRequest updatedRequest) {
         User user = getAuthenticatedUser();
         PetServiceDto updatedServiceDto = PetServiceDto.of(updatedRequest);
-        petServiceImpl.updatePet(id, user, updatedServiceDto);
-        return ResponseEntity.ok(Response.success("댕댕이 정보가 업데이트 완료되었습니다."));
+        PetUpdateResponse petUpdateResponse = petServiceImpl.updatePet(id, user, updatedServiceDto);
+        return ResponseEntity.ok(Response.success(petUpdateResponse));
     }
 
     // 댕댕이 정보 삭제
