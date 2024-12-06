@@ -19,4 +19,8 @@ public class CheckCertificationResponseDto extends LogInResponseDto {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseBody);
     }
 
+    public static ResponseEntity<LogInResponseDto> certificationExpired() {
+        LogInResponseDto responseBody = new LogInResponseDto(ResponseCode.CERTIFICATION_EXPIRED, ResponseMessage.CERTIFICATION_EXPIRED);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+    }
 }

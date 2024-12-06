@@ -20,18 +20,17 @@ public interface UserService {
     ResponseEntity<? super SendRepasswordResponseDto> sendRepassword(SendRepasswordRequestDto dto);
     ResponseEntity<? super RepasswordResponseDto> repassword(RepasswordInfo info);
     ResponseEntity<? super EditMyProfileResponseDto> editMyProfile(EditMyProfileInfo info);
-
     ResponseEntity<? super HeartingResponseDto> hearting(HeartingRequestDto dto);
-
     ResponseEntity<? super GetHeartingListResponseDto> getHeartedList();
-
     ResponseEntity<? super UpdateLocationResponseDto> updateLocation(UpdateLocationInfo info);
-
     ResponseEntity<? super UpdateRecommendationResponseDto> updateRecommend(UpdateRecommendationRequestDto dto);
+    ResponseEntity<? super EditKakaoProfileResponseDto> editKakaoProfile(EditKakaoProfileInfo of);
+
+
+
     String findByUserEmail(Long userId);
 
     GetMyUserDto receiverEmail(String accountId);
 
     void deleteUser(Long accountId);
-    ResponseEntity<? super EditKakaoProfileResponseDto> editKakaoProfile(EditKakaoProfileInfo of);
 }

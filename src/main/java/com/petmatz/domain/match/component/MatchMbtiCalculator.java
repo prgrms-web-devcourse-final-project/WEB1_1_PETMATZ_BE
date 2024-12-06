@@ -1,11 +1,14 @@
-package com.petmatz.domain.match.service;
+package com.petmatz.domain.match.component;
 
 import com.petmatz.domain.match.exception.MatchException;
-import com.petmatz.infra.redis.service.MbtiRedisService;
+import com.petmatz.infra.redis.component.RedisMbti;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -13,10 +16,10 @@ import static com.petmatz.domain.match.exception.MatchErrorCode.INSUFFICIENT_MBT
 
 @Service
 @RequiredArgsConstructor
-public class MatchMbtiService {
+public class MatchMbtiCalculator {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final MbtiRedisService mbtiRedisService;
+    private final RedisMbti redisMbti;
 
     // 점수 전체 가져오기
     public Map<String, Integer> getMbtiScore(String userMbti) {
@@ -35,21 +38,17 @@ public class MatchMbtiService {
     }
 
     // 특정 상대
-    public double calculateMbtiScore(String userMbti, String targetMbti) {
-        if (targetMbti == null) {
-            targetMbti = "UNKNOWN"; // 기본값 설정
-        }
+    public double calculateMbtiAverageScore(String TargetMbti, List<String> myDogMbtiList) {
+        List<Double> scores = redisMbti.getScores(TargetMbti, myDogMbtiList);
 
-        String redisKey = userMbti.toUpperCase();
-        String fieldKey = targetMbti.toUpperCase();
+        double average = scores.stream()
+                .mapToDouble(Double::doubleValue)
+                .average()
+                .orElseThrow(() -> new MatchException(INSUFFICIENT_MBTI_DATA));
 
-        Double score = mbtiRedisService.getScore(redisKey, fieldKey);
+        BigDecimal roundedAverage = BigDecimal.valueOf(average)
+                .setScale(1, RoundingMode.FLOOR);
 
-
-        if (score == null) {
-            throw new MatchException(INSUFFICIENT_MBTI_DATA);
-        }
-
-        return Double.parseDouble(score.toString());
+        return roundedAverage.doubleValue();
     }
 }

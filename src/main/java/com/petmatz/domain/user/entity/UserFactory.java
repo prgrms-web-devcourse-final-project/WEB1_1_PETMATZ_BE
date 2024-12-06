@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 public class UserFactory {
 
-    public static User createNewUser(SignUpInfo info, String encodedPassword, String region,Integer regionCode,String imgURL) {
+    public static User createNewUser(SignUpInfo info, String encodedPassword, String region, Integer regionCode, String imgURL) {
 
         return User.builder()
                 .accountId(info.getAccountId())
@@ -21,7 +21,7 @@ public class UserFactory {
                 .gender(info.getGender())
                 .preferredSizes(info.getPreferredSizes())
                 .introduction(info.getIntroduction())
-                .isCareAvailable(info.getIsCareAvailable())
+                .careAvailable(info.getIsCareAvailable())
                 .isRegistered(false)
                 .recommendationCount(0)
                 .careCompletionCount(0)
@@ -30,6 +30,15 @@ public class UserFactory {
                 .longitude(info.getLongitude())
                 .region(region)
                 .regionCode(regionCode)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static Heart createHeart(Long myId, Long heartedId) {
+        return Heart.builder()
+                .myId(myId)
+                .heartedId(heartedId)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();

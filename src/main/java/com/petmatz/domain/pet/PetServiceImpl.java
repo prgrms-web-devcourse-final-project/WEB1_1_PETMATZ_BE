@@ -27,8 +27,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static com.petmatz.domain.pet.exception.PetErrorCode.PET_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -108,7 +112,7 @@ public class PetServiceImpl implements PetService{
 
         String imgURL;
         String resultImgURL = null;
-        String UUID = user.getAccountId() + "_" + updatedDto.dogRegNo();
+        String UUID = updatedDto.dogRegNo();
 
         // 현재 사용자가 리소스 소유자인지 검증
         if (!existingPet.getUser().equals(user)) {
@@ -160,7 +164,7 @@ public class PetServiceImpl implements PetService{
     // 펫 삭제
     public void deletePet(Long petId, User user) {
         Pet pet = repository.findByIdAndUser(petId, user)
-                .orElseThrow(() -> new PetServiceException(PetErrorCode.PET_NOT_FOUND));
+                .orElseThrow(() -> new PetServiceException(PET_NOT_FOUND));
         repository.delete(pet);
     }
 
@@ -188,6 +192,25 @@ public class PetServiceImpl implements PetService{
             return response.toString();
         }
     }
+
+    public List<Pet> getPetsByUserId(Long userId) {
+        List<Pet> userPets = repository.findByUserId(userId);
+        if (userPets.isEmpty()) {
+            throw new PetServiceException(PET_NOT_FOUND);
+        }
+        return userPets;
+    }
+
+    public List<String> getTemperamentsByUserId(Long userId) {
+        List<Pet> pets = repository.findByUserId(userId);
+        if (pets.isEmpty()) {
+            throw new RuntimeException();
+        }
+        return pets.stream()
+                .map(pet -> pet.getTemperament() != null ? pet.getTemperament() : "Unknown")
+                .collect(Collectors.toList());
+    }
+
 }
 
 
