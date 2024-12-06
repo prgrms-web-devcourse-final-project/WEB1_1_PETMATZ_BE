@@ -32,4 +32,6 @@ public interface ResponseCode {
     String MISSING_FIELDS = "MF";
 
     String UNKNOWN_ERROR = "UE";
+
+    String CERTIFICATION_EXPIRED = "CE";
 }

@@ -11,9 +11,12 @@ import org.springframework.http.ResponseEntity;
 public class SignUpResponseDto extends LogInResponseDto {
     private Long id;
 
-    private SignUpResponseDto(Long id) {
+    private String imgURL;
+
+    private SignUpResponseDto(Long id, String imgURL) {
         super();
         this.id=id;
+        this.imgURL = imgURL;
     }
 
     // 1. 중복된 ID 응답
@@ -29,8 +32,8 @@ public class SignUpResponseDto extends LogInResponseDto {
     }
 
     // 4. 회원가입 성공 응답
-    public static ResponseEntity<SignUpResponseDto> success(Long id) {
-        SignUpResponseDto responseBody = new SignUpResponseDto(id);
+    public static ResponseEntity<SignUpResponseDto> success(Long id, String imgURL) {
+        SignUpResponseDto responseBody = new SignUpResponseDto(id,imgURL);
         return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 

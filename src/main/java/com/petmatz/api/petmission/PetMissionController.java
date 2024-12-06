@@ -42,10 +42,10 @@ public class PetMissionController {
     @Operation(summary = "멍멍이의 부탁 등록", description = "멍멍이의 부탁을 등록하는 API")
     @Parameters({
             @Parameter(name = "receiverId", description = "돌봄이 ID", example = "2"), //-> 레포에서 조회 해서 가져와햐 함.
-            @Parameter(name = "petId", description = "채팅방 번호", example = "10"),
+            @Parameter(name = "petId", description = "펫 ID [ List<String> ] ", example = "[1,2,3]"),
             @Parameter(name = "missionStarted", description = "멍멍이의 부탁 시작일", example = "히힛"),
             @Parameter(name = "missionEnd", description = "멍멍이의 부탁 마감", example = "하핫"),
-            @Parameter(name = "petMissionAsk", description = "멍멍이의 부탁 [ List<String> ]", example = "호수공원 산책하기")
+            @Parameter(name = "petMissionAsk", description = "멍멍이의 부탁 [ List<String> ]", example = "[호수공원 산책하기, 놀아주기]")
     })
     @PostMapping
     public Response<PetMissionResponse> savePetMissionList(@RequestBody PetMissionRequest petMissionRequest) {
@@ -87,11 +87,16 @@ public class PetMissionController {
 
     //------------------------아래는 잠시 보류 ---------------//
 
+    @Operation(summary = "펫 미션 상세 조회", description = "펫 미션 상세 조회 API")
+    @Parameters({
+            @Parameter(name = "petMissionId", description = "펫 미션 ID", example = "2"),
+    })
     @GetMapping("/Info")
     public Response<PetMissionDetails> selectPetMissionInfo(@RequestParam("petMissionId") String petMissionId) {
         PetMissionDetails petMissionDetails = petMissionService.selectPetMissionInfo(petMissionId);
         return Response.success(petMissionDetails);
     }
+
     //TODO comment에 ask달때 사진 s3로 전송해야 함.
 
 

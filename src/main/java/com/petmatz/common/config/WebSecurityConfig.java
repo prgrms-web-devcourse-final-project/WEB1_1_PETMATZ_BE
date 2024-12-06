@@ -49,6 +49,13 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/sosboard/user/{nickname}").permitAll()
                         .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        //스웨거 모든 접근 허용
+                        .requestMatchers(
+                                "/swagger-ui/**",   
+                                "/v3/api-docs/**",  
+                                "/swagger-resources/**",
+                                "/webjars/**"       
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2

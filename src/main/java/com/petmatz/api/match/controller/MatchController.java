@@ -16,7 +16,6 @@ public class MatchController {
     private final MatchService matchService;
     private final MatchScoreService matchScoreService;
 
-    // front 측에서 1회성으로 계산을 할 수 있게 만들어야 할 거 같은데,,, 맨처음 1회 매칭
 
     // TODO 추후에 userId 변경 (JWT)
     @GetMapping("/showmetz")
@@ -24,6 +23,7 @@ public class MatchController {
             @RequestParam Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
+        matchScoreService.calculateTotalScore(userId);
         PaginatedMatchResponse userDetails = matchService.getPageUserDetailsFromRedis(userId, page, size);
 
         if (userDetails.matchResults().isEmpty()) {

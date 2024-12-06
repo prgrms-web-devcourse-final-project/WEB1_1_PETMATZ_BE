@@ -3,6 +3,7 @@ package com.petmatz.domain.user.service;
 import com.petmatz.api.user.request.*;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.common.security.utils.JwtProvider;
+import com.petmatz.domain.aws.AwsClient;
 import com.petmatz.domain.user.entity.Certification;
 import com.petmatz.domain.user.entity.Heart;
 import com.petmatz.domain.user.entity.User;
@@ -15,11 +16,9 @@ import com.petmatz.domain.user.repository.HeartRepository;
 import com.petmatz.domain.user.repository.UserRepository;
 import com.petmatz.domain.user.response.*;
 import com.petmatz.user.common.LogInResponseDto;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +47,8 @@ public class UserServiceImpl implements UserService {
 
     private final GeocodingService geocodingService;
 
+    private final AwsClient awsClient;
+
 
     @Override
     public ResponseEntity<? super EmailCertificationResponseDto> emailCertification(EmailCertificationRequestDto dto) {
@@ -63,7 +65,7 @@ public class UserServiceImpl implements UserService {
             if (!isSendSuccess) return EmailCertificationResponseDto.mailSendFail();
 
             // 인증 엔티티 저장
-            Certification certification = Certification.builder().accountId(accountId).certificationNumber(certificationNumber).build();
+            Certification certification = Certification.builder().accountId(accountId).certificationNumber(certificationNumber).isVerified(false).build();
             certificationRepository.save(certification);
 
         } catch (Exception e) {
@@ -73,27 +75,40 @@ public class UserServiceImpl implements UserService {
         return EmailCertificationResponseDto.success();
     }
 
+
     @Override
+    @Transactional
     public ResponseEntity<? super CheckCertificationResponseDto> checkCertification(CheckCertificationInfo info) {
         try {
             String accountId = info.getAccountId();
             String certificationNumber = info.getCertificationNumber();
 
-            // 인증 엔티티 조회
-            Certification Certification = certificationRepository.findTopByAccountIdOrderByCreatedAtDesc(accountId);
-            if (Certification == null) return CheckCertificationResponseDto.certificationFail();
+            Certification certification = certificationRepository.findTopByAccountIdOrderByCreatedAtDesc(accountId);
+            if (certification == null) return CheckCertificationResponseDto.certificationFail();
 
-            // 이메일 및 인증 번호가 일치하는지 확인
-            boolean isMatch = Certification.getAccountId().equals(accountId) && Certification.getCertificationNumber().equals(certificationNumber);
+            boolean isMatch = certification.getAccountId().equals(accountId)
+                    && certification.getCertificationNumber().equals(certificationNumber);
+
             if (!isMatch) return CheckCertificationResponseDto.certificationFail();
+
+            // 인증 시간 검증
+            LocalDateTime createdAt = certification.getCreatedAt();
+            if (createdAt.isBefore(LocalDateTime.now().minusMinutes(5))) {  // 5분 유효시간
+                return CheckCertificationResponseDto.certificationExpired();
+            }
+
+            // 인증 완료 상태 업데이트
+            certification.markAsVerified();
+            certificationRepository.save(certification);
 
         } catch (Exception e) {
             log.info("인증 번호 확인 실패: {}", e);
             return CheckCertificationResponseDto.databaseError();
         }
 
-        return CheckCertificationResponseDto.success();  // 인증 성공 응답
+        return CheckCertificationResponseDto.success();
     }
+
 
     @Override
     @Transactional
@@ -109,8 +124,8 @@ public class UserServiceImpl implements UserService {
 
             // 2. 인증 번호 확인
             Certification certification = certificationRepository.findTopByAccountIdOrderByCreatedAtDesc(accountId);
-            if (certification == null || !certification.getCertificationNumber().equals(certificationNumber)) {
-                return SignUpResponseDto.certificationFail();
+            if (certification == null || !certification.getIsVerified()) {
+                return SignUpResponseDto.certificationFail(); // 인증되지 않은 경우
             }
 
             // 3. 중복된 ID 확인
@@ -120,32 +135,31 @@ public class UserServiceImpl implements UserService {
 
             // 5. 비밀번호 암호화 후 저장
             String encodedPassword = passwordEncoder.encode(info.getPassword());
-            info.setPassword(encodedPassword);
 
             // 6. GeocodingService를 통해 지역명과 6자리 행정코드 가져오기
             GeocodingService.KakaoRegion kakaoRegion = geocodingService.getRegionFromCoordinates(info.getLatitude(), info.getLongitude());
-            if (kakaoRegion == null) {
+            if (kakaoRegion == null || kakaoRegion.getCodeAsInteger() == null) {
                 return SignUpResponseDto.locationFail();
             }
 
-            String regionName = kakaoRegion.getRegionName();
-            Integer regionCode = kakaoRegion.getCodeAsInteger();
-
-            // regionCode가 null일 경우 추가 처리
-            if (regionCode == null) {
-                log.error("Region Code is null for coordinates: {}, {}", info.getLatitude(), info.getLongitude());
-                return SignUpResponseDto.locationFail();
+            //6-1 Img 정제
+            String imgURL;
+            URL uploadURL = awsClient.uploadImg(info.getAccountId(), info.getProfileImg(), "CUSTOM_USER_IMG");
+            imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
+            String resultImgURL = String.valueOf(uploadURL);
+            if (info.getProfileImg().startsWith("profile")) {
+                resultImgURL = "";
             }
 
             // 7. 새로운 User 생성 및 저장
-            User user = UserFactory.createNewUser(info, encodedPassword, regionName, regionCode);
+            User user = UserFactory.createNewUser(info, encodedPassword, kakaoRegion.getRegionName(), kakaoRegion.getCodeAsInteger(), imgURL);
             userRepository.save(user);
 
             // 8. 인증 엔티티 삭제
             certificationRepository.deleteAllByAccountId(accountId);
 
             // 9. 성공 응답 반환
-            return SignUpResponseDto.success(user.getId());
+            return SignUpResponseDto.success(user.getId(), resultImgURL);
 
         } catch (RuntimeException e) {
             log.error("회원 가입 실패: {}", e.getMessage(), e);
@@ -179,7 +193,6 @@ public class UserServiceImpl implements UserService {
             String token = jwtProvider.create(user.getId(), user.getAccountId());
             log.info("JWT 생성 완료: {}", token);
 
-
             ResponseCookie responseCookie = ResponseCookie.from("jwt", token)
                     .httpOnly(true)           // XSS 방지
                     .secure(true)             // HTTPS만 허용
@@ -195,6 +208,7 @@ public class UserServiceImpl implements UserService {
             return SignInResponseDto.signInFail();
         }
     }
+
 
     @Override
     public ResponseEntity<? super LogInResponseDto> logout(HttpServletResponse response) {
@@ -217,6 +231,7 @@ public class UserServiceImpl implements UserService {
             return LogInResponseDto.validationFail();
         }
     }
+
 
     @Override
     @Transactional
@@ -269,6 +284,8 @@ public class UserServiceImpl implements UserService {
             return GetMyProfileResponseDto.databaseError();
         }
     }
+
+
     @Override
     public ResponseEntity<? super GetOtherProfileResponseDto> getOtherMypage(Long userId) {
         try {
@@ -306,10 +323,15 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<? super EditMyProfileResponseDto> editMyProfile(EditMyProfileInfo info) {
         try {
             Long userId = jwtExtractProvider.findIdFromJwt();
+            String userEmail = jwtExtractProvider.findAccountIdFromJwt();
             boolean exists = userRepository.existsById(userId);
             if (!exists) {
                 return EditMyProfileResponseDto.idNotFound();
             }
+
+            //6-1 Img 정제
+            URL uploadURL = awsClient.uploadImg(userEmail, info.getProfileImg(), "CUSTOM_USER_IMG");
+            String imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
 
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
@@ -323,6 +345,7 @@ public class UserServiceImpl implements UserService {
         }
         return EditMyProfileResponseDto.success();
     }
+
 
     @Override
     @Transactional
@@ -351,12 +374,7 @@ public class UserServiceImpl implements UserService {
             }
 
             // 찜하기 진행 (DB에 저장)
-            Heart heart = Heart.builder()
-                    .myId(user.getId())
-                    .heartedId(heartedId)
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
-                    .build();
+            Heart heart = UserFactory.createHeart(userId, heartedId);
             heartRepository.save(heart);
 
             return HeartingResponseDto.success(); // 찜하기 성공 응답
@@ -366,6 +384,8 @@ public class UserServiceImpl implements UserService {
             return HeartingResponseDto.databaseError(); // 데이터베이스 오류 응답
         }
     }
+
+
     @Override
     public ResponseEntity<? super GetHeartingListResponseDto> getHeartedList() {
         try {
@@ -383,8 +403,6 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-
-    //--------------------------------------------------------------------------------------------------------------------------------------------
     @Override
     @Transactional
     public ResponseEntity<? super SendRepasswordResponseDto> sendRepassword(SendRepasswordRequestDto dto) {
@@ -411,6 +429,7 @@ public class UserServiceImpl implements UserService {
         }
         return SendRepasswordResponseDto.success();
     }
+
 
     @Override
     @Transactional
@@ -459,20 +478,14 @@ public class UserServiceImpl implements UserService {
 
             // GeocodingService에서 지역명과 행정코드 가져오기
             GeocodingService.KakaoRegion kakaoRegion = geocodingService.getRegionFromCoordinates(info.getLatitude(), info.getLongitude());
-            if (kakaoRegion == null) {
+            if (kakaoRegion == null || kakaoRegion.getCodeAsInteger() == null) {
                 return UpdateLocationResponseDto.wrongLocation(); // Kakao API 호출 실패 처리
             }
 
-            String regionName = kakaoRegion.getRegionName();
-            Integer regionCode = kakaoRegion.getCodeAsInteger(); // 행정코드를 Integer로 변환
-
-            log.info("Region Name: {}", regionName);
-            log.info("Region Code: {}", regionCode);
-            // 사용자 위치 업데이트
-            user.updateLocation(info, regionName, regionCode);
+            user.updateLocation(info, kakaoRegion.getRegionName(), kakaoRegion.getCodeAsInteger());
 
             // 성공 응답 반환
-            return UpdateLocationResponseDto.success(regionName, regionCode);
+            return UpdateLocationResponseDto.success(kakaoRegion.getRegionName(), kakaoRegion.getCodeAsInteger());
         } catch (Exception e) {
             log.error("위치 업데이트 실패: {}", e.getMessage(), e);
             return UpdateLocationResponseDto.wrongLocation();
@@ -502,22 +515,6 @@ public class UserServiceImpl implements UserService {
         return UpdateRecommendationResponseDto.success();
     }
 
-    @Override
-    public String findByUserEmail(Long userId) {
-        return userRepository.findById(userId).get().getAccountId();
-    }
-
-
-    @Override
-    public GetMyUserDto receiverEmail(String accountId) {
-        try {
-            User user = userRepository.findByAccountId(accountId);
-            return new GetMyUserDto(user);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new GetMyUserDto();
-    }
 
     @Override
     @Transactional
@@ -540,8 +537,32 @@ public class UserServiceImpl implements UserService {
         return EditKakaoProfileResponseDto.success();
     }
 
+
     public UserInfo selectUserInfo(String receiverEmail) {
         User otherUser = userRepository.findByAccountId(receiverEmail);
         return otherUser.of();
     }
+
+    @Override
+    public String findByUserEmail(Long userId) {
+        return userRepository.findById(userId).get().getAccountId();
+    }
+
+    @Override
+    public GetMyUserDto receiverEmail(String accountId) {
+        try {
+            User user = userRepository.findByAccountId(accountId);
+            return new GetMyUserDto(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new GetMyUserDto();
+    }
+
+    @Override
+    public void deleteUser(Long userUUID) {
+        userRepository.deleteUserById(userUUID);
+    }
+
+
 }

@@ -25,13 +25,13 @@ public class PetMissionService {
     private final PetRepository petRepository;
 
     private final UserToChatRoomReader userToChatRoomReader;
-    private final JwtExtractProvider jwtExtractProvider;
     private final UserToPetMissionInserter userToPetMissionInserter;
     private final UserToPetMissionReader userToPetMissionReader;
     private final PetMissionReader petMissionReader;
     private final PetMissionInserter petMissionInserter;
 
     public PetMissionData insertPetMission(PetMissionInfo petMissionInfo, Long careId) {
+
 
         List<User> users = makeUserEntityList(careId, petMissionInfo.receiverId());
 
@@ -69,7 +69,6 @@ public class PetMissionService {
 
     @Transactional
     public void updatePetMissionStatus(PetMissionUpdateRequest petMissionUpdateRequest) {
-        jwtExtractProvider.findIdFromJwt();
         List<UserToPetMissionEntity> userToPetMissionEntities = userToPetMissionReader.selectUserToPetMissionList(petMissionUpdateRequest);
         for (UserToPetMissionEntity userToPetMissionEntity : userToPetMissionEntities) {
             PetMissionEntity petMission = userToPetMissionEntity.getPetMission();
@@ -81,7 +80,6 @@ public class PetMissionService {
         List<UserToPetMissionEntity> userToPetMissionEntities = userToPetMissionReader.selectUserToPetMissionList(petMissionId);
 
         PetMissionEntity petMissionEntity = petMissionReader.selectUserToPetMission(petMissionId);
-        System.out.println(petMissionEntity.toString());
 
         return PetMissionDetails.of(petMissionEntity, userToPetMissionEntities);
     }
@@ -102,9 +100,7 @@ public class PetMissionService {
         }
         String imgURL = "";
 
-        System.out.println("빈값");
         PetMissionAnswerEntity petMissionAnswerEntity = petMissionInserter.insertPetMissionAnswer(PetMissionAnswerEntity.of(petMissionCommentInfo, imgURL));
-        System.out.println("petMissionAnswerEntity.getId() : " + petMissionAnswerEntity.getId());
         petMissionAskEntity.addPetMissionAnswer(petMissionAnswerEntity);
     }
 }
