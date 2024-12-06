@@ -15,9 +15,9 @@ public record SosBoardServiceDto(
         Long userId, //유저 id
         String accountId,
         String title,
+        String comment,
         PaymentType paymentType,
         Integer price,
-        String comment,
         List<Long> petIds,
         List<PetResponse> petResponses, // PetResponse를 포함
         String startDate, // 변환된 LocalDateTime
@@ -40,9 +40,9 @@ public record SosBoardServiceDto(
                 sosBoard.getUser().getId(),
                 sosBoard.getUser().getAccountId(),
                 sosBoard.getTitle(),
+                sosBoard.getComment(),
                 sosBoard.getPaymentType(),
                 sosBoard.getPrice(),
-                sosBoard.getComment(),
                 sosBoard.getPetSosBoards().stream()
                         .map(petSosBoard -> petSosBoard.getPet().getId())
                         .collect(Collectors.toList()),
