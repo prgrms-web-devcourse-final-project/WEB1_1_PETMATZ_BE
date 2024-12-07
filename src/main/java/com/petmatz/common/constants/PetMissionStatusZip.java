@@ -9,8 +9,8 @@ public enum PetMissionStatusZip {
 
     //        돌봄시작 상태값 { 시작 = PLG, 종료 = END }
     BEF,
-    PLG,
-    END;
+    ING,
+    AFT;
 
 
 
