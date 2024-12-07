@@ -14,6 +14,7 @@ import com.petmatz.domain.pet.exception.PetErrorCode;
 import com.petmatz.domain.pet.exception.PetServiceException;
 import com.petmatz.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -154,7 +155,6 @@ public class PetServiceImpl implements PetService{
             repository.save(updatedPet);
             return PetUpdateResponse.of(UUID, resultImgURL);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new PetServiceException(PetErrorCode.UPDATE_FAILED, "GENERAL_EXCEPTION");
         }
     }

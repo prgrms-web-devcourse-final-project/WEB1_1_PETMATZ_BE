@@ -18,7 +18,9 @@ public record PetMissionPetInfo(
         Gender gender,
         String neuterYn,
         Size size, // 크기
-        String temperament // 성격
+        String temperament, // 성격
+
+        String imgURL
 ) {
 
     public static PetMissionPetInfo of(Pet pet) {
@@ -30,7 +32,7 @@ public record PetMissionPetInfo(
                 .neuterYn(pet.getNeuterYn())
                 .size(pet.getSize())
                 .temperament(pet.getTemperament())
+                .imgURL(pet.getProfileImg())
                 .build();
     }
-
 }

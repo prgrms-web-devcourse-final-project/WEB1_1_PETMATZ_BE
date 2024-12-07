@@ -35,8 +35,10 @@ public class PetMissionService {
     private final UserToPetMissionReader userToPetMissionReader;
     private final PetMissionReader petMissionReader;
     private final PetMissionInserter petMissionInserter;
+    private final PetMissionAskReader petMissionAskReader;
     private final AwsClient awsClient;
 
+    @Transactional
     public PetMissionData insertPetMission(PetMissionInfo petMissionInfo, Long careId) {
 
         List<User> users = makeUserEntityList(careId, petMissionInfo.receiverId());
@@ -46,10 +48,8 @@ public class PetMissionService {
 
         List<Pet> pets = petRepository.findPetListByPetId(petMissionInfo.petId());
         if (pets.isEmpty()) {
-            System.out.println("값이 없음");
             throw new IllegalArgumentException("값없음");
         }
-
 
         List<PetMissionAskEntity> petMissionAskEntityList = petMissionInfo.petMissionAskInfo()
                 .stream()
@@ -69,9 +69,7 @@ public class PetMissionService {
                 .map(user -> UserToPetMissionEntity.of(user, petMissionEntity, careId))
                 .toList();
 
-        System.out.println("1111");
         userToPetMissionInserter.insertUserToPetMission(userToPetMissionEntities);
-        System.out.println("2222");
         return PetMissionData.of(chatRoomId, petMissionEntity);
     }
 
@@ -119,12 +117,15 @@ public class PetMissionService {
             resultImgURL = String.valueOf(uploadURL);
         }
         //6-1 Img 정제
-
-
-
         PetMissionAnswerEntity petMissionAnswerEntity = petMissionInserter.insertPetMissionAnswer(PetMissionAnswerEntity.of(petMissionCommentInfo, imgURL));
         petMissionAskEntity.addPetMissionAnswer(petMissionAnswerEntity);
         return resultImgURL;
+    }
+
+
+    public PetMissionAnswerInfo selectPetMissionAnswerInfo(String askId) {
+        PetMissionAskEntity petMissionAskEntity = petMissionAskReader.selectPetMissionAskInfo(askId);
+        return petMissionAskEntity.getMissionAnswer().of();
     }
 }
 

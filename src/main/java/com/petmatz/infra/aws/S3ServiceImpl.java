@@ -3,11 +3,7 @@ package com.petmatz.infra.aws;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.Headers;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.DeleteObjectsRequest;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.*;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest.KeyVersion;
 import com.petmatz.domain.aws.S3Client;
@@ -15,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,7 +36,7 @@ public class S3ServiceImpl implements S3Client {
         GeneratePresignedUrlRequest generatePresignedUrlRequest = makePresignedURL(bucketName, path);
         return amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
     }
-
+    //언젠간 사용..
     @Override
     public void deleteImg(List<String> keyList) {
         List<KeyVersion> keyVersions = keyList.stream()
@@ -62,6 +57,9 @@ public class S3ServiceImpl implements S3Client {
         generatePresignedUrlRequest.addRequestParameter(
                 Headers.S3_CANNED_ACL,
                 CannedAccessControlList.PublicRead.toString());
+        generatePresignedUrlRequest.addRequestParameter(
+                Headers.CACHE_CONTROL,
+                "no-cache, no-store, must-revalidate");
         return generatePresignedUrlRequest;
     }
 
