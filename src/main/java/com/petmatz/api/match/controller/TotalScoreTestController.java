@@ -1,5 +1,6 @@
 package com.petmatz.api.match.controller;
 
+import com.petmatz.api.global.dto.Response;
 import com.petmatz.api.match.request.UserIdRequest;
 import com.petmatz.domain.match.dto.response.MatchScoreResponse;
 import com.petmatz.domain.match.dto.response.UserResponse;
@@ -17,8 +18,8 @@ public class TotalScoreTestController {
     private final MatchScoreService matchScoreService;
 
     @PostMapping("/calculate")
-    public List<MatchScoreResponse> calculateTotalScore(@RequestBody UserIdRequest userId) {
-        return matchScoreService.calculateTotalScore(userId.userId());
+    public void calculateTotalScore() {
+        matchScoreService.calculateTotalScore();
     }
 
     @PostMapping("/get-users")
