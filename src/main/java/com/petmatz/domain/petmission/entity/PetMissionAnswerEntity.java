@@ -1,5 +1,6 @@
 package com.petmatz.domain.petmission.entity;
 
+import com.petmatz.domain.petmission.dto.PetMissionAnswerInfo;
 import com.petmatz.domain.petmission.dto.PetMissionCommentInfo;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -32,6 +33,14 @@ public class PetMissionAnswerEntity {
     public static PetMissionAnswerEntity of(PetMissionCommentInfo petMissionCommentInfo, String imgURL) {
         return PetMissionAnswerEntity.builder()
                 .comment(petMissionCommentInfo.comment())
+                .imgURL(imgURL)
+                .build();
+    }
+
+    public PetMissionAnswerInfo of() {
+        return PetMissionAnswerInfo.builder()
+                .id(id)
+                .comment(comment)
                 .imgURL(imgURL)
                 .build();
     }

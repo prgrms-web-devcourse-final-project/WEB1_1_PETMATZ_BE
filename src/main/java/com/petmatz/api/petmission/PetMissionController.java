@@ -1,20 +1,12 @@
 package com.petmatz.api.petmission;
 
 import com.petmatz.api.global.dto.Response;
-import com.petmatz.api.petmission.dto.PetMissionCommentRequest;
-import com.petmatz.api.petmission.dto.PetMissionRequest;
-import com.petmatz.api.petmission.dto.PetMissionResponse;
-import com.petmatz.api.petmission.dto.PetMissionUpdateRequest;
-import com.petmatz.common.constants.PetMissionStatusZip;
+import com.petmatz.api.petmission.dto.*;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.chatting.ChatMessageService;
-import com.petmatz.domain.chatting.dto.ChatMessageInfo;
-import com.petmatz.domain.pet.Pet;
 import com.petmatz.domain.pet.PetService;
 import com.petmatz.domain.petmission.PetMissionService;
-import com.petmatz.domain.petmission.dto.PetMissionData;
-import com.petmatz.domain.petmission.dto.PetMissionDetails;
-import com.petmatz.domain.petmission.dto.UserToPetMissionListInfo;
+import com.petmatz.domain.petmission.dto.*;
 import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import com.petmatz.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,7 +28,6 @@ public class PetMissionController {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final ChatMessageService chatService;
     private final UserService userService;
-    private final PetService petService;
 
     private final JwtExtractProvider jwtExtractProvider;
 
@@ -100,11 +91,17 @@ public class PetMissionController {
         return Response.success(petMissionDetails);
     }
 
-    //TODO comment에 ask달때 사진 s3로 전송해야 함.
     @PostMapping("/comment")
     public String saveComment(@RequestBody PetMissionCommentRequest petMissionCommentRequest) throws MalformedURLException {
         String userEmail = jwtExtractProvider.findAccountIdFromJwt();
         return petMissionService.updatePetMissionComment(petMissionCommentRequest.of(), userEmail);
+    }
+
+    //TODO Ask 상세 조회
+    @GetMapping("/comment/answer/info")
+    public PetMissionCommentResponse getCommentInfo(@RequestParam("answerId") String answerId) {
+        PetMissionAnswerInfo petMissionAnswerInfo = petMissionService.selectPetMissionAnswerInfo(answerId);
+        return petMissionAnswerInfo.of();
     }
 
 /*
