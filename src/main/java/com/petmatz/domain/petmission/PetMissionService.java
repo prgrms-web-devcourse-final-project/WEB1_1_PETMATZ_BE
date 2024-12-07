@@ -86,6 +86,10 @@ public class PetMissionService {
         }
     }
 
+    public List<UserToPetMissionEntity> selectUserToPetMissionList(String petMissionId) {
+        return userToPetMissionReader.selectUserToPetMissionList(petMissionId);
+    }
+
     public PetMissionDetails selectPetMissionInfo(String petMissionId) {
         List<UserToPetMissionEntity> userToPetMissionEntities = userToPetMissionReader.selectUserToPetMissionList(petMissionId);
 

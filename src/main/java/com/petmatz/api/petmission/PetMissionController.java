@@ -57,13 +57,18 @@ public class PetMissionController {
         return Response.success(petMissionResponse);
     }
 
+    //TODO 리펙토링 필수임 쿼리문 그지 같음 지금
     @Operation(summary = "멍멍이의 부탁 리스트 조회", description = "멍멍이 리스트 조회 API")
     @GetMapping
     public Response<List<UserToPetMissionListInfo>> selectPetMissionList() {
         Long userId = jwtExtractProvider.findIdFromJwt();
 
+
         List<UserToPetMissionEntity> userToPetMissionEntities = petMissionService.selectPetMissionList(userId);
-        List<UserToPetMissionListInfo> list = userToPetMissionEntities.stream().map(UserToPetMissionListInfo::of
+
+
+        List<UserToPetMissionListInfo> list = userToPetMissionEntities.stream().map(
+                userToPetMissionEntity ->UserToPetMissionListInfo.of(userToPetMissionEntity, petMissionService.selectUserToPetMissionList(String.valueOf(userToPetMissionEntity.getPetMission().getId())))
         ).toList();
         return Response.success(list);
     }
@@ -79,7 +84,6 @@ public class PetMissionController {
         return Response.success("업데이트가 정상적으로 되었습니다.");
     }
 
-    //------------------------아래는 잠시 보류 ---------------//
 
     @Operation(summary = "펫 미션 상세 조회", description = "펫 미션 상세 조회 API")
     @Parameters({
@@ -91,6 +95,12 @@ public class PetMissionController {
         return Response.success(petMissionDetails);
     }
 
+    @Operation(summary = "펫 미션 답글 달기", description = "펫 미션 답글 API")
+    @Parameters({
+            @Parameter(name = "askId", description = "펫 미션 ID [ 작은 틀 ]", example = "2"),
+            @Parameter(name = "comment", description = "답글 내용", example = "2"),
+            @Parameter(name = "imgURL", description = "사진 없으면 빈 값, 있으면 Y", example = "2"),
+    })
     @PostMapping("/comment")
     public String saveComment(@RequestBody PetMissionCommentRequest petMissionCommentRequest) throws MalformedURLException {
         String userEmail = jwtExtractProvider.findAccountIdFromJwt();

@@ -17,7 +17,10 @@ public record PetMissionAskInfo(
     public static PetMissionAskInfo of(PetMissionAskEntity petMissionAskEntity) {
         PetMissionAnswerEntity missionAnswer = petMissionAskEntity.getMissionAnswer();
         if (missionAnswer == null) {
-            return PetMissionAskInfo.builder().ask(petMissionAskEntity.getComment()).build();
+            return PetMissionAskInfo.builder()
+                    .id(petMissionAskEntity.getId())
+                    .ask(petMissionAskEntity.getComment())
+                    .build();
         }
         return PetMissionAskInfo.builder()
                 .id(petMissionAskEntity.getId())
