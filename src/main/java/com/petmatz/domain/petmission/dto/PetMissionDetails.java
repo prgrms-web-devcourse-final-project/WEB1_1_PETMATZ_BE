@@ -13,7 +13,9 @@ public record PetMissionDetails(
 
         Long id,
         String careName,
+        Long careId,
         String receiverName,
+        Long receiverId,
         LocalDateTime receiverStart,
         LocalDateTime receiverEnd,
         PetMissionStatusZip status,
@@ -26,7 +28,9 @@ public record PetMissionDetails(
         return PetMissionDetails.builder()
                 .id(petMissionEntity.getId())
                 .careName(userToPetMissionEntities.get(0).getUser().getNickname())
+                .careId(userToPetMissionEntities.get(0).getUser().getId())
                 .receiverName(userToPetMissionEntities.get(1).getUser().getNickname())
+                .receiverId(userToPetMissionEntities.get(1).getUser().getId())
                 .receiverStart(petMissionEntity.getPetMissionStarted())
                 .receiverEnd(petMissionEntity.getPetMissionEnd())
                 .petMissionPetInfos(petMissionEntity.getPetToPetMissions().stream().map(pet ->

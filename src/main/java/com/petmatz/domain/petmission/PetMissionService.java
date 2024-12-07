@@ -129,6 +129,9 @@ public class PetMissionService {
 
     public PetMissionAnswerInfo selectPetMissionAnswerInfo(String askId) {
         PetMissionAskEntity petMissionAskEntity = petMissionAskReader.selectPetMissionAskInfo(askId);
+        if (petMissionAskEntity.getMissionAnswer() == null) {
+            return PetMissionAnswerInfo.builder().build();
+        }
         return petMissionAskEntity.getMissionAnswer().of();
     }
 }
