@@ -2,9 +2,7 @@ package com.petmatz.domain.match.component;
 
 import com.petmatz.domain.match.exception.MatchException;
 import com.petmatz.domain.pet.Pet;
-import com.petmatz.domain.pet.PetRepository;
 import com.petmatz.domain.pet.PetServiceImpl;
-import com.petmatz.domain.pet.exception.PetServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +11,6 @@ import java.util.stream.Collectors;
 
 import static com.petmatz.domain.match.exception.MatchErrorCode.NULL_PREFERRED_SIZES;
 import static com.petmatz.domain.match.exception.MatchErrorCode.NULL_TARGET_SIZE;
-import static com.petmatz.domain.pet.exception.PetErrorCode.PET_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
