@@ -203,7 +203,6 @@ public class SosBoardServiceImpl implements SosBoardService{
                 page + 1
         );
     }
-
 }
 
 
