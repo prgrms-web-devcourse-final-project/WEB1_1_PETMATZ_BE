@@ -1,5 +1,7 @@
 package com.petmatz.domain.match.service;
 
+import com.petmatz.api.global.dto.Response;
+import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.match.component.BoundingBoxCalculator;
 import com.petmatz.domain.match.component.MatchScoreCalculator;
 import com.petmatz.domain.match.component.MatchScoreProcessor;
@@ -34,6 +36,7 @@ public class MatchScoreService {
     private final BoundingBoxCalculator boundingBoxCalculator;
     private final RedisMatchComponent redisMatchComponent;
     private final MatchScoreProcessor matchScoreProcessor;
+    private final JwtExtractProvider jwtExtractProvider;
 
 
     // sql에서 필터링 후 1000명 가져오기
@@ -59,15 +62,15 @@ public class MatchScoreService {
                 .collect(Collectors.toList());
 }
 
-    // TODO 현재는 임시로 유저, pet(mbti) 직접 조회  | 추후에 user, pet  패키지 구현 의뢰 예정
 
-    public List<MatchScoreResponse> calculateTotalScore(Long userId) {
+    public void calculateTotalScore() {
+        Long userId = jwtExtractProvider.findIdFromJwt();
         String redisKey = "matchResult:" + userId;
 
         try {
             List<MatchScoreResponse> cachedResults = redisMatchComponent.getMatchScoresFromRedis(redisKey);
             if (cachedResults != null && !cachedResults.isEmpty()) {
-                return matchScoreProcessor.filterAndSortScores(cachedResults);
+                return;
             }
         } catch (MatchException e) {
             log.info("Redis에 데이터가 없습니다! 새로운 사용자로 간주되어 새로 측정합니다.");
@@ -94,12 +97,11 @@ public class MatchScoreService {
         );
 
         matchComponent.saveMatchScores(userId, matchResults);
-
-        return matchResults;
     }
 
 
-    public void decreaseScore(Long userId, Long targetId) {
+    public void decreaseScore(Long targetId) {
+        Long userId = jwtExtractProvider.findIdFromJwt();
         List<MatchScoreResponse> updatedResults = matchScoreCalculator.decreaseScore(userId, targetId);
         matchComponent.saveMatchScores(userId, updatedResults);
     }

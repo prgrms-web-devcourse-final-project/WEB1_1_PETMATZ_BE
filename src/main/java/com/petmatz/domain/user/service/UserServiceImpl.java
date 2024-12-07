@@ -419,7 +419,9 @@ public class UserServiceImpl implements UserService {
                                 heart.getMyId(),
                                 heart.getHeartedId(),
                                 heartedUser.getNickname(),
-                                heartedUser.getProfileImg()
+                                heartedUser.getProfileImg(),
+                                heartedUser.getCareAvailable(),
+                                heartedUser.getPreferredSizes()
                         );
                     })
                     .toList();

@@ -1,5 +1,6 @@
 package com.petmatz.domain.user.service;
 
+import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.domain.user.repository.UserRepository;
 import com.petmatz.domain.user.response.RankUserResponse;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 public class RankServiceImpl implements RankService{
 
     private final UserRepository userRepository;
+    private final JwtExtractProvider jwtExtractProvider;
     @Override
     public List<RankUserResponse> getTopRankings() {
         // 추천 수 기준 내림차순
@@ -34,11 +36,11 @@ public class RankServiceImpl implements RankService{
     }
 
     @Override
-    public List<RankUserResponse> getTopRankingsByRegion(Long userId) {
+    public List<RankUserResponse> getTopRankingsByRegion() {
+        Long userId = jwtExtractProvider.findIdFromJwt();
         User currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 사용자를 찾을 수 없습니다."));
 
-        // 일단은 사용자한테 추출 추후에 contextHolder로 변경
         Integer regionCode = currentUser.getRegionCode();
 
         List<User> usersByRegion = userRepository.findByRegionCodeOrderByRecommendationCountDesc(regionCode);

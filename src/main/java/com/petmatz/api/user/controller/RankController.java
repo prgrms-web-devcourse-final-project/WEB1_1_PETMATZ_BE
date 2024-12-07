@@ -17,10 +17,9 @@ public class RankController {
 
     private final RankService rankService;
 
-    @GetMapping("/top-rankings")
-    public ResponseEntity<List<RankUserResponse>> getTopRankings(@RequestParam Long userId) {
-//        List<RankUserResponse> topRankings = rankService.getTopRankings();
-        List<RankUserResponse> topRankings = rankService.getTopRankingsByRegion(userId);
+    @GetMapping("/api/top-rankings")
+    public ResponseEntity<List<RankUserResponse>> getTopRankings() {
+        List<RankUserResponse> topRankings = rankService.getTopRankingsByRegion();
         return ResponseEntity.ok(topRankings);
     }
 }
