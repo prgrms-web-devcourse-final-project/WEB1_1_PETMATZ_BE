@@ -5,6 +5,8 @@ import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.common.security.utils.JwtProvider;
 import com.petmatz.domain.aws.AwsClient;
 import com.petmatz.domain.aws.Prefix;
+import com.petmatz.domain.pet.Pet;
+import com.petmatz.domain.pet.PetRepository;
 import com.petmatz.domain.user.entity.Certification;
 import com.petmatz.domain.user.entity.Heart;
 import com.petmatz.domain.user.entity.User;
@@ -45,6 +47,8 @@ public class UserServiceImpl implements UserService {
     private final JwtProvider jwtProvider;
     private final EmailProvider emailProvider;
     private final RePasswordEmailProvider rePasswordEmailProvider;
+    private final PetRepository petRepository;
+
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final JwtExtractProvider jwtExtractProvider;
 
@@ -259,9 +263,11 @@ public class UserServiceImpl implements UserService {
             if (!isMatched) return DeleteIdResponseDto.wrongPassword();  // 비밀번호 불일치
 
             certificationRepository.deleteById(userId);
-
             // 사용자 삭제
-            userRepository.deleteUserById(userId);
+            List<Pet> pets = petRepository.findAllByUserId(user.getId()); // Pet 엔티티에서 User를 참조하는 기준으로 조회
+            // 명시적으로 Pet 삭제
+            petRepository.deleteAll(pets);
+            userRepository.delete(user);
         } catch (Exception e) {
             log.info("회원 삭제 실패: {}", e);
             return DeleteIdResponseDto.databaseError();  // 데이터베이스 오류 처리

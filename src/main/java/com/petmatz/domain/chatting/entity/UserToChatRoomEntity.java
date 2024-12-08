@@ -16,7 +16,7 @@ public class UserToChatRoomEntity {
     @JoinColumn(name = "account_id", referencedColumnName = "account_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_id", nullable = false)
     private ChatRoomEntity chatRoom; // 채팅방
 

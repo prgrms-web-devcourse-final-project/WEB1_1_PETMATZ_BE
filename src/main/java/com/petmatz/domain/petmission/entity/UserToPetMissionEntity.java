@@ -20,7 +20,7 @@ public class UserToPetMissionEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pet_mission_id", nullable = false)
     private PetMissionEntity petMission;
 
