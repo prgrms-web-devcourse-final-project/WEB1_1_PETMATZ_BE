@@ -107,8 +107,11 @@ public class PetMissionController {
         return petMissionService.updatePetMissionComment(petMissionCommentRequest.of(), userEmail);
     }
 
+    
     //TODO Ask 상세 조회
     @GetMapping("/comment/answer/info")
+    @Operation(summary = "답변 상세 조회", description = "등록된 하나의 답변을 상세 조회 API")
+    @Parameter(name = "answerId", description = "질문 ID", example = "1")
     public PetMissionCommentResponse getCommentInfo(@RequestParam("answerId") String answerId) {
         PetMissionAnswerInfo petMissionAnswerInfo = petMissionService.selectPetMissionAnswerInfo(answerId);
         return petMissionAnswerInfo.of();
