@@ -14,9 +14,9 @@ public class MatchCareCalculator {
             throw new MatchException(INSUFFICIENT_CARE_DATA);
         }
         if (isCareAvailable) {
-            return 20.0;
+            return 15.0;
         } else {
-            return 10.0;
+            return 7.0;
         }
     }
 }
