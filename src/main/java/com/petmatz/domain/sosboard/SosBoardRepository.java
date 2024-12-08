@@ -14,6 +14,7 @@ public interface SosBoardRepository extends JpaRepository<SosBoard, Long> {
     @Query("SELECT s FROM SosBoard s JOIN s.user u WHERE u.region = :region")
     Page<SosBoard> findByUserRegion(@Param("region") String region, Pageable pageable);
 
+
     // 인덱스 기반 전체 조회 (id 기준 내림차순)
     List<SosBoard> findAllByIdLessThanOrderByIdDesc(Long lastIndex, Pageable pageable);
 

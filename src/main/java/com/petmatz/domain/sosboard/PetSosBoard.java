@@ -1,5 +1,6 @@
 package com.petmatz.domain.sosboard;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.petmatz.domain.global.BaseEntity;
 import com.petmatz.domain.pet.Pet;
 import jakarta.persistence.*;

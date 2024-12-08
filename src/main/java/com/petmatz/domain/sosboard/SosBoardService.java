@@ -7,7 +7,8 @@ import com.petmatz.domain.user.entity.User;
 
 import java.util.List;
 
-public interface SosBoardService {
+public interface
+SosBoardService {
 
     // 전체 조회 (지역 필터링 + 인덱스 기반 페이지네이션)
     PageResponseDto<SosBoardServiceDto> getAllSosBoards(String region, int pageNum, int size);

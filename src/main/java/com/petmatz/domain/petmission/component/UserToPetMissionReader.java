@@ -6,6 +6,8 @@ import com.petmatz.domain.petmission.repository.UserToPetMissionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +20,11 @@ public class UserToPetMissionReader {
     //TODO 예외 처리 필요
     public List<UserToPetMissionEntity> selectUserToPetMissionList(Long userId) {
         Optional<List<UserToPetMissionEntity>> userToPetMissionEntities = userToPetMissionRepository.selectUserToPetMissionList(userId);
+        return userToPetMissionEntities.get();
+    }
+
+    public List<UserToPetMissionEntity> selectUserToPetMissionList(Long userId, LocalDate petMissionStart) {
+        Optional<List<UserToPetMissionEntity>> userToPetMissionEntities = userToPetMissionRepository.selectUserToPetMissionList(userId, petMissionStart);
         return userToPetMissionEntities.get();
     }
 

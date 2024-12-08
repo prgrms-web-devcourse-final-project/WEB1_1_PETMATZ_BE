@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +14,12 @@ public interface UserToPetMissionRepository extends JpaRepository<UserToPetMissi
 
     @Query("select utr from UserToPetMissionEntity utr where utr.user.id = :userId")
     Optional<List<UserToPetMissionEntity>> selectUserToPetMissionList(@Param("userId") Long userId);
+
+    @Query("SELECT utr FROM UserToPetMissionEntity utr WHERE utr.user.id = :userId AND FUNCTION('DATE', utr.petMission.petMissionStarted) = :petMissionStart")
+    Optional<List<UserToPetMissionEntity>> selectUserToPetMissionList(
+            @Param("userId") Long userId,
+            @Param("petMissionStart") LocalDate petMissionStart
+    );
 
     @Query("select utr from UserToPetMissionEntity utr where utr.petMission.id = :petMissionId")
     Optional<List<UserToPetMissionEntity>> selectUserToPetMissionList(@Param("petMissionId") String petMissionId);
