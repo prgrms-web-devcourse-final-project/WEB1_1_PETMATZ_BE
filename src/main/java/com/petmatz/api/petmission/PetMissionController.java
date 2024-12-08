@@ -2,6 +2,7 @@ package com.petmatz.api.petmission;
 
 import com.petmatz.api.global.dto.Response;
 import com.petmatz.api.petmission.dto.*;
+import com.petmatz.common.constants.PetMissionStatusZip;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.chatting.ChatMessageService;
 import com.petmatz.domain.chatting.dto.ChatMessageInfo;
@@ -81,16 +82,16 @@ public class PetMissionController {
     @PutMapping
     public Response<Void> updatePetMissionStatus(@RequestBody PetMissionUpdateRequest petMissionUpdateRequest) {
         petMissionService.updatePetMissionStatus(petMissionUpdateRequest);
-        PetMissionDetails petMissionDetails = petMissionService.selectPetMissionInfo(petMissionUpdateRequest.petMissionId());
-        String chatRoomId = petMissionService.selectChatRoomId(petMissionDetails.careEmail(), petMissionDetails.receiverEmail());
-
-        ChatMessageInfo chatMessageInfo = petMissionUpdateRequest.of(petMissionUpdateRequest.petMissionId());
-        chatService.updateMessage(petMissionUpdateRequest.of(petMissionUpdateRequest.petMissionId()), chatRoomId);
-
-        String destination = "/topic/chat/" + chatRoomId;
-        //채팅 메세지에 UUID 담아서 보내기
-        simpMessagingTemplate.convertAndSend(destination, chatMessageInfo);
-
+        if (PetMissionStatusZip.AFT.equals(petMissionUpdateRequest.missionStatusZip())) {
+            PetMissionDetails petMissionDetails = petMissionService.selectPetMissionInfo(petMissionUpdateRequest.petMissionId());
+            String chatRoomId = petMissionService.selectChatRoomId(petMissionDetails.careEmail(), petMissionDetails.receiverEmail());
+            ChatMessageInfo chatMessageInfo = petMissionUpdateRequest.of(petMissionUpdateRequest.petMissionId());
+            chatService.updateMessage(petMissionUpdateRequest.of(petMissionUpdateRequest.petMissionId()), chatRoomId);
+            String destination = "/topic/chat/" + chatRoomId;
+            //채팅 메세지에 UUID 담아서 보내기
+            simpMessagingTemplate.convertAndSend(destination, chatMessageInfo);
+            return Response.success("업데이트가 정상적으로 되었습니다.");
+        }
         return Response.success("업데이트가 정상적으로 되었습니다.");
     }
 
