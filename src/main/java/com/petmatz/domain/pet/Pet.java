@@ -22,7 +22,7 @@ public class Pet extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // User 테이블 참조
 
@@ -67,5 +67,10 @@ public class Pet extends BaseEntity {
     public boolean checkImgURL(String Img) {
         return profileImg.equals(Img);
     }
+
+    public void addUser() {
+        user = null;
+    }
+
 }
 
