@@ -29,8 +29,14 @@ jobs:
       - name: application.yml 파일 셋팅
         run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yaml
 
+      - name: 디버그 application.yml 확인
+        run: cat ./src/main/resources/application.yaml
+
       - name: 로그 설정파일 셋팅
         run: echo "${{ secrets.LOG_BACK }}" > ./src/main/resources/logback-spring.xml
+
+      - name: 디버그 logback-spring.xml 확인
+        run: cat ./src/main/resources/logback-spring.xml
 
       - name: gradle 권한 설정
         run: sudo chmod +x gradlew
