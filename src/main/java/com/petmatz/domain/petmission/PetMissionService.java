@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -75,6 +77,10 @@ public class PetMissionService {
 
     public List<UserToPetMissionEntity> selectPetMissionList(Long userId) {
         return userToPetMissionReader.selectUserToPetMissionList(userId);
+    }
+
+    public List<UserToPetMissionEntity> selectPetMissionList(Long userId, LocalDate petMissionStart) {
+        return userToPetMissionReader.selectUserToPetMissionList(userId, petMissionStart);
     }
 
     @Transactional
