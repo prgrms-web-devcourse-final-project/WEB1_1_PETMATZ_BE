@@ -10,7 +10,6 @@ public record PetMissionUpdateRequest(
 
         String careEmail,
         String receiverEmail,
-
         String petMissionId,
         PetMissionStatusZip missionStatusZip
 

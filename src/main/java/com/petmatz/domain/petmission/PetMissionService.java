@@ -1,7 +1,6 @@
 package com.petmatz.domain.petmission;
 
 import com.petmatz.api.petmission.dto.PetMissionUpdateRequest;
-import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.aws.AwsClient;
 import com.petmatz.domain.pet.Pet;
 import com.petmatz.domain.pet.PetRepository;
@@ -11,7 +10,6 @@ import com.petmatz.domain.petmission.entity.*;
 import com.petmatz.domain.petmission.exception.ExistPetMissionAnswerException;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.domain.user.repository.UserRepository;
-import io.lettuce.core.ScriptOutputType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,11 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +45,6 @@ public class PetMissionService {
         List<User> users = makeUserEntityList(careId, petMissionInfo.receiverId());
 
         String chatRoomId = userToChatRoomReader.selectChatRoomId(users.get(0).getAccountId(), users.get(1).getAccountId());
-
 
         List<Pet> pets = petRepository.findPetListByPetId(petMissionInfo.petId());
         if (pets.isEmpty()) {

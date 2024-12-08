@@ -14,6 +14,8 @@ public record PetMissionResponse(
         Long petMissionId
 
 
+
+
 ) {
 
     public static PetMissionResponse of(PetMissionData petMissionData) {

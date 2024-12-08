@@ -15,11 +15,13 @@ public interface UserToPetMissionRepository extends JpaRepository<UserToPetMissi
     @Query("select utr from UserToPetMissionEntity utr where utr.user.id = :userId")
     Optional<List<UserToPetMissionEntity>> selectUserToPetMissionList(@Param("userId") Long userId);
 
-    @Query("SELECT utr FROM UserToPetMissionEntity utr WHERE utr.user.id = :userId AND FUNCTION('DATE', utr.petMission.petMissionStarted) = :petMissionStart")
-    Optional<List<UserToPetMissionEntity>> selectUserToPetMissionList(
-            @Param("userId") Long userId,
-            @Param("petMissionStart") LocalDate petMissionStart
-    );
+
+    @Query("SELECT utr FROM UserToPetMissionEntity utr " +
+            "WHERE utr.user.id = :userId " +
+            "AND :currentDate BETWEEN utr.petMission.petMissionStarted AND utr.petMission.petMissionEnd")
+    List<UserToPetMissionEntity> selectUserToPetMissionList(@Param("userId") Long userId,
+                                                     @Param("currentDate") LocalDate petMissionStart);
+
 
     @Query("select utr from UserToPetMissionEntity utr where utr.petMission.id = :petMissionId")
     Optional<List<UserToPetMissionEntity>> selectUserToPetMissionList(@Param("petMissionId") String petMissionId);

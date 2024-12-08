@@ -19,7 +19,7 @@ public class ChatMessageInfo {
 
     private LocalDateTime msgTimestamp;
 
-    ChatMessageMsgType msg_type;
+    private ChatMessageMsgType msg_type;
 
     private boolean readStatus = true;
 
