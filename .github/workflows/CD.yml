@@ -22,7 +22,7 @@ jobs:
 
       - name: application.yml 파일 셋팅
         run: |
-          echo "${{ secrets.ENCODED_APPLICATION_YML }}" | base64 --decode > ./src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION }}" | base64 --decode > ./src/main/resources/application.yml
 
       - name: 디버그 application.yml 확인
         run: cat ./src/main/resources/application.yaml
