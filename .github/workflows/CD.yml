@@ -32,8 +32,9 @@ jobs:
       - name: 디버그 application.yml 확인
         run: cat ./src/main/resources/application.yaml
 
-      - name: 로그 설정파일 셋팅
-        run: echo "${{ secrets.LOG_BACK }}" > ./src/main/resources/logback-spring.xml
+      - name: logback-spring.xml 디코더 밎 파일 작성
+        run: |
+          echo "${{ secrets.LOG_BACK }}" | base64 --decode > ./src/main/resources/logback-spring.xml
 
       - name: 디버그 logback-spring.xml 확인
         run: cat ./src/main/resources/logback-spring.xml
