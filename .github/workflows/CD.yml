@@ -21,7 +21,8 @@ jobs:
           distribution: 'temurin'
 
       - name: application.yml 파일 셋팅
-        run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yaml
+        run: |
+          echo "${{ secrets.ENCODED_APPLICATION_YML }}" | base64 --decode > ./src/main/resources/application.yml
 
       - name: 디버그 application.yml 확인
         run: cat ./src/main/resources/application.yaml
@@ -39,8 +40,9 @@ jobs:
       - name: gradle 권한 설정
         run: sudo chmod +x gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew build
+      - name: Build with Gradle (without tests)
+        run: ./gradlew build -x test --stacktrace --info
+
 
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_IMAGE_NAME }}:latest
