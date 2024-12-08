@@ -40,6 +40,10 @@ public class PetMissionService {
     private final PetMissionAskReader petMissionAskReader;
     private final AwsClient awsClient;
 
+
+    public String selectChatRoomId(String careEmail, String receiverEmail) {
+        return userToChatRoomReader.selectChatRoomId(careEmail, receiverEmail);
+    }
     @Transactional
     public PetMissionData insertPetMission(PetMissionInfo petMissionInfo, Long careId) {
 

@@ -13,8 +13,10 @@ public record PetMissionDetails(
 
         Long id,
         String careName,
+        String careEmail,
         Long careId,
         String receiverName,
+        String receiverEmail,
         Long receiverId,
         LocalDateTime receiverStart,
         LocalDateTime receiverEnd,
@@ -28,8 +30,10 @@ public record PetMissionDetails(
         return PetMissionDetails.builder()
                 .id(petMissionEntity.getId())
                 .careName(userToPetMissionEntities.get(0).getUser().getNickname())
+                .careEmail(userToPetMissionEntities.get(0).getUser().getAccountId())
                 .careId(userToPetMissionEntities.get(0).getUser().getId())
                 .receiverName(userToPetMissionEntities.get(1).getUser().getNickname())
+                .receiverEmail(userToPetMissionEntities.get(1).getUser().getAccountId())
                 .receiverId(userToPetMissionEntities.get(1).getUser().getId())
                 .receiverStart(petMissionEntity.getPetMissionStarted())
                 .receiverEnd(petMissionEntity.getPetMissionEnd())
