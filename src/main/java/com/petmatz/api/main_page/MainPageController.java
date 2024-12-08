@@ -38,7 +38,6 @@ public class MainPageController {
         Long userId = jwtExtractProvider.findIdFromJwt();
         List<UserToPetMissionEntity> userToPetMissionEntities = petMissionService.selectPetMissionList(userId, LocalDate.now());
 
-
         List<UserToPetMissionListInfo> list = userToPetMissionEntities.stream().map(
                 userToPetMissionEntity ->UserToPetMissionListInfo.of(userToPetMissionEntity, petMissionService.selectUserToPetMissionList(String.valueOf(userToPetMissionEntity.getPetMission().getId())))
         ).toList();
