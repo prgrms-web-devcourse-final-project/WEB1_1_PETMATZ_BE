@@ -4,6 +4,7 @@ import com.petmatz.api.global.dto.Response;
 import com.petmatz.api.petmission.dto.*;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.chatting.ChatMessageService;
+import com.petmatz.domain.chatting.dto.ChatMessageInfo;
 import com.petmatz.domain.pet.PetService;
 import com.petmatz.domain.petmission.PetMissionService;
 import com.petmatz.domain.petmission.dto.*;
@@ -44,9 +45,7 @@ public class PetMissionController {
         Long careId = jwtExtractProvider.findIdFromJwt();
 
         String receiverEmail = userService.findByUserEmail(petMissionRequest.receiverId());
-        System.out.println("1");
         PetMissionData petMissionData = petMissionService.insertPetMission(petMissionRequest.of(), careId);
-        System.out.println("2");
 
         chatService.updateMessage(petMissionRequest.ofto(), petMissionData, receiverEmail);
 
@@ -81,6 +80,18 @@ public class PetMissionController {
     @PutMapping
     public Response<Void> updatePetMissionStatus(@RequestBody PetMissionUpdateRequest petMissionUpdateRequest) {
         petMissionService.updatePetMissionStatus(petMissionUpdateRequest);
+        List<UserToPetMissionEntity> userToPetMissionEntities = petMissionService.selectUserToPetMissionList(petMissionUpdateRequest.petMissionId());
+        PetMissionDetails petMissionDetails = petMissionService.selectPetMissionInfo(petMissionUpdateRequest.petMissionId());
+        String chatRoomId = petMissionService.selectChatRoomId(petMissionDetails.careEmail(), petMissionDetails.receiverEmail());
+
+
+        chatService.updateMessage(petMissionUpdateRequest.of(petMissionUpdateRequest.petMissionId()), chatRoomId);
+
+        String destination = "/topic/chat/" + chatRoomId;
+        //채팅 메세지에 UUID 담아서 보내기
+        PetMissionResponse petMissionResponse = PetMissionResponse.of(PetMissionData.of(chatRoomId, petMissionUpdateRequest.petMissionId()));
+        simpMessagingTemplate.convertAndSend(destination, petMissionResponse);
+
         return Response.success("업데이트가 정상적으로 되었습니다.");
     }
 

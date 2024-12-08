@@ -22,4 +22,11 @@ public record PetMissionData(
                 .petMissionId(petMissionEntity.getId())
                 .build();
     }
+
+    public static PetMissionData of(String chatRoomId, String petMissionId) {
+        return PetMissionData.builder()
+                .chatRoomId(chatRoomId)
+                .petMissionId(Long.valueOf(petMissionId))
+                .build();
+    }
 }
