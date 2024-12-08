@@ -24,8 +24,7 @@ public class UserToPetMissionReader {
     }
 
     public List<UserToPetMissionEntity> selectUserToPetMissionList(Long userId, LocalDate petMissionStart) {
-        Optional<List<UserToPetMissionEntity>> userToPetMissionEntities = userToPetMissionRepository.selectUserToPetMissionList(userId, petMissionStart);
-        return userToPetMissionEntities.get();
+        return userToPetMissionRepository.selectUserToPetMissionList(userId, petMissionStart);
     }
 
     public List<UserToPetMissionEntity> selectUserToPetMissionList(PetMissionUpdateRequest petMissionUpdateRequest) {

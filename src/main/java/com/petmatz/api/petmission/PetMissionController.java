@@ -43,6 +43,7 @@ public class PetMissionController {
     @PostMapping
     public Response<PetMissionResponse> savePetMissionList(@RequestBody PetMissionRequest petMissionRequest) {
         Long careId = jwtExtractProvider.findIdFromJwt();
+        String careEmail = jwtExtractProvider.findAccountIdFromJwt();
 
         String receiverEmail = userService.findByUserEmail(petMissionRequest.receiverId());
         PetMissionData petMissionData = petMissionService.insertPetMission(petMissionRequest.of(), careId);
@@ -51,8 +52,10 @@ public class PetMissionController {
 
         String destination = "/topic/chat/" + petMissionData.chatRoomId();
         //채팅 메세지에 UUID 담아서 보내기
+        ChatMessageInfo chatMessageInfo = petMissionRequest.of(petMissionData.petMissionId(), careEmail,receiverEmail);
+
         PetMissionResponse petMissionResponse = PetMissionResponse.of(petMissionData);
-        simpMessagingTemplate.convertAndSend(destination, petMissionResponse);
+        simpMessagingTemplate.convertAndSend(destination, chatMessageInfo);
         return Response.success(petMissionResponse);
     }
 
@@ -62,9 +65,7 @@ public class PetMissionController {
     public Response<List<UserToPetMissionListInfo>> selectPetMissionList() {
         Long userId = jwtExtractProvider.findIdFromJwt();
 
-
         List<UserToPetMissionEntity> userToPetMissionEntities = petMissionService.selectPetMissionList(userId);
-
 
         List<UserToPetMissionListInfo> list = userToPetMissionEntities.stream().map(
                 userToPetMissionEntity ->UserToPetMissionListInfo.of(userToPetMissionEntity, petMissionService.selectUserToPetMissionList(String.valueOf(userToPetMissionEntity.getPetMission().getId())))
@@ -80,17 +81,15 @@ public class PetMissionController {
     @PutMapping
     public Response<Void> updatePetMissionStatus(@RequestBody PetMissionUpdateRequest petMissionUpdateRequest) {
         petMissionService.updatePetMissionStatus(petMissionUpdateRequest);
-        List<UserToPetMissionEntity> userToPetMissionEntities = petMissionService.selectUserToPetMissionList(petMissionUpdateRequest.petMissionId());
         PetMissionDetails petMissionDetails = petMissionService.selectPetMissionInfo(petMissionUpdateRequest.petMissionId());
         String chatRoomId = petMissionService.selectChatRoomId(petMissionDetails.careEmail(), petMissionDetails.receiverEmail());
 
-
+        ChatMessageInfo chatMessageInfo = petMissionUpdateRequest.of(petMissionUpdateRequest.petMissionId());
         chatService.updateMessage(petMissionUpdateRequest.of(petMissionUpdateRequest.petMissionId()), chatRoomId);
 
         String destination = "/topic/chat/" + chatRoomId;
         //채팅 메세지에 UUID 담아서 보내기
-        PetMissionResponse petMissionResponse = PetMissionResponse.of(PetMissionData.of(chatRoomId, petMissionUpdateRequest.petMissionId()));
-        simpMessagingTemplate.convertAndSend(destination, petMissionResponse);
+        simpMessagingTemplate.convertAndSend(destination, chatMessageInfo);
 
         return Response.success("업데이트가 정상적으로 되었습니다.");
     }
