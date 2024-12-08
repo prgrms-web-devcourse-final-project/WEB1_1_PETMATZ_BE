@@ -38,7 +38,7 @@ public class RedisMbti {
         }
         return myDogMbtiList.stream()
                 .map(targetMbti -> {
-                    String score = (String) redisTemplate.opsForHash().get("MBTI:" + TargetMbti, targetMbti);
+                    String score = (String) redisTemplate.opsForHash().get("MBTI:" + targetMbti, TargetMbti);
                     if (score != null) {
                         return Double.parseDouble(score);
                     } else {
