@@ -49,3 +49,28 @@ jobs:
 
       - name: Push the Docker image
         run: docker push ${{ secrets.DOCKER_IMAGE_NAME }}:latest
+
+
+#
+#  deploy-to-ec2:
+#
+#    needs: build-and-push-docker
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Deploy to EC2
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ env.EC2_HOST }}
+#          username: ${{ env.EC2_SSH_USER }}
+#          key: ${{ env.PRIVATE_KEY }}
+#          script: |
+#            CONTAINER_ID=$(sudo docker ps -q --filter "publish=80-8080")
+#
+#            if [ ! -z "$CONTAINER_ID" ]; then
+#              sudo docker stop $CONTAINER_ID
+#              sudo docker rm $CONTAINER_ID
+#            fi
+#
+#            sudo docker pull ${{ env.DOCKER_HUB }}
+#            sudo docker run --name ${{ env.CONTAINER_NAME }} -d -p 80:8080 -e TZ=Asia/Seoul ${{ env.DOCKER_HUB }}
