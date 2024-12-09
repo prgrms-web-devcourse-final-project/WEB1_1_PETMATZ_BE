@@ -13,7 +13,7 @@ public class ChatRoomDeleter {
     private final UserToChatRoomRepository userToChatRoomRepository;
 
     @Transactional
-    public void deleteChatRoom(String userEmail, String roomId) {
-        userToChatRoomRepository.deleteByChatRoom_IdAndUser_AccountId(Long.valueOf(roomId), userEmail);
+    public void deleteChatRoom(String roomId) {
+        userToChatRoomRepository.deleteByChatRoom_Id(Long.valueOf(roomId));
     }
 }

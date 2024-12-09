@@ -12,10 +12,10 @@ public interface UserToChatRoomRepository extends JpaRepository<UserToChatRoomEn
 
     Optional<List<UserToChatRoomEntity>> findByUser_AccountId(String userEmail);
 
-    void deleteByChatRoom_IdAndUser_AccountId(Long chatRoomId, String userEmail);
+    void deleteByChatRoom_Id(Long chatRoomId);
 
     @Query("select u.user.accountId from UserToChatRoomEntity u where u.chatRoom.id = :chatRoomId")
-    Optional<List<String>> selectChatRoomForUserList(@Param("chatRoomId") Long chatRoomId);
+    List<String> selectChatRoomForUserList(@Param("chatRoomId") Long chatRoomId);
 
     @Query(value = "SELECT chat_room_id FROM user_to_chat_room_entity " +
             "WHERE account_id IN (:careEmail, :receiverEmail) " +
