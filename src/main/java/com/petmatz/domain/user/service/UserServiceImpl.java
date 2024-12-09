@@ -4,18 +4,15 @@ import com.petmatz.api.user.request.*;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.common.security.utils.JwtProvider;
 import com.petmatz.domain.aws.AwsClient;
-import com.petmatz.domain.aws.Prefix;
 import com.petmatz.domain.pet.Pet;
 import com.petmatz.domain.pet.PetRepository;
-import com.petmatz.domain.user.entity.Certification;
-import com.petmatz.domain.user.entity.Heart;
-import com.petmatz.domain.user.entity.User;
-import com.petmatz.domain.user.entity.UserFactory;
+import com.petmatz.domain.user.entity.*;
 import com.petmatz.domain.user.info.*;
 import com.petmatz.domain.user.provider.CertificationNumberProvider;
 import com.petmatz.domain.user.provider.RePasswordProvider;
 import com.petmatz.domain.user.repository.CertificationRepository;
 import com.petmatz.domain.user.repository.HeartRepository;
+import com.petmatz.domain.user.repository.RecommendationRepository;
 import com.petmatz.domain.user.repository.UserRepository;
 import com.petmatz.domain.user.response.*;
 import com.petmatz.user.common.LogInResponseDto;
@@ -31,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -44,6 +39,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final CertificationRepository certificationRepository;
     private final HeartRepository heartRepository;
+    private final RecommendationRepository recommendationRepository;
     private final JwtProvider jwtProvider;
     private final EmailProvider emailProvider;
     private final RePasswordEmailProvider rePasswordEmailProvider;
@@ -535,17 +531,21 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public ResponseEntity<? super UpdateRecommendationResponseDto> updateRecommend(UpdateRecommendationRequestDto dto) {
         try {
-            Long userId = dto.getUserId();
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
+            Long recommendedId = dto.getUserId();
+            Long myId = jwtExtractProvider.findIdFromJwt();
+            User recommendedUser = userRepository.findById(recommendedId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + recommendedId));
 
-            boolean exists = userRepository.existsById(userId);
+            boolean exists = userRepository.existsById(recommendedId);
             if (!exists) {
                 return UpdateRecommendationResponseDto.userNotFound();
             }
-            Integer recommendationCount = user.getRecommendationCount() + 1;
+            Integer recommendationCount = recommendedUser.getRecommendationCount() + 1;
 
-            user.updateRecommendation(recommendationCount);
+            recommendedUser.updateRecommendation(recommendationCount);
+
+            Recommendation recommendation = UserFactory.createRecommendation(myId, recommendedId);
+            recommendationRepository.save(recommendation);
 
         } catch (Exception e) {
             log.info("추천수 업데이트 실패: {}", e);
@@ -554,6 +554,20 @@ public class UserServiceImpl implements UserService {
         return UpdateRecommendationResponseDto.success();
     }
 
+    @Override
+    public ResponseEntity<? super GetRecommendationResponseDto> getRecommend(UpdateRecommendationRequestDto dto) {
+        try {
+            Long recommendedId = dto.getUserId();
+            Long myId = jwtExtractProvider.findIdFromJwt();
+
+            boolean exists = recommendationRepository.existsByMyIdAndRecommendedId(myId,recommendedId);
+            return GetRecommendationResponseDto.success(exists);
+
+        } catch (Exception e) {
+            log.info("추천수 업데이트 실패: {}", e);
+            return GetRecommendationResponseDto.userNotFound();
+        }
+    }
 
     @Override
     @Transactional
@@ -604,6 +618,7 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long userUUID) {
         userRepository.deleteUserById(userUUID);
     }
+
 
     public UserInfo selectUserInfo(String receiverEmail) {
         User otherUser = userRepository.findByAccountId(receiverEmail);
