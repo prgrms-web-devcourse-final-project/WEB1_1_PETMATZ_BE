@@ -8,29 +8,21 @@ import com.petmatz.domain.pet.dto.PetSaveResponse;
 import com.petmatz.domain.pet.dto.PetServiceDto;
 import com.petmatz.domain.pet.dto.PetServiceDtoFactory;
 import com.petmatz.domain.pet.dto.PetUpdateResponse;
-import com.petmatz.domain.pet.exception.ImageErrorCode;
-import com.petmatz.domain.pet.exception.ImageServiceException;
 import com.petmatz.domain.pet.exception.PetErrorCode;
 import com.petmatz.domain.pet.exception.PetServiceException;
 import com.petmatz.domain.user.entity.User;
+import com.petmatz.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.petmatz.domain.pet.exception.PetErrorCode.PET_NOT_FOUND;
@@ -42,6 +34,7 @@ public class PetServiceImpl implements PetService{
     private final AwsClient awsClient;
 
     private final PetRepository repository;
+    private final UserRepository userRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final String uploadDir = System.getProperty("user.dir") + "/uploads/";
 
@@ -104,6 +97,11 @@ public class PetServiceImpl implements PetService{
                 .build();
 
         Long id = repository.save(pet).getId();
+
+        // User의 isRegistered 상태 업데이트
+        user.markAsRegistered();
+        userRepository.save(user);
+
         return PetSaveResponse.of(id, resultImgURL);
     }
 
