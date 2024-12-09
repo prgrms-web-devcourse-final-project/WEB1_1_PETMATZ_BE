@@ -115,9 +115,16 @@ public class UserController {
     }
 
     @PostMapping("/update-recommendation")
-    public ResponseEntity<? super UpdateRecommendationResponseDto> updateLocation(@RequestBody @Valid UpdateRecommendationRequestDto requestBody) {
+    public ResponseEntity<? super UpdateRecommendationResponseDto> updateRecommend(@RequestBody @Valid UpdateRecommendationRequestDto requestBody) {
         ResponseEntity<? super UpdateRecommendationResponseDto> response = userService.updateRecommend(requestBody);
-        log.info("[updateLocation]");
+        log.info("[updateRecommend]");
+        return response;
+    }
+
+    @GetMapping("/get-recommended")
+    public ResponseEntity<? super GetRecommendationResponseDto> getRecommend(@RequestBody @Valid UpdateRecommendationRequestDto requestBody) {
+        ResponseEntity<? super GetRecommendationResponseDto> response = userService.getRecommend(requestBody);
+        log.info("[getRecommend]");
         return response;
     }
 

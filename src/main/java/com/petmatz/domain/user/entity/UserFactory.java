@@ -44,4 +44,13 @@ public class UserFactory {
                 .build();
     }
 
+    public static Recommendation createRecommendation(Long myId, Long recommendedId) {
+        return Recommendation.builder()
+                .myId(myId)
+                .recommendedId(recommendedId)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
 }

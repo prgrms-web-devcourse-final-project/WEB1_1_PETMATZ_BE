@@ -32,4 +32,6 @@ public interface UserService {
     GetMyUserDto receiverEmail(String accountId);
 
     void deleteUser(Long accountId);
+
+    ResponseEntity<? super GetRecommendationResponseDto> getRecommend(UpdateRecommendationRequestDto dto);
 }
