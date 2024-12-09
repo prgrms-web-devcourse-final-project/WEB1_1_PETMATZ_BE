@@ -60,7 +60,7 @@ public class WebSecurityConfig {
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(endpoint -> endpoint
-                                .baseUri("/oauth2/authorization")) // OAuth2 로그인 엔드포인트
+                                .baseUri("/oauth2/authorization/kakao")) // OAuth2 로그인 엔드포인트
                         .redirectionEndpoint(endpoint -> endpoint
                                 .baseUri("/oauth2/callback/*")) // 리디렉션 엔드포인트
                         .userInfoEndpoint(endpoint -> endpoint
@@ -92,6 +92,8 @@ class FailedAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+        System.out.println("req URI :: " + request.getRequestURI());
+        System.out.println("request.getQueryString() :: " + request.getQueryString());
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403 상태 반환
         response.getWriter().write("{\"code\":\"NP\",\"message\":\"No Permission.\"}"); // 인증 실패 메시지
