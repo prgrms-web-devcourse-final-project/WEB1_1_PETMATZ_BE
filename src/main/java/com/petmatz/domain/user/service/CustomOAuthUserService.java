@@ -66,6 +66,8 @@ public class CustomOAuthUserService extends DefaultOAuth2UserService {
                 .profileImg(profileImage) // 프로필 이미지 저장
                 .loginRole(LoginRole.ROLE_USER) // 기본 역할 설정
                 .loginType(LoginType.KAKAO) // 로그인 타입
+                .careCompletionCount(0)
+                .recommendationCount(0)
                 .build();
 
         return userRepository.save(newUser);
