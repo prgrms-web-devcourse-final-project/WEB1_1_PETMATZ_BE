@@ -44,8 +44,8 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
         User user= userRepository.findByAccountId(accountId);
         String redirectUrl =(user.getGender()==null)
-                ? "https://localhost:5173/kakao-signup"
-                : "https://localhost:5173/kakao-login";
+                ? "https://petmatz-fe.vercel.app/kakao-signup"
+                : "https://petmatz-fe.vercel.app/kakao-login";
 
         // 클라이언트로 리다이렉트
         response.sendRedirect(redirectUrl);
