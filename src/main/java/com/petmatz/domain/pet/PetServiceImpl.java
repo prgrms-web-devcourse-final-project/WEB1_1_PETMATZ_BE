@@ -125,7 +125,7 @@ public class PetServiceImpl implements PetService{
             String resultImgURL = "";
             if (!existingPet.checkImgURL(updatedDto.profileImg())) {
                 //6-1 Img 정제
-                URL uploadURL = awsClient.uploadImg(user.getAccountId(), updatedDto.profileImg(), "PET_IMG", updatedDto.dogRegNo());
+                URL uploadURL = awsClient.uploadImg(user.getAccountId(), updatedDto.profileImg(), "PET_IMG", existingPet.getDogRegNo());
                 imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
                 resultImgURL = String.valueOf(uploadURL);
                 if (updatedDto.profileImg().startsWith("profile")) {
