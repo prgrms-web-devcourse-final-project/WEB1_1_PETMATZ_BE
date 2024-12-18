@@ -10,6 +10,7 @@ import com.petmatz.domain.match.dto.response.PaginatedMatchResponse;
 import com.petmatz.infra.redis.component.RedisMatchComponent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
 import java.util.List;
 
@@ -37,7 +38,12 @@ public class MatchService {
         long totalElements = matchScores.size();
         int totalPages = matchScoreProcessor.calculateTotalPages(totalElements, size);
 
-        return new PaginatedMatchResponse(detailedMatchResults, totalPages);
+        PaginatedMatchResponse paginatedMatchResponse = new PaginatedMatchResponse(detailedMatchResults, totalPages);
+        if (paginatedMatchResponse.matchResults().isEmpty()) {
+            throw new NotFoundException("매치 결과가 없습니다.");
+        }
+
+        return paginatedMatchResponse;
     }
 }
 

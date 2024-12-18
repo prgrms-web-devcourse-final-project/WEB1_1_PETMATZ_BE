@@ -33,42 +33,42 @@ public class PetController {
     // 동물등록번호 조회
     @PostMapping("/fetch")
     @Operation(summary = "동물등록번호 조회", description = "외부 API를 통해 동물등록번호 정보를 조회합니다.")
-    public ResponseEntity<Response<PetInfoDto>> fetchPetInfo(@RequestBody PetApiRequest request) {
+    public Response<PetInfoDto> fetchPetInfo(@RequestBody PetApiRequest request) {
         PetServiceDto serviceDto = PetApiRequest.toServiceDto(request);
         PetServiceDto fetchedServiceDto = petServiceImpl.fetchPetInfo(serviceDto.dogRegNo(), serviceDto.ownerNm());
         PetInfoDto responseDto = PetInfoDto.of(fetchedServiceDto);
-        return ResponseEntity.ok(Response.success(responseDto));
+        return Response.success(responseDto);
     }
 
     // 댕댕이 정보 등록
     @PostMapping("/register")
     @Operation(summary = "반려동물 등록", description = "사용자의 반려동물 정보를 등록합니다.")
-    public ResponseEntity<Response<PetSaveResponse>> registerPet(@RequestBody PetRequest request) throws MalformedURLException {
+    public Response<PetSaveResponse> registerPet(@RequestBody PetRequest request) throws MalformedURLException {
         User user = getAuthenticatedUser();
         PetServiceDto serviceDto = PetRequest.toServiceDto(request);
         PetSaveResponse petSaveResponse = petServiceImpl.savePet(user, serviceDto);
-        return ResponseEntity.ok(Response.success(petSaveResponse));
+        return Response.success(petSaveResponse);
     }
 
     // 댕댕이 정보 수정
     @PutMapping("/{id}")
     @Operation(summary = "반려동물 정보 수정", description = "기존 반려동물 정보를 수정합니다.")
     @Parameter(name = "id", description = "반려동물 ID", example = "1")
-    public ResponseEntity<Response<PetUpdateResponse>> updatePet(@PathVariable Long id, @RequestBody PetRequest updatedRequest) {
+    public Response<PetUpdateResponse> updatePet(@PathVariable Long id, @RequestBody PetRequest updatedRequest) {
         User user = getAuthenticatedUser();
         PetServiceDto updatedServiceDto = PetServiceDto.of(updatedRequest);
         PetUpdateResponse petUpdateResponse = petServiceImpl.updatePet(id, user, updatedServiceDto);
-        return ResponseEntity.ok(Response.success(petUpdateResponse));
+        return Response.success(petUpdateResponse);
     }
 
     // 댕댕이 정보 삭제
     @DeleteMapping("/{id}")
     @Operation(summary = "반려동물 삭제", description = "등록된 반려동물을 삭제합니다.")
     @Parameter(name = "id", description = "반려동물 ID", example = "1")
-    public ResponseEntity<Response<Void>> deletePet(@PathVariable Long id) {
+    public Response<Void> deletePet(@PathVariable Long id) {
         User user = getAuthenticatedUser();
         petServiceImpl.deletePet(id, user);
-        return ResponseEntity.ok(Response.success("댕댕이 정보가 성공적으로 삭제되었습니다."));
+        return Response.success("댕댕이 정보가 성공적으로 삭제되었습니다.");
     }
 
     private User getAuthenticatedUser() {
