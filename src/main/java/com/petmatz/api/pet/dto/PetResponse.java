@@ -1,7 +1,7 @@
 package com.petmatz.api.pet.dto;
 
-import com.petmatz.domain.pet.Pet;
-import com.petmatz.domain.pet.dto.PetServiceDto;
+import com.petmatz.domain.pet.entity.Pet;
+import com.petmatz.domain.pet.vo.PetInf;
 import com.petmatz.domain.sosboard.dto.SosBoardPetDto;
 
 public record PetResponse(
@@ -18,7 +18,7 @@ public record PetResponse(
         String preferredWalkingLocation,
         String comment
 ) {
-    public static PetResponse of(PetServiceDto serviceDto) {
+    public static PetResponse of(PetInf serviceDto) {
         return new PetResponse(
                 serviceDto.id(), // ID 추가
                 serviceDto.dogRegNo(),

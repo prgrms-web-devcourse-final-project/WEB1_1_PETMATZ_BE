@@ -1,11 +1,8 @@
 package com.petmatz.api.main_page.dto;
 
 import com.petmatz.domain.pet.Gender;
-import com.petmatz.domain.pet.Pet;
+import com.petmatz.domain.pet.entity.Pet;
 import com.petmatz.domain.petmission.entity.PetToPetMissionEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.Builder;
 
 @Builder

@@ -1,9 +1,9 @@
-package com.petmatz.domain.pet.dto;
+package com.petmatz.domain.pet.vo;
 
 import com.petmatz.api.pet.dto.PetRequest;
-import com.petmatz.domain.pet.Pet;
+import com.petmatz.domain.pet.entity.Pet;
 
-public record PetServiceDto(
+public record PetInf(
         Long id,
         String dogRegNo,
         String ownerNm,
@@ -18,8 +18,8 @@ public record PetServiceDto(
         String profileImg,
         String comment
 ) {
-    public static PetServiceDto of(PetRequest request) {
-        return new PetServiceDto(
+    public static PetInf of(PetRequest request) {
+        return new PetInf(
                 request.id(),
                 request.dogRegNo(),
                 request.ownerNm(),
@@ -36,8 +36,8 @@ public record PetServiceDto(
         );
     }
 
-    public static PetServiceDto of(Pet pet) {
-        return new PetServiceDto(
+    public static PetInf of(Pet pet) {
+        return new PetInf(
                 pet.getId(),
                 pet.getDogRegNo(),// Long → String 변환
                 null, // ownerNm은 null 처리

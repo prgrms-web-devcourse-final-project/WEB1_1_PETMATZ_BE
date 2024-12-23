@@ -1,6 +1,6 @@
 package com.petmatz.domain.sosboard.dto;
 
-import com.petmatz.domain.pet.Pet;
+import com.petmatz.domain.pet.entity.Pet;
 
 public record SosBoardPetDto(
         Long id,

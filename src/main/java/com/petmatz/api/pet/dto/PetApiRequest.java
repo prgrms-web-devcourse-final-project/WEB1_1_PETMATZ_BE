@@ -1,13 +1,13 @@
 package com.petmatz.api.pet.dto;
 
-import com.petmatz.domain.pet.dto.PetServiceDto;
+import com.petmatz.domain.pet.vo.PetInf;
 
 public record PetApiRequest(
         String dogRegNo,
         String ownerNm
 ) {
-    public static PetServiceDto toServiceDto(PetApiRequest request) {
-        return new PetServiceDto(
+    public static PetInf toServiceDto(PetApiRequest request) {
+        return new PetInf(
                 null,
                 request.dogRegNo(),
                 request.ownerNm(),

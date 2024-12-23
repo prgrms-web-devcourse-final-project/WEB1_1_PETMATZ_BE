@@ -3,12 +3,13 @@ package com.petmatz.domain.pet.dto;
 import com.petmatz.api.pet.dto.PetApiRequest;
 import com.petmatz.api.pet.dto.PetInfoDto;
 import com.petmatz.api.pet.dto.PetRequest;
+import com.petmatz.domain.pet.vo.PetInf;
 
 public class PetServiceDtoFactory {
 
     // PetInfoDto → PetServiceDto 변환
-    public static PetServiceDto from(PetInfoDto infoDto) {
-        return new PetServiceDto(
+    public static PetInf from(PetInfoDto infoDto) {
+        return new PetInf(
                 null, // id (기본값)
                 infoDto.dogRegNo(),
                 null, // ownerNm
@@ -26,8 +27,8 @@ public class PetServiceDtoFactory {
     }
 
     // PetApiRequest → PetServiceDto 변환
-    public static PetServiceDto from(PetApiRequest request) {
-        return new PetServiceDto(
+    public static PetInf from(PetApiRequest request) {
+        return new PetInf(
                 null, // id (기본값)
                 request.dogRegNo(),
                 request.ownerNm(),
@@ -45,8 +46,8 @@ public class PetServiceDtoFactory {
     }
 
     // PetRequest → PetServiceDto 변환
-    public static PetServiceDto from(PetRequest request) {
-        return new PetServiceDto(
+    public static PetInf from(PetRequest request) {
+        return new PetInf(
                 null, // id (기본값)
                 request.dogRegNo(),
                 request.ownerNm(),

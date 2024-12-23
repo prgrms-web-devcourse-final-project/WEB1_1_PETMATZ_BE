@@ -6,7 +6,6 @@ import com.petmatz.common.constants.PetMissionStatusZip;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.chatting.ChatMessageService;
 import com.petmatz.domain.chatting.dto.ChatMessageInfo;
-import com.petmatz.domain.pet.PetService;
 import com.petmatz.domain.petmission.PetMissionService;
 import com.petmatz.domain.petmission.dto.*;
 import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;

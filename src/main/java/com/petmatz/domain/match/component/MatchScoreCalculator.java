@@ -2,7 +2,7 @@ package com.petmatz.domain.match.component;
 
 import com.petmatz.domain.match.dto.response.MatchScoreResponse;
 import com.petmatz.domain.match.dto.response.UserResponse;
-import com.petmatz.domain.pet.PetServiceImpl;
+import com.petmatz.domain.pet.PetService;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.infra.redis.component.RedisMatchComponent;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ public class MatchScoreCalculator {
     private final MatchCareCalculator matchCareCalculator;
     private final MatchSizeCalculator matchSizeCalculator;
     private final MatchMbtiCalculator matchMbtiCalculator;
-    private final PetServiceImpl petService;
+    private final PetService petService;
     private final RedisMatchComponent matchComponent;
 
     public MatchScoreResponse calculateScore(User user, UserResponse targetUser) {
