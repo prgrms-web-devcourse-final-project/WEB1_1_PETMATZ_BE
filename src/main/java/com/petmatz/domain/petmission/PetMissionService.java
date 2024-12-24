@@ -2,8 +2,8 @@ package com.petmatz.domain.petmission;
 
 import com.petmatz.api.petmission.dto.PetMissionUpdateRequest;
 import com.petmatz.domain.aws.AwsClient;
-import com.petmatz.domain.pet.Pet;
-import com.petmatz.domain.pet.PetRepository;
+import com.petmatz.domain.pet.entity.Pet;
+import com.petmatz.domain.pet.repository.PetRepository;
 import com.petmatz.domain.petmission.component.*;
 import com.petmatz.domain.petmission.dto.*;
 import com.petmatz.domain.petmission.entity.*;

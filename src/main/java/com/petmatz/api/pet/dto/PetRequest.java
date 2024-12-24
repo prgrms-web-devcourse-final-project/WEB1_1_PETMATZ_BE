@@ -1,7 +1,5 @@
 package com.petmatz.api.pet.dto;
 
-import com.petmatz.domain.pet.dto.PetServiceDto;
-
 public record PetRequest(
         Long id,
         String dogRegNo,
@@ -17,22 +15,5 @@ public record PetRequest(
         String profileImg,
         String comment
 ) {
-    public static PetServiceDto toServiceDto(PetRequest request) {
-        return new PetServiceDto(
-                request.id(),
-                request.dogRegNo(),
-                request.ownerNm(),
-                request.petName(),
-                request.breed(),
-                request.gender(),
-                request.neuterYn(),
-                request.size(),
-                request.age(),
-                request.temperament(),
-                request.preferredWalkingLocation(),
-                request.profileImg(),
-                request.comment()
-        );
-    }
 }
 

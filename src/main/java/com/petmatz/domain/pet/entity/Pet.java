@@ -1,6 +1,9 @@
-package com.petmatz.domain.pet;
+package com.petmatz.domain.pet.entity;
 
 import com.petmatz.domain.global.BaseEntity;
+import com.petmatz.domain.pet.Gender;
+import com.petmatz.domain.pet.Size;
+import com.petmatz.domain.pet.dto.PetUpdateInfo;
 import com.petmatz.domain.petmission.entity.PetToPetMissionEntity;
 import com.petmatz.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -68,8 +71,20 @@ public class Pet extends BaseEntity {
         return profileImg.equals(Img);
     }
 
-    public void addUser() {
-        user = null;
+    public void addUser(User userData) {
+        user = userData;
+    }
+
+    public void updatePetInfo(PetUpdateInfo petUpdateInfo, String imgUrl) {
+        age = petUpdateInfo.age();
+        breed = petUpdateInfo.breed();
+        comment = petUpdateInfo.comment();
+        gender = petUpdateInfo.gender();
+        neuterYn = petUpdateInfo.neuterYn();
+        petName = petUpdateInfo.petName();
+        profileImg = imgUrl;
+        size = petUpdateInfo.size();
+        temperament = petUpdateInfo.temperament();
     }
 
 }

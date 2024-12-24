@@ -1,8 +1,8 @@
 package com.petmatz.domain.sosboard;
 
 import com.petmatz.api.pet.dto.PetResponse;
-import com.petmatz.domain.pet.Pet;
-import com.petmatz.domain.pet.PetRepository;
+import com.petmatz.domain.pet.entity.Pet;
+import com.petmatz.domain.pet.repository.PetRepository;
 import com.petmatz.domain.sosboard.dto.PageResponseDto;
 import com.petmatz.domain.sosboard.dto.SosBoardPetDto;
 import com.petmatz.domain.sosboard.dto.SosBoardServiceDto;

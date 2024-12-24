@@ -1,13 +1,9 @@
 package com.petmatz.domain.petmission.dto;
 
 import com.petmatz.domain.pet.Gender;
-import com.petmatz.domain.pet.Pet;
+import com.petmatz.domain.pet.entity.Pet;
 import com.petmatz.domain.pet.Size;
-import com.petmatz.domain.petmission.entity.PetMissionEntity;
-import com.petmatz.domain.petmission.entity.PetToPetMissionEntity;
 import lombok.Builder;
-
-import java.util.List;
 
 @Builder
 public record PetMissionPetInfo(

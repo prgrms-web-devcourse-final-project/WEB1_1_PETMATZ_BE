@@ -171,10 +171,10 @@ public class User extends BaseEntity {
         }
     }
 
-    public void markAsRegistered() {
-        if (Boolean.TRUE.equals(this.isRegistered)) {
-            return; // 이미 등록된 경우 아무 작업도 하지 않음
+    //등록 상태로 변경
+    public void updateUserRegistered() {
+        if (Boolean.FALSE.equals(isRegistered)) {
+            this.isRegistered = true;
         }
-        this.isRegistered = true; // 등록 상태로 변경
     }
 }

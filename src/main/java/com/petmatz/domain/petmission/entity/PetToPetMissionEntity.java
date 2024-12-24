@@ -1,6 +1,6 @@
 package com.petmatz.domain.petmission.entity;
 
-import com.petmatz.domain.pet.Pet;
+import com.petmatz.domain.pet.entity.Pet;
 import jakarta.persistence.*;
 import lombok.*;
 
