@@ -1,6 +1,5 @@
 package com.petmatz.domain.chatting.component;
 
-import com.petmatz.domain.chatting.repository.ChatRoomRepository;
 import com.petmatz.domain.chatting.repository.UserToChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

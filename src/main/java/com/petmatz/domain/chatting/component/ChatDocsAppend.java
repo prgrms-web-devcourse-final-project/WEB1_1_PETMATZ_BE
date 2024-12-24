@@ -3,14 +3,10 @@ package com.petmatz.domain.chatting.component;
 import com.petmatz.domain.chatting.docs.ChatReadStatusDocs;
 import com.petmatz.domain.chatting.docs.ChatRoomDocs;
 import com.petmatz.domain.chatting.docs.ChatRoomMetadataDocs;
-import com.petmatz.domain.chatting.dto.*;
-
-
-import com.petmatz.domain.chatting.repository.ChatRoomRepository;
-import org.springframework.data.mongodb.core.MongoTemplate;
-
-import org.springframework.stereotype.Component;
+import com.petmatz.domain.chatting.dto.ChatRoomInfo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.stereotype.Component;
 
 
 @Component
@@ -18,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 public class ChatDocsAppend {
 
     private final MongoTemplate mongoTemplate;
-    private final ChatRoomRepository chatRoomRepository;
 
 
     //채팅방 생성시 이에 해당하는 Docs도 같이 생성 ( 채팅 내역, 채팅방 메타 데이터 )
