@@ -1,4 +1,4 @@
-package com.petmatz.domain.pet.vo;
+package com.petmatz.domain.pet.dto;
 
 import com.petmatz.api.pet.dto.PetUpdateRequest;
 import com.petmatz.domain.pet.Gender;

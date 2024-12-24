@@ -1,29 +1,23 @@
 package com.petmatz.domain.pet;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.petmatz.api.pet.dto.PetInfoDto;
 import com.petmatz.domain.aws.AwsClient;
 import com.petmatz.domain.global.S3ImgDataInfo;
+import com.petmatz.domain.pet.component.OpenApiPet;
 import com.petmatz.domain.pet.entity.Pet;
 import com.petmatz.domain.pet.repository.PetRepository;
-import com.petmatz.domain.pet.vo.PetInf;
-import com.petmatz.domain.pet.dto.PetServiceDtoFactory;
+import com.petmatz.domain.pet.utils.PetMapper;
+import com.petmatz.domain.pet.dto.OpenApiPetInfo;
+import com.petmatz.domain.pet.dto.PetInf;
 import com.petmatz.domain.pet.exception.PetErrorCode;
 import com.petmatz.domain.pet.exception.PetServiceException;
-import com.petmatz.domain.pet.vo.PetUpdateInfo;
+import com.petmatz.domain.pet.dto.PetUpdateInfo;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,39 +28,25 @@ import static com.petmatz.domain.pet.exception.PetErrorCode.PET_NOT_FOUND;
 public class PetService {
 
     private final AwsClient awsClient;
+    private final OpenApiPet openApiPet;
 
     private final PetRepository repository;
     private final UserRepository userRepository;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
 
-    //TODO Infra로 이전 해야함.
-    // 동물 등록 정보를 외부 API로 가져오는 메서드
-    public PetInf fetchPetInfo(String dogRegNo, String ownerNm) {
-        if (repository.existsByDogRegNo(dogRegNo)) {
-            throw new PetServiceException(PetErrorCode.DOG_REG_NO_DUPLICATE);
-        }
-
-        try {
-            String response = callApi(dogRegNo, ownerNm);
-            JsonNode rootNode = objectMapper.readTree(response);
-            JsonNode item = rootNode.path("response").path("body").path("item");
-
-            if (item.isMissingNode()) {
-                throw new PetServiceException(PetErrorCode.FETCH_FAILED, "API_RESPONSE");
-            }
-
-            // API 결과를 PetInfoDto로 변환 후 PetServiceDto 생성
-            PetInfoDto infoDto = objectMapper.treeToValue(item, PetInfoDto.class);
-            return PetServiceDtoFactory.from(infoDto);
-        } catch (IOException e) {
-            throw new PetServiceException(PetErrorCode.FETCH_FAILED, "IO_EXCEPTION");
-        } catch (PetServiceException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new PetServiceException(PetErrorCode.FETCH_FAILED, "GENERAL_EXCEPTION");
-        }
+    public OpenApiPetInfo fetchPetInfo(String dogRegNo, String ownerNm) {
+        return openApiPet.getOpenApiPetInfo(dogRegNo, ownerNm);
     }
+
+    //TODO Component로 옮기기
+    // 펫 삭제
+    public void deletePet(Long petId, User user) {
+        repository.findByIdAndUser(petId, user)
+                .orElseThrow(() -> new PetServiceException(PET_NOT_FOUND));
+        repository.deleteById(petId);
+//        repository.delete(pet);
+    }
+
 
     // 펫 저장
     public S3ImgDataInfo savePet(User user, PetInf petInf) throws MalformedURLException {
@@ -84,8 +64,9 @@ public class PetService {
         }
 
         //Pet Entity 생성
-        Pet pet = Pet.of(petInf, imgURL, user);
+        Pet pet = PetMapper.of(petInf, imgURL, user);
 
+        //Pet 정보 저장
         Pet petEntity = repository.save(pet);
         Long id = petEntity.getId();
 
@@ -124,42 +105,7 @@ public class PetService {
         return S3ImgDataInfo.of(petId, resultImgURL);
     }
 
-
-    //TODO Component로 옮기기
-    // 펫 삭제
-    public void deletePet(Long petId, User user) {
-        repository.findByIdAndUser(petId, user)
-                .orElseThrow(() -> new PetServiceException(PET_NOT_FOUND));
-        repository.deleteById(petId);
-//        repository.delete(pet);
-    }
-
-
-    //TODO Infra로 빼야됨.
-    // 외부 API 호출
-    private String callApi(String dogRegNo, String ownerNm) throws Exception {
-        String baseUrl = "http://apis.data.go.kr/1543061/animalInfoSrvc/animalInfo";
-        String serviceKey = "YOUR_SERVICE_KEY";
-
-        StringBuilder urlBuilder = new StringBuilder(baseUrl);
-        urlBuilder.append("?").append(URLEncoder.encode("serviceKey", "UTF-8")).append("=").append(serviceKey);
-        urlBuilder.append("&").append(URLEncoder.encode("dog_reg_no", "UTF-8")).append("=").append(URLEncoder.encode(dogRegNo, "UTF-8"));
-        urlBuilder.append("&").append(URLEncoder.encode("owner_nm", "UTF-8")).append("=").append(URLEncoder.encode(ownerNm, "UTF-8"));
-        urlBuilder.append("&").append(URLEncoder.encode("_type", "UTF-8")).append("=").append("json");
-
-        HttpURLConnection conn = (HttpURLConnection) new URL(urlBuilder.toString()).openConnection();
-        conn.setRequestMethod("GET");
-        conn.setRequestProperty("Content-type", "application/json");
-
-        try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = rd.readLine()) != null) {
-                response.append(line);
-            }
-            return response.toString();
-        }
-    }
+    //아래 리펙은 상당히 힘들지도
 
     public List<Pet> getPetsByUserId(Long userId) {
         List<Pet> userPets = repository.findByUserId(userId);
@@ -178,10 +124,6 @@ public class PetService {
                 .map(pet -> pet.getTemperament() != null ? pet.getTemperament() : "Unknown")
                 .collect(Collectors.toList());
     }
-
 }
-
-
-
 
 

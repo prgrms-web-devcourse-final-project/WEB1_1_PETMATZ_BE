@@ -1,6 +1,6 @@
 package com.petmatz.api.pet.dto;
 
-import com.petmatz.domain.pet.vo.PetInf;
+import com.petmatz.domain.pet.dto.PetInf;
 
 public record PetApiRequest(
         String dogRegNo,
