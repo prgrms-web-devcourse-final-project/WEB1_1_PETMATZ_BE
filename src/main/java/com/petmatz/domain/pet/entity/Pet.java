@@ -8,7 +8,10 @@ import com.petmatz.domain.pet.dto.PetUpdateInfo;
 import com.petmatz.domain.petmission.entity.PetToPetMissionEntity;
 import com.petmatz.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;

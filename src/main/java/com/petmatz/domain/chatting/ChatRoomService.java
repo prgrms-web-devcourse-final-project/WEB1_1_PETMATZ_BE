@@ -3,14 +3,19 @@ package com.petmatz.domain.chatting;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.chatting.component.*;
 import com.petmatz.domain.chatting.docs.ChatReadStatusDocs;
-import com.petmatz.domain.chatting.dto.*;
+import com.petmatz.domain.chatting.dto.ChatRoomInfo;
+import com.petmatz.domain.chatting.dto.ChatRoomMetaDataInfo;
+import com.petmatz.domain.chatting.dto.IChatUserInfo;
 import com.petmatz.domain.chatting.entity.ChatRoomEntity;
 import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

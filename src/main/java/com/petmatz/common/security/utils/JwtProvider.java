@@ -1,6 +1,5 @@
 package com.petmatz.common.security.utils;
 
-import com.petmatz.domain.user.entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;

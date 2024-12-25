@@ -1,6 +1,5 @@
 package com.petmatz.domain.user.response;
 
-import com.petmatz.domain.user.entity.User;
 import com.petmatz.user.common.LogInResponseDto;
 import com.petmatz.user.common.ResponseCode;
 import com.petmatz.user.common.ResponseMessage;

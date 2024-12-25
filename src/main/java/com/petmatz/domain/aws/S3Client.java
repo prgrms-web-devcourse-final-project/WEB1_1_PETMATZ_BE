@@ -1,6 +1,5 @@
 package com.petmatz.domain.aws;
 
-import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 

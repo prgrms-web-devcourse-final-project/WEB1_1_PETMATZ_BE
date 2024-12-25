@@ -3,9 +3,7 @@ package com.petmatz.api.chatting;
 import com.petmatz.api.chatting.dto.ChatRoomMetaDataInfoResponse;
 import com.petmatz.api.chatting.dto.MatchRequest;
 import com.petmatz.api.global.dto.Response;
-
 import com.petmatz.domain.chatting.ChatRoomService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;

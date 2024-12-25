@@ -1,6 +1,5 @@
 package com.petmatz.api.petmission.dto;
 
-import com.petmatz.domain.petmission.dto.PetMissionUserInfo;
 import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import com.petmatz.domain.user.entity.User;
 import lombok.Builder;

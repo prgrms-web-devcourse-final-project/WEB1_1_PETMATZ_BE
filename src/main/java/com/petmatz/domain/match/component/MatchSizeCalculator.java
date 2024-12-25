@@ -1,8 +1,8 @@
 package com.petmatz.domain.match.component;
 
 import com.petmatz.domain.match.exception.MatchException;
-import com.petmatz.domain.pet.entity.Pet;
 import com.petmatz.domain.pet.PetService;
+import com.petmatz.domain.pet.entity.Pet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

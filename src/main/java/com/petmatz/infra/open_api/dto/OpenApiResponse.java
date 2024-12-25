@@ -1,7 +1,6 @@
 package com.petmatz.infra.open_api.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 public record OpenApiResponse<T>(@JsonProperty("response") Response<T> response) {
 

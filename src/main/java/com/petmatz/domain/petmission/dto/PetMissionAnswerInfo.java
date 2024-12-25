@@ -1,7 +1,6 @@
 package com.petmatz.domain.petmission.dto;
 
 import com.petmatz.api.petmission.dto.PetMissionCommentResponse;
-import com.petmatz.domain.petmission.entity.PetMissionAnswerEntity;
 import lombok.Builder;
 
 @Builder

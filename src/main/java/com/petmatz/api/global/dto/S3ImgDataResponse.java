@@ -1,7 +1,6 @@
 package com.petmatz.api.global.dto;
 
 import com.petmatz.domain.global.S3ImgDataInfo;
-import lombok.Builder;
 
 public record S3ImgDataResponse(
 

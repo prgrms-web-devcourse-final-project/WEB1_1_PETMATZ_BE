@@ -1,12 +1,13 @@
 package com.petmatz.domain.sosboard;
 
 
-
-import com.petmatz.domain.user.entity.User;
-import jakarta.persistence.GeneratedValue;
 import com.petmatz.domain.global.BaseEntity;
+import com.petmatz.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;

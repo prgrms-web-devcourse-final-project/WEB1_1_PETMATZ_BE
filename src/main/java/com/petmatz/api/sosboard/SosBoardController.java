@@ -10,11 +10,11 @@ import com.petmatz.domain.sosboard.dto.PageResponseDto;
 import com.petmatz.domain.sosboard.dto.SosBoardServiceDto;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.domain.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;

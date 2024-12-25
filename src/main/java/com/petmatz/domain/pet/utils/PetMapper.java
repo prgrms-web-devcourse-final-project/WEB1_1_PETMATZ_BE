@@ -2,8 +2,8 @@ package com.petmatz.domain.pet.utils;
 
 import com.petmatz.domain.pet.Gender;
 import com.petmatz.domain.pet.Size;
-import com.petmatz.domain.pet.entity.Pet;
 import com.petmatz.domain.pet.dto.PetInf;
+import com.petmatz.domain.pet.entity.Pet;
 import com.petmatz.domain.user.entity.User;
 
 public class PetMapper {

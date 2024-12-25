@@ -2,7 +2,8 @@ package com.petmatz.domain.chatting.entity;
 
 import com.petmatz.domain.global.BaseEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;

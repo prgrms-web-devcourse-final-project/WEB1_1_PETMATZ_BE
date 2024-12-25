@@ -4,14 +4,14 @@ import com.petmatz.domain.aws.AwsClient;
 import com.petmatz.domain.aws.vo.S3Imge;
 import com.petmatz.domain.global.S3ImgDataInfo;
 import com.petmatz.domain.pet.component.OpenApiPet;
-import com.petmatz.domain.pet.entity.Pet;
-import com.petmatz.domain.pet.repository.PetRepository;
-import com.petmatz.domain.pet.utils.PetMapper;
 import com.petmatz.domain.pet.dto.OpenApiPetInfo;
 import com.petmatz.domain.pet.dto.PetInf;
+import com.petmatz.domain.pet.dto.PetUpdateInfo;
+import com.petmatz.domain.pet.entity.Pet;
 import com.petmatz.domain.pet.exception.PetErrorCode;
 import com.petmatz.domain.pet.exception.PetServiceException;
-import com.petmatz.domain.pet.dto.PetUpdateInfo;
+import com.petmatz.domain.pet.repository.PetRepository;
+import com.petmatz.domain.pet.utils.PetMapper;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 

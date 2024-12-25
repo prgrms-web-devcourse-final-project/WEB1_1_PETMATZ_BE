@@ -5,7 +5,6 @@ import com.petmatz.domain.user.info.*;
 import com.petmatz.domain.user.response.*;
 import com.petmatz.user.common.LogInResponseDto;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 
 public interface UserService {

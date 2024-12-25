@@ -8,7 +8,6 @@ import com.petmatz.domain.sosboard.dto.SosBoardPetDto;
 import com.petmatz.domain.sosboard.dto.SosBoardServiceDto;
 import com.petmatz.domain.sosboard.exception.SosBoardErrorCode;
 import com.petmatz.domain.sosboard.exception.SosBoardServiceException;
-
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

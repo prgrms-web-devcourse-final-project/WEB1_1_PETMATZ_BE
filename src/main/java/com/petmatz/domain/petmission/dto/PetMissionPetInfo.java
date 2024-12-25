@@ -1,8 +1,8 @@
 package com.petmatz.domain.petmission.dto;
 
 import com.petmatz.domain.pet.Gender;
-import com.petmatz.domain.pet.entity.Pet;
 import com.petmatz.domain.pet.Size;
+import com.petmatz.domain.pet.entity.Pet;
 import lombok.Builder;
 
 @Builder

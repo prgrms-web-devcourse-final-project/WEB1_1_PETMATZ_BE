@@ -2,14 +2,11 @@ package com.petmatz.api.chatting;
 
 import com.petmatz.api.chatting.dto.*;
 import com.petmatz.api.global.dto.Response;
-
+import com.petmatz.domain.chatting.ChatMessageService;
+import com.petmatz.domain.chatting.ChatRoomService;
 import com.petmatz.domain.chatting.dto.ChatMessageInfo;
 import com.petmatz.domain.user.info.UserInfo;
 import com.petmatz.domain.user.service.UserServiceImpl;
-
-import com.petmatz.domain.chatting.ChatMessageService;
-import com.petmatz.domain.chatting.ChatRoomService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
