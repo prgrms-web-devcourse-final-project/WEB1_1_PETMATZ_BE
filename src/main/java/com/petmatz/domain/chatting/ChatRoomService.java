@@ -115,7 +115,6 @@ public class ChatRoomService {
         if (userEmailList.isEmpty()) {
             throw new NullPointerException("해당 채팅방이 존재하지 않습니다.");
         }
-        List<String> list = userEmailList;
-        return userEmail.equals(list.get(0)) ? list.get(1) : list.get(0);
+        return userEmail.equals(userEmailList.get(0)) ? userEmailList.get(1) : userEmailList.get(0);
     }
 }

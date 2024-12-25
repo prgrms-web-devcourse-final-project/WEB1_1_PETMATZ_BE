@@ -17,7 +17,6 @@ public class ChatRoomEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //TODO 추후 userEntity와 연관관계 매핑이 필요함.
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserToChatRoomEntity> participants = new ArrayList<>();
 

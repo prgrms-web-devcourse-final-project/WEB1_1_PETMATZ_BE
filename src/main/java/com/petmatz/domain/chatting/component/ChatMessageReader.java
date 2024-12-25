@@ -77,7 +77,6 @@ public class ChatMessageReader {
 
         if (lastFetchTimestamp == null) {
             lastFetchTimestamp = LocalDateTime.now();
-            System.out.println(lastFetchTimestamp);
         }
 
         // 기본 Criteria 생성
@@ -94,9 +93,6 @@ public class ChatMessageReader {
                 Aggregation.limit(pageSize) // 한 페이지의 크기
         );
     }
-
-
-
 
     protected Aggregation createQuerySelectChatMessagesPaging(String chatRoomsId,String userEmail,LocalDateTime lastReadTimestamp, int pageNumber, int pageSize) {
         return Aggregation.newAggregation(
