@@ -22,15 +22,6 @@ public class MatchingController {
 
     private final ChatRoomService chatRoomService;
 
-    /**
-     * 채팅방 매칭시 반려인과 돌봄이의 닉네임을 가져와야 한다.
-     * @param matchRequest
-     * @return
-     */
-    //TODO 반려인 닉네임 -> Token
-    //TODO 채팅방 생성시 동작하도록  ( 구독 )
-    //TODO 채팅방 고유 ID 가 NULL이면 없는 채팅방으로 간주하고 새로 생성한다.
-    //TODO caregiverEmail -> JWT으로 바꾸기
     @PostMapping
     @Operation(summary = "채팅방 생성", description = "채팅방을 생성하는 API API")
     @Parameters({
@@ -43,7 +34,7 @@ public class MatchingController {
         return Response.success(chatRoomNumber);
     }
 
-    // TODO user정보 포함시켜서 보내기
+
     @GetMapping
     @Operation(summary = "채팅방 조회", description = "해당 사용자가 보유하고 있는 채팅방 조회 API")
     @Parameters({

@@ -97,15 +97,6 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserToPetMissionEntity> userPetMissions = new ArrayList<>();
 
-    public User checkUUID(List<User> users, Long id) {
-        for (User user : users) {
-            if (user.id.equals(id)) {
-                return user;
-            }
-        }
-        return null;
-    }
-
     public void updatePassword(String newPassword) {
         this.password = newPassword;
     }

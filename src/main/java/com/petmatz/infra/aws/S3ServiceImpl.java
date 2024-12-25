@@ -36,6 +36,7 @@ public class S3ServiceImpl implements S3Client {
         GeneratePresignedUrlRequest generatePresignedUrlRequest = makePresignedURL(bucketName, path);
         return amazonS3Client.generatePresignedUrl(generatePresignedUrlRequest);
     }
+
     //언젠간 사용..
     @Override
     public void deleteImg(List<String> keyList) {
