@@ -2,6 +2,7 @@ package com.petmatz.domain.match.component;
 
 import com.petmatz.domain.match.exception.MatchException;
 import com.petmatz.domain.pet.PetService;
+import com.petmatz.domain.pet.component.PetReader;
 import com.petmatz.domain.pet.entity.Pet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,9 +17,9 @@ import static com.petmatz.domain.match.exception.MatchErrorCode.NULL_TARGET_SIZE
 @RequiredArgsConstructor
 public class MatchSizeCalculator {
 
-    private final PetService petService;
+    private final PetReader petReader;
     public double calculateDogSizeScore(Long userId, List<String> targetPreferredSizes) {
-        List<Pet> userPets = petService.getPetsByUserId(userId);
+        List<Pet> userPets = petReader.getPetsByUserId(userId);
 
         if (targetPreferredSizes == null || targetPreferredSizes.isEmpty()) {
             throw new MatchException(NULL_PREFERRED_SIZES);
