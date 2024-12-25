@@ -1,5 +1,6 @@
 package com.petmatz.domain.user.entity;
 
+import com.petmatz.domain.aws.vo.S3Imge;
 import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import com.petmatz.domain.global.BaseEntity;
 import com.petmatz.domain.match.exception.MatchException;
@@ -113,8 +114,7 @@ public class User extends BaseEntity {
         this.recommendationCount = recommendationCount;
     }
 
-    public void updateProfile(EditMyProfileInfo info, String resultImgURL) {
-        this.profileImg = resultImgURL;
+    public void updateProfile(EditMyProfileInfo info) {
         this.nickname = info.getNickname();
         this.introduction = info.getIntroduction();
         this.preferredSizes = info.getPreferredSizes();
@@ -176,5 +176,13 @@ public class User extends BaseEntity {
         if (Boolean.FALSE.equals(isRegistered)) {
             this.isRegistered = true;
         }
+    }
+
+    public String updateImgURL(String profileImgURL, S3Imge petImg) {
+        if (!profileImg.equals(profileImgURL)) {
+            profileImg = petImg.uploadURL();
+            return petImg.checkResultImg();
+        }
+        return "";
     }
 }

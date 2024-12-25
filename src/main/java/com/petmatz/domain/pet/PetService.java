@@ -1,6 +1,7 @@
 package com.petmatz.domain.pet;
 
 import com.petmatz.domain.aws.AwsClient;
+import com.petmatz.domain.aws.vo.S3Imge;
 import com.petmatz.domain.global.S3ImgDataInfo;
 import com.petmatz.domain.pet.component.OpenApiPet;
 import com.petmatz.domain.pet.entity.Pet;
@@ -15,6 +16,7 @@ import com.petmatz.domain.user.entity.User;
 import com.petmatz.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -55,16 +57,9 @@ public class PetService {
         }
 
         //6-1 Img 정제
-        URL uploadURL = awsClient.uploadImg(user.getAccountId(), petInf.profileImg(), "PET_IMG", petInf.dogRegNo());
-        String imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
-        String resultImgURL = String.valueOf(uploadURL);
-        if (petInf.profileImg().startsWith("profile")) {
-            imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + petInf.profileImg() + ".svg";
-            resultImgURL = "";
-        }
-
+        S3Imge petImg = awsClient.UploadImg(user.getAccountId(), petInf.profileImg(), "PET_IMG", petInf.dogRegNo());
         //Pet Entity 생성
-        Pet pet = PetMapper.of(petInf, imgURL, user);
+        Pet pet = PetMapper.of(petInf, petImg.uploadURL(), user);
 
         //Pet 정보 저장
         Pet petEntity = repository.save(pet);
@@ -73,10 +68,13 @@ public class PetService {
         // User의 isRegistered 상태 업데이트
         user.updateUserRegistered();
 
-        return S3ImgDataInfo.of(id, resultImgURL);
+//        return S3ImgDataInfo.of(id, resultImgURL);
+        return S3ImgDataInfo.of(id, petImg.checkResultImg());
     }
 
+
     // 펫 업데이트
+    @Transactional
     public S3ImgDataInfo updatePet(Long petId, User user, PetUpdateInfo petUpdateInfo) throws MalformedURLException {
         Pet existingPet = repository.findByIdAndUser(petId, user)
                 .orElseThrow(() -> new PetServiceException(PetErrorCode.PET_NOT_FOUND));
@@ -86,23 +84,13 @@ public class PetService {
             throw new SecurityException("권한이 없습니다.");
         }
 
-        String imgURL = petUpdateInfo.profileImg();
-        String resultImgURL = "";
-        if (!existingPet.checkImgURL(petUpdateInfo.profileImg())) {
-            //6-1 Img 정제
-            URL uploadURL = awsClient.uploadImg(user.getAccountId(), petUpdateInfo.profileImg(), "PET_IMG", existingPet.getDogRegNo());
-            imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
-            resultImgURL = String.valueOf(uploadURL);
-            if (petUpdateInfo.profileImg().startsWith("profile")) {
-                imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + petUpdateInfo.profileImg() + ".svg";
-                resultImgURL = "";
-            }
-        }
+        S3Imge petImg = awsClient.UploadImg(user.getAccountId(), petUpdateInfo.profileImg(), "PET_IMG", existingPet.getDogRegNo());
 
         // 병합된 DTO를 기반으로 엔티티 생성
-        existingPet.updatePetInfo(petUpdateInfo, imgURL);
+        String resultImg = existingPet.updateImgURL(petUpdateInfo.profileImg(), petImg);
+        existingPet.updatePetInfo(petUpdateInfo);
 
-        return S3ImgDataInfo.of(petId, resultImgURL);
+        return S3ImgDataInfo.of(petId, resultImg);
     }
 
     //아래 리펙은 상당히 힘들지도
