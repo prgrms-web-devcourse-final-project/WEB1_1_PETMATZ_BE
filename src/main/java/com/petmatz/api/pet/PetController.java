@@ -77,16 +77,4 @@ public class PetController {
         petService.deletePet(id, user);
         return Response.success("댕댕이 정보가 성공적으로 삭제되었습니다.");
     }
-
-
-
 }
-
-
-
-
-
-
-
-
-
