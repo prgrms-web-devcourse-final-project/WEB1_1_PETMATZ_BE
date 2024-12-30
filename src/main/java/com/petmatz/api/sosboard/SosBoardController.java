@@ -5,16 +5,16 @@ import com.petmatz.api.pet.dto.PetResponse;
 import com.petmatz.api.sosboard.dto.SosBoardCreateRequestDto;
 import com.petmatz.api.sosboard.dto.SosBoardResponseDto;
 import com.petmatz.common.security.utils.JwtExtractProvider;
-import com.petmatz.domain.sosboard.SosBoardServiceImpl;
+import com.petmatz.domain.sosboard.SosBoardService;
 import com.petmatz.domain.sosboard.dto.PageResponseDto;
 import com.petmatz.domain.sosboard.dto.SosBoardServiceDto;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.domain.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SosBoardController {
 
-    private final SosBoardServiceImpl sosBoardServiceImpl;
+    private final SosBoardService sosBoardService;
     private final UserRepository userRepository;
     private final JwtExtractProvider jwtExtractProvider;
 
@@ -44,7 +44,7 @@ public class SosBoardController {
         int adjustedPage = pageNum - 1;
 
         // 서비스 호출
-        PageResponseDto<SosBoardServiceDto> serviceDtoPageResponse = sosBoardServiceImpl.getAllSosBoards(region, adjustedPage, size);
+        PageResponseDto<SosBoardServiceDto> serviceDtoPageResponse = sosBoardService.getAllSosBoards(region, adjustedPage, size);
 
         // SosBoardServiceDto → SosBoardResponseDto 변환
         List<SosBoardResponseDto> responseDtos = serviceDtoPageResponse.content().stream()
@@ -70,7 +70,7 @@ public class SosBoardController {
         User user = getAuthenticatedUser(); // 인증된 사용자 가져오기
         SosBoardServiceDto serviceDto = requestDto.toServiceDto(user); // 프레젠테이션 DTO → 서비스 DTO 변환
         // 서비스 계층 호출
-        SosBoardServiceDto createdBoard = sosBoardServiceImpl.createSosBoard(serviceDto);
+        SosBoardServiceDto createdBoard = sosBoardService.createSosBoard(serviceDto);
         SosBoardResponseDto responseDto = SosBoardResponseDto.fromServiceDto(createdBoard);
         return Response.success(responseDto);
     }
@@ -80,7 +80,7 @@ public class SosBoardController {
     @Operation(summary = "특정 SOS 게시글 조회", description = "게시글 ID를 통해 특정 SOS 게시글을 조회합니다.")
     @Parameter(name = "id", description = "조회할 게시글의 ID", example = "1")
     public Response<SosBoardResponseDto> getSosBoardById(@PathVariable Long id) {
-        SosBoardServiceDto serviceDto = sosBoardServiceImpl.getSosBoardById(id);
+        SosBoardServiceDto serviceDto = sosBoardService.getSosBoardById(id);
 
         SosBoardResponseDto responseDto = SosBoardResponseDto.fromServiceDto(serviceDto);
 
@@ -96,7 +96,7 @@ public class SosBoardController {
 
         User user = getAuthenticatedUser(); // 인증된 사용자 가져오기
         SosBoardServiceDto serviceDto = requestDto.toServiceDto(user);
-        SosBoardServiceDto updatedBoard = sosBoardServiceImpl.updateSosBoard(id, serviceDto, user);
+        SosBoardServiceDto updatedBoard = sosBoardService.updateSosBoard(id, serviceDto, user);
         SosBoardResponseDto responseDto = SosBoardResponseDto.fromServiceDto(updatedBoard);
 
         return Response.success(responseDto);
@@ -107,7 +107,7 @@ public class SosBoardController {
     @Operation(summary = "SOS 게시글 삭제", description = "SOS 게시판의 게시글을 삭제합니다.")
     public Response<Void> deleteSosBoard(@PathVariable Long id) {
         User user = getAuthenticatedUser(); // 인증된 사용자 가져오기
-        sosBoardServiceImpl.deleteSosBoard(id, user);
+        sosBoardService.deleteSosBoard(id, user);
         return Response.success("게시글이 성공적으로 삭제되었습니다.");
     }
 
@@ -117,7 +117,7 @@ public class SosBoardController {
     @Operation(summary = "사용자 반려동물 조회", description = "사용자의 모든 반려동물 정보를 조회합니다.")
     @Parameter(name = "userId", description = "사용자 ID", example = "1")
     public Response<List<PetResponse>> getUserPets(@PathVariable Long userId) {
-        List<PetResponse> userPets = sosBoardServiceImpl.getUserPets(userId);
+        List<PetResponse> userPets = sosBoardService.getUserPets(userId);
         return Response.success(userPets);
     }
 
@@ -137,7 +137,7 @@ public class SosBoardController {
         int adjustedPage = pageNum - 1;
 
         // 서비스 계층 호출
-        PageResponseDto<SosBoardServiceDto> serviceDtoPageResponse = sosBoardServiceImpl.getUserSosBoardsByNickname(nickname, adjustedPage, size);
+        PageResponseDto<SosBoardServiceDto> serviceDtoPageResponse = sosBoardService.getUserSosBoardsByNickname(nickname, adjustedPage, size);
 
         // SosBoardServiceDto → SosBoardResponseDto 변환
         List<SosBoardResponseDto> responseDtos = serviceDtoPageResponse.content().stream()

@@ -1,16 +1,23 @@
 package com.petmatz.domain.user.entity;
 
+import com.petmatz.domain.aws.vo.S3Imge;
 import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import com.petmatz.domain.global.BaseEntity;
 import com.petmatz.domain.match.exception.MatchException;
 import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
-import com.petmatz.domain.user.constant.*;
+import com.petmatz.domain.user.constant.Gender;
+import com.petmatz.domain.user.constant.LoginRole;
+import com.petmatz.domain.user.constant.LoginType;
+import com.petmatz.domain.user.constant.PreferredSize;
 import com.petmatz.domain.user.info.EditKakaoProfileInfo;
 import com.petmatz.domain.user.info.EditMyProfileInfo;
 import com.petmatz.domain.user.info.UpdateLocationInfo;
 import com.petmatz.domain.user.info.UserInfo;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
@@ -96,15 +103,6 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserToPetMissionEntity> userPetMissions = new ArrayList<>();
 
-    public User checkUUID(List<User> users, Long id) {
-        for (User user : users) {
-            if (user.id.equals(id)) {
-                return user;
-            }
-        }
-        return null;
-    }
-
     public void updatePassword(String newPassword) {
         this.password = newPassword;
     }
@@ -113,8 +111,7 @@ public class User extends BaseEntity {
         this.recommendationCount = recommendationCount;
     }
 
-    public void updateProfile(EditMyProfileInfo info, String resultImgURL) {
-        this.profileImg = resultImgURL;
+    public void updateProfile(EditMyProfileInfo info) {
         this.nickname = info.getNickname();
         this.introduction = info.getIntroduction();
         this.preferredSizes = info.getPreferredSizes();
@@ -176,5 +173,13 @@ public class User extends BaseEntity {
         if (Boolean.FALSE.equals(isRegistered)) {
             this.isRegistered = true;
         }
+    }
+
+    public String updateImgURL(String profileImgURL, S3Imge petImg) {
+        if (!profileImg.equals(profileImgURL)) {
+            profileImg = petImg.uploadURL();
+            return petImg.checkResultImg();
+        }
+        return "";
     }
 }

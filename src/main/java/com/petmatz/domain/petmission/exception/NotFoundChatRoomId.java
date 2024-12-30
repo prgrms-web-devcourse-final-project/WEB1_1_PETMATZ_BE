@@ -1,6 +1,5 @@
 package com.petmatz.domain.petmission.exception;
 
-import com.petmatz.common.exception.BaseErrorCode;
 import com.petmatz.common.exception.DomainException;
 
 public class NotFoundChatRoomId extends DomainException {

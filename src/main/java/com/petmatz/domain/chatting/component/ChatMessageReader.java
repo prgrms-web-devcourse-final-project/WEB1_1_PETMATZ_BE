@@ -1,12 +1,11 @@
 package com.petmatz.domain.chatting.component;
 
-import com.petmatz.domain.chatting.dto.ChatMessageInfo;
 import com.petmatz.domain.chatting.docs.ChatReadStatusDocs;
 import com.petmatz.domain.chatting.docs.ChatRoomDocs;
+import com.petmatz.domain.chatting.dto.ChatMessageInfo;
 import com.petmatz.domain.chatting.utils.ChatUtils;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
-import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -78,7 +77,6 @@ public class ChatMessageReader {
 
         if (lastFetchTimestamp == null) {
             lastFetchTimestamp = LocalDateTime.now();
-            System.out.println(lastFetchTimestamp);
         }
 
         // 기본 Criteria 생성
@@ -95,9 +93,6 @@ public class ChatMessageReader {
                 Aggregation.limit(pageSize) // 한 페이지의 크기
         );
     }
-
-
-
 
     protected Aggregation createQuerySelectChatMessagesPaging(String chatRoomsId,String userEmail,LocalDateTime lastReadTimestamp, int pageNumber, int pageSize) {
         return Aggregation.newAggregation(

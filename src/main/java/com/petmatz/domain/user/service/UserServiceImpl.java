@@ -4,6 +4,7 @@ import com.petmatz.api.user.request.*;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.common.security.utils.JwtProvider;
 import com.petmatz.domain.aws.AwsClient;
+import com.petmatz.domain.aws.vo.S3Imge;
 import com.petmatz.domain.pet.entity.Pet;
 import com.petmatz.domain.pet.repository.PetRepository;
 import com.petmatz.domain.user.entity.*;
@@ -26,7 +27,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -146,24 +146,17 @@ public class UserServiceImpl implements UserService {
             }
 
             //6-1 Img 정제
-            String imgURL;
-            URL uploadURL = awsClient.uploadImg(info.getAccountId(), info.getProfileImg(), "CUSTOM_USER_IMG", null);
-            imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
-            String resultImgURL = String.valueOf(uploadURL);
-            if (info.getProfileImg().startsWith("profile")) {
-                imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + info.getProfileImg() + ".svg";
-                resultImgURL = "";
-            }
+            S3Imge petImg = awsClient.UploadImg(info.getAccountId(), info.getProfileImg(), "CUSTOM_USER_IMG", null);
 
             // 7. 새로운 User 생성 및 저장
-            User user = UserFactory.createNewUser(info, encodedPassword, kakaoRegion.getRegionName(), kakaoRegion.getCodeAsInteger(), imgURL);
+            User user = UserFactory.createNewUser(info, encodedPassword, kakaoRegion.getRegionName(), kakaoRegion.getCodeAsInteger(), petImg.uploadURL());
             userRepository.save(user);
 
             // 8. 인증 엔티티 삭제
             certificationRepository.deleteAllByAccountId(accountId);
 
             // 9. 성공 응답 반환
-            return SignUpResponseDto.success(user.getId(), resultImgURL);
+            return SignUpResponseDto.success(user.getId(), petImg.checkResultImg());
 
         } catch (RuntimeException e) {
             log.error("회원 가입 실패: {}", e.getMessage(), e);
@@ -341,19 +334,14 @@ public class UserServiceImpl implements UserService {
                     .orElseThrow(() -> new IllegalArgumentException("User not found for ID: " + userId));
 
             //6-1 Img 정제
-            String resultImgURL = "";
-            URL uploadURL = awsClient.uploadImg(userEmail, info.getProfileImg(), "CUSTOM_USER_IMG", null);
-            String imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
-            resultImgURL = String.valueOf(uploadURL);
-            if (info.getProfileImg().startsWith("profile")) {
-                imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + "/기본이미지_폴더/" + info.getProfileImg() + ".svg";
-                resultImgURL = "";
-            }
+            S3Imge petImg = awsClient.UploadImg(userEmail, info.getProfileImg(), "CUSTOM_USER_IMG", null);
 
-            user.updateProfile(info, imgURL);
+            // 병합된 DTO를 기반으로 엔티티 생성
+            String resultImg = user.updateImgURL(info.getProfileImg(), petImg);
+            user.updateProfile(info);
 
 //            반환해야 함 아래꺼
-            return EditMyProfileResponseDto.success(resultImgURL);
+            return EditMyProfileResponseDto.success(resultImg);
 
         } catch (Exception e) {
             log.info("프로필 수정 실패: {}", e);

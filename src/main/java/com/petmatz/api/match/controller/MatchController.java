@@ -6,8 +6,6 @@ import com.petmatz.domain.match.dto.response.PaginatedMatchResponse;
 import com.petmatz.domain.match.service.MatchScoreService;
 import com.petmatz.domain.match.service.MatchService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

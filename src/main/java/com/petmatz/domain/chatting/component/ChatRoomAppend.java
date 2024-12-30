@@ -1,7 +1,7 @@
 package com.petmatz.domain.chatting.component;
 
-import com.petmatz.domain.chatting.entity.ChatRoomEntity;
 import com.petmatz.domain.chatting.dto.ChatRoomInfo;
+import com.petmatz.domain.chatting.entity.ChatRoomEntity;
 import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import com.petmatz.domain.chatting.repository.ChatRoomRepository;
 import com.petmatz.domain.user.entity.User;

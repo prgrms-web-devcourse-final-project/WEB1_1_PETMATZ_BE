@@ -4,7 +4,6 @@ import com.petmatz.common.constants.ChatMessageMsgType;
 import com.petmatz.domain.chatting.dto.ChatMessageInfo;
 import com.petmatz.domain.chatting.dto.ChatMessagePetMissionInfo;
 import com.petmatz.domain.petmission.dto.PetMissionInfo;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 import java.util.List;

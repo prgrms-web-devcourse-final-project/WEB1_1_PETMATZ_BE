@@ -15,8 +15,6 @@ public enum Prefix {
 
     public static String returnKoreaName(String name) {
         for (Prefix value : Prefix.values()) {
-            System.out.println("value.name() : " + value.name());
-            System.out.println("name : " + name);
             if (value.name().equals(name)) {
                 return value.koreaName;
             }

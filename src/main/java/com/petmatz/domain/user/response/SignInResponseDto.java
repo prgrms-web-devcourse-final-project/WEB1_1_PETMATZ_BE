@@ -1,6 +1,9 @@
 package com.petmatz.domain.user.response;
 
-import com.petmatz.domain.user.constant.*;
+import com.petmatz.domain.user.constant.Gender;
+import com.petmatz.domain.user.constant.LoginRole;
+import com.petmatz.domain.user.constant.LoginType;
+import com.petmatz.domain.user.constant.PreferredSize;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.user.common.LogInResponseDto;
 import com.petmatz.user.common.ResponseCode;

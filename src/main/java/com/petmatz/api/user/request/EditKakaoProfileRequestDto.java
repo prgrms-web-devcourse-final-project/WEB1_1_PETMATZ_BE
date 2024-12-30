@@ -3,7 +3,6 @@ package com.petmatz.api.user.request;
 import com.petmatz.domain.user.constant.Gender;
 import com.petmatz.domain.user.constant.PreferredSize;
 import com.petmatz.domain.user.info.EditKakaoProfileInfo;
-import com.petmatz.domain.user.info.EditMyProfileInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

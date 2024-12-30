@@ -1,6 +1,5 @@
 package com.petmatz.domain.user.info;
 
-import jakarta.persistence.Column;
 import lombok.Builder;
 
 @Builder

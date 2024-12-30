@@ -4,7 +4,7 @@ import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.chatting.docs.ChatReadStatusDocs;
 import com.petmatz.domain.chatting.docs.ChatRoomDocs;
 import com.petmatz.domain.chatting.docs.ChatRoomMetadataDocs;
-import com.petmatz.domain.chatting.dto.*;
+import com.petmatz.domain.chatting.dto.ChatMessageInfo;
 import com.petmatz.domain.chatting.utils.ChatUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -46,8 +46,6 @@ public class ChatMessageUpdater {
     private ChatRoomMetadataDocs updateChatRoomMetaDataDocs(ChatMessageInfo chatMessageInfo, String chatRoomId) {
         return ChatRoomMetadataDocs.updateChatRoomMetaData(chatMessageInfo, chatRoomId);
     }
-
-
 
 
 }

@@ -1,6 +1,5 @@
 package com.petmatz.common.security.utils;
 
-import com.petmatz.domain.user.entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -35,7 +34,7 @@ public class JwtProvider {
      */
     public String create(Long userId, String accountId) {
         // 토큰 만료 시간 설정 (1시간 후)
-        Date expireDate = Date.from(Instant.now().plus(1, ChronoUnit.HOURS));
+        Date expireDate = Date.from(Instant.now().plus(24, ChronoUnit.HOURS));
 
         // 비밀 키 생성
         Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
