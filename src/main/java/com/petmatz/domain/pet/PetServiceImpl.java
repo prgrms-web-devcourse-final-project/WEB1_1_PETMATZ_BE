@@ -36,6 +36,7 @@ public class PetServiceImpl implements PetService{
     private final PetRepository repository;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String uploadDir = System.getProperty("user.dir") + "/uploads/";
 
     // 동물 등록 정보를 외부 API로 가져오는 메서드
     public PetServiceDto fetchPetInfo(String dogRegNo, String ownerNm) {

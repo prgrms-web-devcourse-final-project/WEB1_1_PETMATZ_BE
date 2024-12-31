@@ -23,9 +23,8 @@ public class TotalScoreTestController {
     }
 
     @PostMapping("/get-users")
-    public Response<List<UserResponse>> getUsersWithinBoundingBox(@RequestBody UserIdRequest userId) {
-        List<UserResponse> usersWithinBoundingBox = matchScoreService.getUsersWithinBoundingBox(userId.userId());
-        return Response.success(usersWithinBoundingBox);
+    public List<UserResponse> getUsersWithinBoundingBox(@RequestBody UserIdRequest userId) {
+        return matchScoreService.getUsersWithinBoundingBox(userId.userId());
     }
 }
 
