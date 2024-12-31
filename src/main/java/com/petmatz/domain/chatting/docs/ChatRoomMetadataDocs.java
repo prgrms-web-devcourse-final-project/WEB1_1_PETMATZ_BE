@@ -30,6 +30,9 @@ public class ChatRoomMetadataDocs {
         this.unreadCount = unreadCount;
     }
 
+
+
+
     public static ChatRoomMetadataDocs initChatRoomMetaData(ChatRoomInfo chatRoomInfo, long chatRoomId) {
         return ChatRoomMetadataDocs.builder()
                 .room_id(String.valueOf(chatRoomId))

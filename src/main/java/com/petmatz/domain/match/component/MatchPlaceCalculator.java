@@ -1,14 +1,14 @@
 package com.petmatz.domain.match.component;
 
 import com.petmatz.domain.match.dto.request.DistanceRequest;
-import com.petmatz.domain.match.dto.response.UserResponse;
 import com.petmatz.domain.match.exception.MatchException;
+import com.petmatz.domain.match.dto.response.UserResponse;
 import com.petmatz.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import static com.petmatz.domain.match.exception.MatchErrorCode.INVALID_MATCH_DATA;
+import static com.petmatz.domain.match.exception.MatchErrorCode.*;
 
 @Service
 @Component

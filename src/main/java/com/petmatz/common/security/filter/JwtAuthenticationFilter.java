@@ -1,8 +1,8 @@
 package com.petmatz.common.security.filter;
 
-import com.petmatz.common.security.utils.JwtProvider;
 import com.petmatz.domain.user.constant.LoginRole;
 import com.petmatz.domain.user.entity.User;
+import com.petmatz.common.security.utils.JwtProvider;
 import com.petmatz.domain.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

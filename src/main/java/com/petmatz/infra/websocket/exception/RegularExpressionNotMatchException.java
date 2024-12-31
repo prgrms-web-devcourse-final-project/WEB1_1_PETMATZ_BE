@@ -1,5 +1,6 @@
 package com.petmatz.infra.websocket.exception;
 
+import com.petmatz.common.exception.BaseErrorCode;
 import com.petmatz.common.exception.InfraException;
 
 public class RegularExpressionNotMatchException extends InfraException {

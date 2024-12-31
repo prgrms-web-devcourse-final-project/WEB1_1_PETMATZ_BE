@@ -1,6 +1,5 @@
 package com.petmatz.domain.pet.entity;
 
-import com.petmatz.domain.aws.vo.S3Imge;
 import com.petmatz.domain.global.BaseEntity;
 import com.petmatz.domain.pet.Gender;
 import com.petmatz.domain.pet.Size;
@@ -8,10 +7,7 @@ import com.petmatz.domain.pet.dto.PetUpdateInfo;
 import com.petmatz.domain.petmission.entity.PetToPetMissionEntity;
 import com.petmatz.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
@@ -71,25 +67,22 @@ public class Pet extends BaseEntity {
     @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PetToPetMissionEntity> petToPetMissions = new ArrayList<>();
 
-    public String updateImgURL(String profileImgURL, S3Imge petImg) {
-        if (!profileImg.equals(profileImgURL)) {
-            profileImg = petImg.uploadURL();
-            return petImg.checkResultImg();
-        }
-        return "";
+    public boolean checkImgURL(String Img) {
+        return profileImg.equals(Img);
     }
 
     public void addUser(User userData) {
         user = userData;
     }
 
-    public void updatePetInfo(PetUpdateInfo petUpdateInfo) {
+    public void updatePetInfo(PetUpdateInfo petUpdateInfo, String imgUrl) {
         age = petUpdateInfo.age();
         breed = petUpdateInfo.breed();
         comment = petUpdateInfo.comment();
         gender = petUpdateInfo.gender();
         neuterYn = petUpdateInfo.neuterYn();
         petName = petUpdateInfo.petName();
+        profileImg = imgUrl;
         size = petUpdateInfo.size();
         temperament = petUpdateInfo.temperament();
     }

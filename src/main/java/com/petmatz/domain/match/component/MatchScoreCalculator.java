@@ -3,7 +3,6 @@ package com.petmatz.domain.match.component;
 import com.petmatz.domain.match.dto.response.MatchScoreResponse;
 import com.petmatz.domain.match.dto.response.UserResponse;
 import com.petmatz.domain.pet.PetService;
-import com.petmatz.domain.pet.component.PetReader;
 import com.petmatz.domain.user.entity.User;
 import com.petmatz.infra.redis.component.RedisMatchComponent;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +18,8 @@ public class MatchScoreCalculator {
     private final MatchCareCalculator matchCareCalculator;
     private final MatchSizeCalculator matchSizeCalculator;
     private final MatchMbtiCalculator matchMbtiCalculator;
+    private final PetService petService;
     private final RedisMatchComponent matchComponent;
-    private final PetReader petReader;
 
     public MatchScoreResponse calculateScore(User user, UserResponse targetUser) {
         double distance = matchPlaceCalculator.calculateDistanceOnly(user, targetUser);
@@ -28,7 +27,7 @@ public class MatchScoreCalculator {
         double careScore = matchCareCalculator.calculateCareScore(targetUser.isCareAvailable());
         double sizeScore = matchSizeCalculator.calculateDogSizeScore(user.getId(), targetUser.preferredSize());
         double mbtiScore = matchMbtiCalculator.calculateMbtiAverageScore(
-                targetUser.mbti(), petReader.getTemperamentsByUserId(user.getId()));
+                targetUser.mbti(), petService.getTemperamentsByUserId(user.getId()));
 
         double totalScore = distanceScore + careScore + sizeScore + mbtiScore;
 

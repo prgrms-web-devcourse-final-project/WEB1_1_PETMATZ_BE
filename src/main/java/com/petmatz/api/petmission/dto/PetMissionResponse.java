@@ -1,7 +1,10 @@
 package com.petmatz.api.petmission.dto;
 
 import com.petmatz.domain.petmission.dto.PetMissionData;
+import com.petmatz.domain.petmission.dto.PetMissionUserInfo;
 import lombok.Builder;
+
+import java.util.List;
 
 @Builder
 public record PetMissionResponse(

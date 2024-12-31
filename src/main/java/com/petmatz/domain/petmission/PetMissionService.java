@@ -2,7 +2,6 @@ package com.petmatz.domain.petmission;
 
 import com.petmatz.api.petmission.dto.PetMissionUpdateRequest;
 import com.petmatz.domain.aws.AwsClient;
-import com.petmatz.domain.aws.vo.S3Imge;
 import com.petmatz.domain.pet.entity.Pet;
 import com.petmatz.domain.pet.repository.PetRepository;
 import com.petmatz.domain.petmission.component.*;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ public class PetMissionService {
 
         List<Pet> pets = petRepository.findPetListByPetId(petMissionInfo.petId());
         if (pets.isEmpty()) {
-            throw new IllegalArgumentException("해당 Pet ID에 대한 펫을 찾을 수 없습니다");
+            throw new IllegalArgumentException("값없음");
         }
 
         List<PetMissionAskEntity> petMissionAskEntityList = petMissionInfo.petMissionAskInfo()
@@ -115,15 +115,21 @@ public class PetMissionService {
         PetMissionAskEntity petMissionAskEntity = petMissionReader.selectById(Long.valueOf(petMissionCommentInfo.askId()));
         if (petMissionAskEntity.getMissionAnswer() != null) {
             throw ExistPetMissionAnswerException.EXCEPTION;
+
         }
-
-        S3Imge petImg = awsClient.UploadImg(userEmail, petMissionCommentInfo.imgURL(), "CARE_HISTORY_IMG", String.valueOf(petMissionAskEntity.getId()));
-
+        String resultImgURL = "";
+        String imgURL = "";
+        if (!petMissionCommentInfo.imgURL().equals("")) {
+            URL uploadURL = awsClient.uploadImg(userEmail, petMissionCommentInfo.imgURL(), "CARE_HISTORY_IMG", String.valueOf(petMissionAskEntity.getId()));
+            imgURL = uploadURL.getProtocol() + "://" + uploadURL.getHost() + uploadURL.getPath();
+            resultImgURL = String.valueOf(uploadURL);
+        }
         //6-1 Img 정제
-        PetMissionAnswerEntity petMissionAnswerEntity = petMissionInserter.insertPetMissionAnswer(PetMissionAnswerEntity.of(petMissionCommentInfo, petImg.uploadURL()));
+        PetMissionAnswerEntity petMissionAnswerEntity = petMissionInserter.insertPetMissionAnswer(PetMissionAnswerEntity.of(petMissionCommentInfo, imgURL));
         petMissionAskEntity.addPetMissionAnswer(petMissionAnswerEntity);
-        return petImg.checkResultImg();
+        return resultImgURL;
     }
+
 
     public PetMissionAnswerInfo selectPetMissionAnswerInfo(String askId) {
         PetMissionAskEntity petMissionAskEntity = petMissionAskReader.selectPetMissionAskInfo(askId);

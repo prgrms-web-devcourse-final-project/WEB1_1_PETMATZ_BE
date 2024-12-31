@@ -36,6 +36,8 @@ public class ChatController {
     private final UserServiceImpl userService;
     private final ChatRoomService chatRoomService;
 
+
+    //TODO 메세지 전송 ( 구독한 쪽으로 )
     @MessageMapping("/chat")
     public void sendPrivateMessage(ChatMessageRequest chatMessageRequest) {
         ChatMessageInfo chatMessageInfo = chatMessageRequest.of();
@@ -44,6 +46,11 @@ public class ChatController {
         simpMessagingTemplate.convertAndSend(destination, chatMessageInfo);
     }
 
+    // TODO 멍멍이 부탁등록 실시간 API 하나 파기
+    // TODO 멍멍이 부탁같은 경우 채팅 DTO랑 똑같이 만들기
+
+    //TODO 메세지 읽음 처리 ( 구독한 쪽으로 ), senderId, chatRoomId
+    //TDO 상대편 마지막 읽음 시간 재측정,
     @MessageMapping("/chat/{chatRoomId}/read")
     public void sendReadStatus(@Payload ChatReadStatusDirect chatReadStatusDirect,
                                @DestinationVariable String chatRoomId) {
@@ -52,6 +59,9 @@ public class ChatController {
     }
 
 
+    //TODO sender는 Token 파싱해서 사용, Pagin적용해서 보내기
+    //TODO 토큰으로 해당 채팅방에 사용자가 있는지 판단
+    //TDO readStatus, enderId, receverId
     @GetMapping("/chat/message")
     @Operation(summary = "메세지 내역 긁어오기", description = "채팅방의 메세지 내역을 긁어오는 API")
     @Parameters({
@@ -71,6 +81,8 @@ public class ChatController {
         Page<ChatMessageInfo> chatMessageInfos = chatService.selectMessage(receiverEmail, chatRoomId, startPage, pageSize, lastFetchTimestamp);
         UserInfo userInfo = userService.selectUserInfo(receiverEmail);
 
+
+        log.info("chatMessageInfos.getContent() : " + chatMessageInfos.getContent());
         return Response.success(ChatMessageResponse.of(
                 chatMessageInfos.getContent()
                         .stream().map(ChatMessage::of).toList(),

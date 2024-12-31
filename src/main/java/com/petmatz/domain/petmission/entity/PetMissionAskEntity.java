@@ -1,10 +1,11 @@
 package com.petmatz.domain.petmission.entity;
 
+import com.petmatz.domain.petmission.dto.PetMissionCommentInfo;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

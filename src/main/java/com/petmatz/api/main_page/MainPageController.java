@@ -4,6 +4,7 @@ import com.petmatz.api.global.dto.Response;
 import com.petmatz.api.main_page.dto.MainPagePetMissionResponse;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.petmission.PetMissionService;
+import com.petmatz.domain.petmission.dto.UserToPetMissionListInfo;
 import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;

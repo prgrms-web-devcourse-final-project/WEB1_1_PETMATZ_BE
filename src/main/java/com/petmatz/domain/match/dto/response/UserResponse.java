@@ -4,8 +4,7 @@ import com.petmatz.domain.match.exception.MatchException;
 
 import java.util.List;
 
-import static com.petmatz.domain.match.exception.MatchErrorCode.INSUFFICIENT_TARGET_LATITUDE_DATA;
-import static com.petmatz.domain.match.exception.MatchErrorCode.INSUFFICIENT_TARGET_LONGITUDE_DATA;
+import static com.petmatz.domain.match.exception.MatchErrorCode.*;
 
 public record UserResponse (
         Long id,

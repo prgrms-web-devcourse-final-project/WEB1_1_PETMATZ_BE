@@ -3,19 +3,14 @@ package com.petmatz.domain.chatting;
 import com.petmatz.common.security.utils.JwtExtractProvider;
 import com.petmatz.domain.chatting.component.*;
 import com.petmatz.domain.chatting.docs.ChatReadStatusDocs;
-import com.petmatz.domain.chatting.dto.ChatRoomInfo;
-import com.petmatz.domain.chatting.dto.ChatRoomMetaDataInfo;
-import com.petmatz.domain.chatting.dto.IChatUserInfo;
+import com.petmatz.domain.chatting.dto.*;
 import com.petmatz.domain.chatting.entity.ChatRoomEntity;
 import com.petmatz.domain.chatting.entity.UserToChatRoomEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -115,6 +110,7 @@ public class ChatRoomService {
         if (userEmailList.isEmpty()) {
             throw new NullPointerException("해당 채팅방이 존재하지 않습니다.");
         }
-        return userEmail.equals(userEmailList.get(0)) ? userEmailList.get(1) : userEmailList.get(0);
+        List<String> list = userEmailList;
+        return userEmail.equals(list.get(0)) ? list.get(1) : list.get(0);
     }
 }

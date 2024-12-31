@@ -33,10 +33,9 @@ public class WebSecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final DefaultOAuth2UserService oAuth2UserService;
     private final OAuthSuccessHandler oAuthSuccessHandler;
-    private final FailedAuthenticationEntryPoint failedAuthenticationEntryPoint;
 
     @Bean
-    public SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
+    protected SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
 
         httpSecurity
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정
@@ -69,7 +68,7 @@ public class WebSecurityConfig {
                         .successHandler(oAuthSuccessHandler) // OAuth2 성공 핸들러
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .authenticationEntryPoint(failedAuthenticationEntryPoint)) // 인증 실패 핸들러
+                        .authenticationEntryPoint(new FailedAuthenticationEntryPoint())) // 인증 실패 핸들러
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // JWT 필터 추가
 
         return httpSecurity.build();
@@ -89,3 +88,14 @@ public class WebSecurityConfig {
     }
 }
 
+class FailedAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+        System.out.println("request.getRequestURI() :: " + request.getRequestURI());
+        System.out.println("request.getQueryString() :: " + request.getQueryString());
+        response.setContentType("application/json");
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403 상태 반환
+        response.getWriter().write("{\"code\":\"NP\",\"message\":\"No Permission.\"}"); // 인증 실패 메시지
+    }
+}

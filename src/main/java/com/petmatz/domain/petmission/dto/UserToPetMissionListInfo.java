@@ -6,9 +6,11 @@ import com.petmatz.domain.petmission.entity.PetMissionAskEntity;
 import com.petmatz.domain.petmission.entity.PetMissionEntity;
 import com.petmatz.domain.petmission.entity.PetToPetMissionEntity;
 import com.petmatz.domain.petmission.entity.UserToPetMissionEntity;
+import com.petmatz.domain.user.entity.User;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Builder

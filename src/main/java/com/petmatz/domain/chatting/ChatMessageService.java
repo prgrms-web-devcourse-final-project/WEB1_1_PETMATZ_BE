@@ -2,10 +2,14 @@ package com.petmatz.domain.chatting;
 
 import com.petmatz.domain.chatting.component.ChatMessageReader;
 import com.petmatz.domain.chatting.component.ChatMessageUpdater;
-import com.petmatz.domain.chatting.docs.ChatReadStatusDocs;
+
 import com.petmatz.domain.chatting.dto.ChatMessageInfo;
 import com.petmatz.domain.chatting.dto.ChatMessagePetMissionInfo;
+
 import com.petmatz.domain.petmission.dto.PetMissionData;
+import com.petmatz.domain.user.repository.UserRepository;
+import com.petmatz.domain.chatting.docs.ChatReadStatusDocs;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,6 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ChatMessageService {
 
+    private final UserRepository userRepository;
     private final ChatMessageReader chatMessageReader;
     private final ChatMessageUpdater chatMessageUpdater;
 

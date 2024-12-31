@@ -1,5 +1,6 @@
 package com.petmatz.api.user.request;
 
+import com.petmatz.domain.user.info.RepasswordInfo;
 import com.petmatz.domain.user.info.UpdateLocationInfo;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

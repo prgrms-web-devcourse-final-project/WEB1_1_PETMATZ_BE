@@ -1,7 +1,7 @@
 package com.petmatz.api.pet.dto;
 
-import com.petmatz.domain.pet.dto.PetInf;
 import com.petmatz.domain.pet.entity.Pet;
+import com.petmatz.domain.pet.dto.PetInf;
 import com.petmatz.domain.sosboard.dto.SosBoardPetDto;
 
 public record PetResponse(

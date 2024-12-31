@@ -1,5 +1,6 @@
 package com.petmatz.domain.global;
 
+import com.petmatz.domain.pet.dto.PetSaveInfo;
 import lombok.Builder;
 
 @Builder
