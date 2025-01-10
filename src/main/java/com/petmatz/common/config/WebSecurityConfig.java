@@ -45,10 +45,12 @@ public class WebSecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 비활성화 (JWT 사용)
                 .authorizeHttpRequests(authRequests -> authRequests
                         .requestMatchers("/", "/api/auth/**", "/oauth2/**").permitAll()
+                        .requestMatchers("/api/v1/chat").permitAll() // 테스트용
                         .requestMatchers(HttpMethod.GET, "/api/sosboard").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/sosboard/user/{nickname}").permitAll()
                         .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/login.html").permitAll()
                         //스웨거 모든 접근 허용
                         .requestMatchers(
                                 "/swagger-ui/**",   

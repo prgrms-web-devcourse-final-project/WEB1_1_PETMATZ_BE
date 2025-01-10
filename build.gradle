@@ -84,6 +84,10 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	implementation 'com.google.firebase:firebase-admin:9.1.1'
+	implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names:2.13.0'
+
 }
 
 tasks.named('test') {
