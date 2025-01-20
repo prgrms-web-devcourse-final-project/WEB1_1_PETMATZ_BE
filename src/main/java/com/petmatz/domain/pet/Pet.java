@@ -1,6 +1,7 @@
 package com.petmatz.domain.pet;
 
 import com.petmatz.domain.global.BaseEntity;
+import com.petmatz.domain.pet.dto.PetServiceDto;
 import com.petmatz.domain.petmission.entity.PetToPetMissionEntity;
 import com.petmatz.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -72,5 +73,36 @@ public class Pet extends BaseEntity {
         user = null;
     }
 
+    public static Pet createFromDto(User user, PetServiceDto dto, String profileImg) {
+        return Pet.builder()
+                .user(user)
+                .dogRegNo(dto.dogRegNo())
+                .petName(dto.petName())
+                .breed(dto.breed())
+                .gender(Gender.fromString(dto.gender()))
+                .neuterYn(dto.neuterYn())
+                .size(Size.fromString(dto.size()))
+                .age(dto.age())
+                .temperament(dto.temperament())
+                .preferredWalkingLocation(dto.preferredWalkingLocation())
+                .profileImg(profileImg)
+                .comment(dto.comment())
+                .build();
+    }
+
+    public void updateFromDto(PetServiceDto dto, String profileImg) {
+        this.petName = dto.petName() != null ? dto.petName() : this.petName;
+        this.breed = dto.breed() != null ? dto.breed() : this.breed;
+        this.gender = dto.gender() != null ? Gender.fromString(dto.gender()) : this.gender;
+        this.neuterYn = dto.neuterYn() != null ? dto.neuterYn() : this.neuterYn;
+        this.size = dto.size() != null ? Size.fromString(dto.size()) : this.size;
+        this.age = dto.age() != null ? dto.age() : this.age;
+        this.temperament = dto.temperament() != null ? dto.temperament() : this.temperament;
+        this.preferredWalkingLocation = dto.preferredWalkingLocation() != null ? dto.preferredWalkingLocation() : this.preferredWalkingLocation;
+        this.profileImg = profileImg != null ? profileImg : this.profileImg;
+        this.comment = dto.comment() != null ? dto.comment() : this.comment;
+    }
 }
+
+
 
