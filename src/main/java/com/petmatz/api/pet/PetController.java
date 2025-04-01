@@ -54,7 +54,7 @@ public class PetController {
     @PutMapping("/{id}")
     @Operation(summary = "반려동물 정보 수정", description = "기존 반려동물 정보를 수정합니다.")
     @Parameter(name = "id", description = "반려동물 ID", example = "1")
-    public ResponseEntity<Response<PetUpdateResponse>> updatePet(@PathVariable Long id, @RequestBody PetRequest updatedRequest) {
+    public ResponseEntity<Response<PetUpdateResponse>> updatePet(@PathVariable Long id, @RequestBody PetRequest updatedRequest) throws MalformedURLException {
         User user = getAuthenticatedUser();
         PetServiceDto updatedServiceDto = PetServiceDto.of(updatedRequest);
         PetUpdateResponse petUpdateResponse = petServiceImpl.updatePet(id, user, updatedServiceDto);
